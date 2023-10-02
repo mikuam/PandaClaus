@@ -1,4 +1,4 @@
-﻿namespace PandaClaus.LettersApi;
+﻿namespace PandaClaus.Web;
 
 public class Letter
 {

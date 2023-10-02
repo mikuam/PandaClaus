@@ -1,3 +1,5 @@
+namespace PandaClaus.Web;
+
 public class LetterAssignment
 {
     public int RowNumber { get; set; }

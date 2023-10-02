@@ -31,5 +31,5 @@ packages
 *ncrunch*
 *.vs
 
-/PandaClaus.LettersApi/appsettings.Development.json
-/PandaClaus.LettersApi/client_secrets.json
+*/appsettings.json
+*/client_secrets.json

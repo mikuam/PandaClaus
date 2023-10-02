@@ -4,7 +4,7 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
 
-namespace PandaClaus.LettersApi;
+namespace PandaClaus.Web;
 
 public class GoogleSheetsClient
 {
@@ -78,7 +78,7 @@ public class GoogleSheetsClient
             Reason = row[8].ToString() ?? string.Empty,
             ImageUrls = string.IsNullOrWhiteSpace(row[10].ToString())
                 ? new List<string>()
-                : row[10].ToString()!.Split(',').Select(url => url.Trim()).ToList(),
+                : row[10].ToString()!.Split(',').Select(url => url.Trim().Replace("open?", "uc?")).ToList(),
 
             // optional cells
             IsHidden = !string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 12)),
