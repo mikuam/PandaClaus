@@ -10,12 +10,15 @@ public class GoogleSheetsClient
 {
     private readonly string _sheetName;
     private readonly string _spreadsheetId;
+    private readonly string _googleSeetsCredentials;
     private readonly SheetsService _sheetsService;
 
     public GoogleSheetsClient(IConfiguration configuration)
     {
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
+
+        _googleSeetsCredentials = configuration["GoogleSheetsCredentials"]!;
 
         var credential = GetCredentialsFromFile();
         _sheetsService = new SheetsService(new BaseClientService.Initializer()
@@ -104,16 +107,17 @@ public class GoogleSheetsClient
 
     private GoogleCredential GetCredentialsFromFile()
     {
-        using var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read);
-        var credential = GoogleCredential.FromStream(stream).CreateScoped(SheetsService.Scope.Spreadsheets);
-        return credential;
+        var data = Convert.FromBase64String(_googleSeetsCredentials);
+        var credentialsJson = System.Text.Encoding.UTF8.GetString(data);
+        
+        return GoogleCredential.FromJson(credentialsJson).CreateScoped(SheetsService.Scope.Spreadsheets);
     }
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
         var range = $"{_sheetName}!N{assignment.RowNumber}:R{assignment.RowNumber}";
 
-        var valuesToUpdate = new List<object>{ "tak", assignment.Name, assignment.Email, assignment.PhoneNumber, assignment.Description };
+        var valuesToUpdate = new List<object> { "tak", assignment.Name, assignment.Email, assignment.PhoneNumber, assignment.Description };
         var valueRange = new ValueRange
         {
             Values = new List<IList<object>> { valuesToUpdate }

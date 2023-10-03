@@ -30,6 +30,3 @@ _ReSharper*/
 packages
 *ncrunch*
 *.vs
-
-*/appsettings.json
-*/client_secrets.json
