@@ -3,7 +3,8 @@ using PandaClaus.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.json", false, true)
+    .AddEnvironmentVariables()
     .Build();
 
 builder.Services.AddSingleton(configuration);
