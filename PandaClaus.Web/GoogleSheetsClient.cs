@@ -34,7 +34,7 @@ public class GoogleSheetsClient
         return MapToLetters(response.Values);
     }
 
-    public async Task<Letter> FetchLetter(int rowNumber)
+    public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
         var range = $"{_sheetName}!A{rowNumber}:R{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
@@ -109,7 +109,7 @@ public class GoogleSheetsClient
         return credential;
     }
 
-    public async Task AssignLetter(LetterAssignment assignment)
+    public async Task AssignLetterAsync(LetterAssignment assignment)
     {
         var range = $"{_sheetName}!N{assignment.RowNumber}:R{assignment.RowNumber}";
 
