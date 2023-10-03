@@ -12,16 +12,9 @@ public class GoogleSheetsClient
     private readonly string _spreadsheetId;
     private readonly string _googleSeetsCredentials;
     private readonly SheetsService _sheetsService;
-    private readonly ILogger<GoogleSheetsClient> _logger;
 
-    public GoogleSheetsClient(IConfiguration configuration, ILogger<GoogleSheetsClient> logger)
+    public GoogleSheetsClient(IConfiguration configuration)
     {
-        _logger = logger;
-
-        _logger.LogInformation($"SpreadsheetId: {configuration["SpreadsheetId"]}");
-        _logger.LogInformation($"SheetName: {configuration["SheetName"]}");
-        _logger.LogInformation($"GoogleSheetsCredentials: {configuration["GoogleSheetsCredentials"]}");
-
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
 
