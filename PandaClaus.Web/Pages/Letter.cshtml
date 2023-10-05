@@ -9,6 +9,11 @@
         <div class="container">
             <div class="row g-5 align-items-center">
                 <h1 class="mb-4">@Model.Letter.ChildenNamesAndAges</h1>
+                
+                @if (Model.Letter.IsAssigned)
+                {
+                    <p id="letter-reserved"><i class="fa fa-times text-primary me-3"></i>List zarezerwowany</p>
+                }
 
                 <div class="col-lg-12 wow fadeIn" data-wow-delay="0.1s">
                     <div class="overflow-hidden carousel-background p-5 pe-0">
@@ -42,13 +47,8 @@
 
                 <div class="col-lg-12 wow fadeIn" data-wow-delay="0.5s">
                     <p class="mb-4">@Model.Letter.Reason</p>
-                    @if (Model.Letter.IsAssigned)
+                    @if (!Model.Letter.IsAssigned)
                     {
-                        <p><i class="fa fa-times text-primary me-3"></i>Zarezerwowane</p>
-                    }
-                    else
-                    {
-                        <p><i class="fa fa-check text-primary me-3"></i>Dostępne</p>
                         <hr/>
                         <h3>Zarezerwuj list</h3>
                         <form method="post">
