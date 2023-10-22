@@ -16,7 +16,7 @@
                 }
 
                 <div class="col-lg-12 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="overflow-hidden carousel-background p-5 pe-0">
+                    <div class="overflow-hidden carousel-background p-5 pe-0 carousel-width">
                         <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-indicators">
                                 @for (int i = 0; i < Model.Letter.ImageUrls.Count(); i++)
@@ -28,10 +28,12 @@
                                 @foreach (var imageUrl in Model.Letter.ImageUrls)
                                 {
                                     <div class="carousel-item carousel-big-image @(Model.Letter.ImageUrls.First() == imageUrl ? "active" : "")">
-                                        <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
+                                        <a href="@imageUrl" target="_blank">
+                                            <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
+                                        </a>
+                                        
                                     </div>
                                 }
-                                )
                             </div>
                             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
