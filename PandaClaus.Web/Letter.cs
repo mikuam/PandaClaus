@@ -13,7 +13,7 @@ public class Letter
     public string Reason { get; set; }
     public List<string> ImageUrls { get; set; }
 
-    public bool IsHidden { get; set; }
+    public bool IsVisible { get; set; }
     public bool IsAssigned { get; set; }
     public string AssignedTo { get; set; }
     public string AssignedToEmail { get; set; }

@@ -13,6 +13,16 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Letters = await _client.FetchLetters();
+        var result = (await _client.FetchLetters()).Where(l => l.IsVisible).ToList();
+        result.ForEach(l => l.Reason = TrimLength(l.Reason));
+        Letters = result;
+    }
+
+    private string TrimLength(string text)
+    {
+        if (text.Length > 130)
+            return text.Substring(0, 130) + "...";
+
+        return text;
     }
 }

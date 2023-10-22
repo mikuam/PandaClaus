@@ -84,7 +84,7 @@ public class GoogleSheetsClient
                 : row[10].ToString()!.Split(',').Select(url => url.Trim().Replace("open?", "uc?")).ToList(),
 
             // optional cells
-            IsHidden = !string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 12)),
+            IsVisible = string.Equals(GetCellOrEmptyString(row, 12), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             IsAssigned = !string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 13)),
             AssignedTo = GetCellOrEmptyString(row, 14),
             AssignedToEmail = GetCellOrEmptyString(row, 15),
