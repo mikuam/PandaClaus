@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.0" />
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.62.0.3148" />
   </ItemGroup>
 

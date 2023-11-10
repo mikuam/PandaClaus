@@ -1,18 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace PandaClaus.Web.Pages;
 public class LetterFormModel : PageModel
 {
     private readonly GoogleSheetsClient _sheetsClient;
+    private readonly BlobClient _blobClient;
 
     [BindProperty]
     [Required]
     public string ParentName { get; set; }
-
-    [BindProperty]
-    public string CompanyName { get; set; }
 
     [BindProperty]
     [Required]
@@ -42,9 +42,10 @@ public class LetterFormModel : PageModel
     [Required]
     public List<IFormFile> LetterPhotos { get; set; }
 
-    public LetterFormModel(GoogleSheetsClient sheetsClient)
+    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient)
     {
         _sheetsClient = sheetsClient;
+        _blobClient = blobClient;
     }
 
     public async Task OnGetAsync()
@@ -54,6 +55,8 @@ public class LetterFormModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var photoIds = await _blobClient.UploadPhotos(LetterPhotos);
+
         var letter = new Letter
         {
             Number = "X",
@@ -64,34 +67,21 @@ public class LetterFormModel : PageModel
             PaczkomatCode = PaczkomatCode,
             ChildAge = ChildAge,
             Description = Description,
-            ImageIds = LetterPhotos.Select(p => p.FileName).ToList(),
+            ImageIds = photoIds,
             Added = DateTime.Now,
             IsVisible = false
         };
 
-        await _sheetsClient.AddLetter(letter);
+        var rowNumber = await _sheetsClient.AddLetter(letter);
 
         /*
-        var rowNumber = int.Parse(Request.Form["RowNumber"]!);
-
-        var letter = await _client.FetchLetterAsync(rowNumber);
-        if (!letter.IsAssigned)
-        {
-            await _client.AssignLetterAsync(new LetterAssignment
-            {
-                RowNumber = rowNumber,
-                Name = Request.Form["Name"],
-                Email = Request.Form["Email"],
-                PhoneNumber = Request.Form["Phone"],
-            });
-        }
 
         await _emailSender.SendConfirmationEmail(rowNumber);
         
         return RedirectToPage($"./Confirmation", new { rowNumber});
         */
 
-        return RedirectToPage($"./");
+        return RedirectToPage($"./LetterAddedConfirmation", new { rowNumber });
     }
 }
 

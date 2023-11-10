@@ -10,6 +10,7 @@ IConfiguration configuration = new ConfigurationBuilder()
 
 builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<GoogleSheetsClient>();
+builder.Services.AddScoped<BlobClient>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.Configure<FormOptions>(options =>
 {

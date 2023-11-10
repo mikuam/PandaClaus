@@ -11,12 +11,14 @@ public class GoogleSheetsClient
     private readonly string _sheetName;
     private readonly string _spreadsheetId;
     private readonly string _googleSeetsCredentials;
+    private readonly string _blobUrl;
     private readonly SheetsService _sheetsService;
 
     public GoogleSheetsClient(IConfiguration configuration)
     {
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
+        _blobUrl = configuration["BlobUrl"]!;
 
         _googleSeetsCredentials = configuration["GoogleSheetsCredentials"]!;
 
@@ -47,13 +49,13 @@ public class GoogleSheetsClient
         return letter;
     }
 
-    public async Task AddLetter(Letter letter)
+    public async Task<int> AddLetter(Letter letter)
     {
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
         var range = $"{_sheetName}!A{firstEmptyRow}:L{firstEmptyRow}";
-        var valuesToUpdate = new List<object>
+        var valuesToAdd = new List<object>
         {
             letter.Number,
             letter.ParentName,
@@ -70,12 +72,14 @@ public class GoogleSheetsClient
         };
         var valueRange = new ValueRange
         {
-            Values = new List<IList<object>> { valuesToUpdate }
+            Values = new List<IList<object>> { valuesToAdd }
         };
 
         var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
         updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await updateRequest.ExecuteAsync();
+
+        return firstEmptyRow;
     }
 
     private List<Letter> MapToLetters(IList<IList<object>> values)
@@ -97,7 +101,7 @@ public class GoogleSheetsClient
         return letters;
     }
 
-    private static Letter MapLetter(int rowNumber, IList<object> row)
+    private Letter MapLetter(int rowNumber, IList<object> row)
     {
         var letter = new Letter
         {
@@ -112,7 +116,7 @@ public class GoogleSheetsClient
             Description = row[7].ToString() ?? string.Empty,
             ImageIds = string.IsNullOrWhiteSpace(row[8].ToString())
                 ? new List<string>()
-                : row[8].ToString()!.Split(',').Select(url => url.Trim().Replace("open?", "uc?")).ToList(),
+                : row[8].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
             Added = DateTime.Parse(row[9].ToString() ?? string.Empty),
             IsVisible = string.Equals(row[10].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             IsAssigned = string.Equals(row[11].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
