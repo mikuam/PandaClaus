@@ -5,11 +5,13 @@ namespace PandaClaus.Web.Pages;
 public class LetterModel : PageModel
 {
     private readonly GoogleSheetsClient _client;
+    private readonly EmailSender _emailSender;
 
     public Letter Letter { get; set; }
 
-    public LetterModel(GoogleSheetsClient client)
+    public LetterModel(GoogleSheetsClient client, EmailSender emailSender)
     {
+        _emailSender = emailSender;
         _client = client;
     }
 
@@ -33,6 +35,8 @@ public class LetterModel : PageModel
                 PhoneNumber = Request.Form["Phone"],
             });
         }
+
+        await _emailSender.SendConfirmationEmail(rowNumber);
         
         return RedirectToPage($"./Confirmation", new { rowNumber});
     }

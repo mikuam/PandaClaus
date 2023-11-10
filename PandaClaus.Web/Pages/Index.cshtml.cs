@@ -14,7 +14,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         var result = (await _client.FetchLetters()).Where(l => l.IsVisible).ToList();
-        result.ForEach(l => l.Reason = TrimLength(l.Reason));
+        result.ForEach(l => l.Description = TrimLength(l.Description));
         Letters = result;
     }
 

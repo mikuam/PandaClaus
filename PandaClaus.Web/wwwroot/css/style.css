@@ -408,6 +408,11 @@
 
 
 /*** Footer ***/
+.footer {
+    background: rgb(225, 159, 138);
+    color: rgb(85, 87, 73);
+}
+
 .footer .btn.btn-social {
     margin-right: 5px;
     width: 35px;
@@ -460,8 +465,8 @@
     border-top: 1px solid rgba(256, 256, 256, .1);
 }
 
-    .footer .copyright a {
-        color: var(--light);
+    .footer .copyright a, .footer .copyright a:hover {
+        color: rgb(85, 87, 73);
     }
 
 .footer .footer-menu a {

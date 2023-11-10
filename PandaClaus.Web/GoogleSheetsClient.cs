@@ -30,7 +30,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:R";
+        var range = $"{_sheetName}!A:Q";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -39,12 +39,43 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:R{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:Q{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
         var letter = MapLetter(rowNumber, response.Values.First());
         return letter;
+    }
+
+    public async Task AddLetter(Letter letter)
+    {
+        var letters = await FetchLetters();
+        var firstEmptyRow = letters.Count + 2;
+
+        var range = $"{_sheetName}!A{firstEmptyRow}:L{firstEmptyRow}";
+        var valuesToUpdate = new List<object>
+        {
+            letter.Number,
+            letter.ParentName,
+            letter.PhoneNumber,
+            letter.Email,
+            letter.Address,
+            letter.PaczkomatCode,
+            letter.ChildAge,
+            letter.Description,
+            string.Join(",", letter.ImageIds),
+            letter.Added.ToString("yyyy-MM-dd HH:mm:ss"),
+            letter.IsVisible ? "tak" : "nie",
+            "nie"
+        };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
     }
 
     private List<Letter> MapToLetters(IList<IList<object>> values)
@@ -54,7 +85,7 @@ public class GoogleSheetsClient
 
         foreach (var row in values.Skip(1))
         {
-            if (row.Count < 11)
+            if (row.Count < 12)
                 continue;
 
             var letter = MapLetter(rowNumber, row);
@@ -71,25 +102,27 @@ public class GoogleSheetsClient
         var letter = new Letter
         {
             RowNumber = rowNumber,
-            Added = DateTime.Parse(row[0].ToString() ?? string.Empty),
-            Email = row[1].ToString() ?? string.Empty,
-            ParentName = row[2].ToString() ?? string.Empty,
-            PhoneNumber = row[4].ToString() ?? string.Empty,
-            Address = row[5].ToString() ?? string.Empty,
-            PaczkomatCode = row[6].ToString() ?? string.Empty,
-            ChildenNamesAndAges = row[7].ToString() ?? string.Empty,
-            Reason = row[8].ToString() ?? string.Empty,
-            ImageUrls = string.IsNullOrWhiteSpace(row[10].ToString())
+            Number = row[0].ToString() ?? string.Empty,
+            ParentName = row[1].ToString() ?? string.Empty,
+            PhoneNumber = row[2].ToString() ?? string.Empty,
+            Email = row[3].ToString() ?? string.Empty,
+            Address = row[4].ToString() ?? string.Empty,
+            PaczkomatCode = row[5].ToString() ?? string.Empty,
+            ChildAge = row[6].ToString() ?? string.Empty,
+            Description = row[7].ToString() ?? string.Empty,
+            ImageIds = string.IsNullOrWhiteSpace(row[8].ToString())
                 ? new List<string>()
-                : row[10].ToString()!.Split(',').Select(url => url.Trim().Replace("open?", "uc?")).ToList(),
-
+                : row[8].ToString()!.Split(',').Select(url => url.Trim().Replace("open?", "uc?")).ToList(),
+            Added = DateTime.Parse(row[9].ToString() ?? string.Empty),
+            IsVisible = string.Equals(row[10].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[11].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            
             // optional cells
-            IsVisible = string.Equals(GetCellOrEmptyString(row, 12), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = !string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 13)),
-            AssignedTo = GetCellOrEmptyString(row, 14),
-            AssignedToEmail = GetCellOrEmptyString(row, 15),
-            AssignedToPhone = GetCellOrEmptyString(row, 16),
-            AssignedToDescription = GetCellOrEmptyString(row, 17)
+            AssignedTo = GetCellOrEmptyString(row, 12),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 13),
+            AssignedToEmail = GetCellOrEmptyString(row, 14),
+            AssignedToPhone = GetCellOrEmptyString(row, 15),
+            AssignedToDescription = GetCellOrEmptyString(row, 16)
         };
 
         return letter;

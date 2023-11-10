@@ -1,0 +1,87 @@
+﻿@page
+@model LetterFormModel
+@{
+    ViewData["Title"] = "List";
+}
+
+<div class="container-xxl bg-white p-0">
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="mt-4 mb-4">Panda Claus 2023</h1>
+                    <p>Panda Claus powraca! Dzięki wsparciu naszych dzielnych pomocników Pandowego Mikołaja będziemy znowu spełniać marzenia rodzeństw dzieci chorych onkologicznie oraz tych dzieci, które niedawno straciły rodzeństwo. <strong>Zgłoszenia możecie wysyłać z całej Polski. </strong></p>
+                    <p>Zasady są bardzo proste:</p>
+                    <ol>
+                        <li>Napiszcie wspólnie list do św. Mikołaja. Prosimy rodziców o zwrócenie uwagi na to, aby wartość prezentu dla jednego dziecka nie przekraczała 300 zł i była na tyle małogabarytowa aby dało się wysłać ją standardowym kurierem.</li>
+                        <li>Wypełnijcie formularz zgłoszeniowy, dodaj także skan lub zdjęcie listu do 20 listopada.</li>
+                        <li>Listy zostaną opublikowane w naszych social mediach (bez podanych danych osobowych, jedynie imiona i wiek dzieci).</li>
+                        <li>Osoby z naszej społeczności będą wybierać list, który chcą zrealizować.</li>
+                        <li>Prezenty wyślemy do dzieci do 20 grudnia.</li>
+                    </ol>
+                    <p><strong>WAŻNE!</strong></p>
+                    <p>Akcja jest skierowana do rodzeństw dzieci onkologicznych oraz do dzieci, które niedawno straciły brata lub siostrę. Jedno dziecko może przesłać jeden list.</p>
+                    <p>Nie realizujemy prezentów związanych z elektroniką (telefonów, tabletów) oraz żywymi zwierzętami. Wartość pojedynczego listu nie powinna przekraczać 300 zł.</p>
+                    <p>Wysyłając do nas zgłoszenie, wyrażana jest tym samym zgoda na publikację listu oraz na przekazanie Fundacji swoich danych kontaktowych i danych do wysyłki. Szczegółowe informacje na temat przetwarzania danych osobowych znajdują się na stronie <a href="https://pandateam.pl/polityka-prywatnosci/">https://pandateam.pl/polityka-prywatnosci/</a>.</p>
+                    <p>Zastrzegamy sobie prawo do weryfikacji diagnozy choroby nowotworowej.</p>
+                    <p>Wszelkie pytania prosimy kierować na adres e-mail <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a></p>
+                </div>
+            </div>
+        </div>
+        <hr class="mb-4"/>
+        <form method="post" enctype="multipart/form-data">
+            <div class="container col-lg-6 offset-lg-3">
+                <div class="form-group mb-4">
+                    <label asp-for="ParentName">Imię i nazwisko rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="ParentName" type="text" class="form-control" id="parentName" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="PhoneNumber" type="text" class="form-control" id="phoneNumber" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="Email" type="text" class="form-control" id="email" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Address">Adres do wysyłki paczki <span class="text-danger">*</span></label>
+                    <input asp-for="Address" type="text" class="form-control" id="address" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="PaczkomatCode">Numer paczkomatu, do którego ma zostać wysłana paczka <span class="text-danger">*</span></label>
+                    <input asp-for="PaczkomatCode" type="text" class="form-control" id="paczkomatCode" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="ChildAge">Imię oraz wiek dziecka zgłaszanego do akcji (Jeżeli dodajesz kilkoro dzieci, dodaj je osobno) <span class="text-danger">*</span></label>
+                    <input asp-for="ChildAge" type="text" class="form-control" id="childAge" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Description">Z jakiego powodu bierzecie udział w akcji? Opiszcie nam krótko swoją historię. <span class="text-danger">*</span></label>
+                    <input asp-for="Description" type="text" class="form-control" id="description" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="LetterPhotos">Wyślij skan lub zdjęcie listu <span class="text-danger">*</span></label>
+                    <input asp-for="LetterPhotos" type="file" class="form-control" id="file" required multiple>
+                </div>
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" value="" id="privacy" required>
+                    <label class="form-check-label" for="privacy">
+                        Akceptuję politykę prywatności Fundacji Panda Team im. Michałka Tarachowicza dostępną na stronie <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">https://pandateam.pl/polityka-prywatnosci/</a>
+                    </label>
+                </div>
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" value="" id="rules" required>
+                    <label class="form-check-label" for="rules">
+                        Wyrażam zgodę na udział w akcji Panda Claus 2023 i akceptuję zasady akcji dostępne na stronie https://pandaclaus.pandateam.pl/Privacy <a href="https://pandaclaus.pandateam.pl/Privacy" target="_blank">https://pandaclaus.pandateam.pl/Privacy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-right">Wyślij</button>
+            </div>
+            
+        </form>
+
+
+        
+    </div>
+</div>

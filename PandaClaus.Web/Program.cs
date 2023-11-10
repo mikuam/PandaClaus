@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using PandaClaus.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,13 @@ IConfiguration configuration = new ConfigurationBuilder()
 
 builder.Services.AddSingleton(configuration);
 builder.Services.AddScoped<GoogleSheetsClient>();
+builder.Services.AddScoped<EmailSender>();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = 10 * 1024 * 1024; // 10MB
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+    options.MultipartHeadersLengthLimit = 10 * 1024 * 1024; // 10MB
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
