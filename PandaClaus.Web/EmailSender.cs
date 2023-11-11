@@ -26,20 +26,22 @@ public class EmailSender
         var plainTextContent = $"Cześć {letter.AssignedTo}!\n\n" +
                                $"Potwierdzamy przypisanie listu do Ciebie. " +
                                $"Oto link do listu: {GetLetterUrl(letter)} " +
-                               $"W razie pytań prosimy o kontakt na adres e-mail pandaclaus@pandateam.pl.\n\n";
+                               $"W razie pytań prosimy o kontakt na adres e-mail pandaclaus@pandateam.pl.\n\n" +
+                               $"Pozdrawiamy,\n" +
+                               $"Zespół Panda Team";
 
-        await _emailClient.SendAsync(
-            WaitUntil.Completed,
+        var email = new EmailMessage(
             EmailFrom,
             letter.AssignedToEmail,
-            subject,
-            string.Empty,
-            plainTextContent);
+            new EmailContent(subject) { PlainText = plainTextContent });
+        email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
+
+        await _emailClient.SendAsync(WaitUntil.Completed, email);
     }
 
     private string GetLetterUrl(Letter letter)
     {
-        return PageUrl + $"Letter/?rowNumber={letter.RowNumber}";
+        return PageUrl + $"Letter?rowNumber={letter.RowNumber}";
     }
 
     public async Task SendLetterAdded(int rowNumber)
@@ -51,14 +53,16 @@ public class EmailSender
         var plainTextContent = $"Cześć {letter.ParentName}!\n\n" +
                                $"Potwierdzamy dodanie przez Ciebie listu dla: {letter.ChildAge}\n\n" +
                                $"List wymaga jeszcze weryfikacji przez naszych wolontariuszy. Jeżeli wszystko będzie w porządku, list zostanie opublikowany na naszej stronie internetowej." +
-                               $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus @pandateam.pl.\n\n";
+                               $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus@pandateam.pl.\n\n" +
+                               $"Pozdrawiamy,\n" +
+                               $"Zespół Panda Team";
 
-        await _emailClient.SendAsync(
-            WaitUntil.Completed,
+        var email = new EmailMessage(
             EmailFrom,
             letter.Email,
-            subject,
-            string.Empty,
-            plainTextContent);
+            new EmailContent(subject) { PlainText = plainTextContent });
+        email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
+
+        await _emailClient.SendAsync(WaitUntil.Completed, email);
     }
 }
