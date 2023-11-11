@@ -12,7 +12,7 @@ public class EmailSender
     public EmailSender(IConfiguration configuration, GoogleSheetsClient googleSheetsClient)
     {
         _googleSheetsClient = googleSheetsClient;
-        _emailClient = new EmailClient(configuration["COMMUNICATION_SERVICES_CONNECTION_STRING"]!);
+        _emailClient = new EmailClient(configuration["EmailConnectionString"]!);
     }
 
     public async Task SendConfirmationEmail(int rowNumber)
