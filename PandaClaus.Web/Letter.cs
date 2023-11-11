@@ -20,5 +20,5 @@ public class Letter
     public string AssignedToCompanyName { get; set; }
     public string AssignedToEmail { get; set; }
     public string AssignedToPhone { get; set; }
-    public string AssignedToDescription { get; set; }
+    public string AssignedToInfo { get; set; }
 }

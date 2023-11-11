@@ -9,7 +9,7 @@
         <div class="container">
             <div class="row g-5 align-items-center">
                 <h1 class="mb-4">@Model.Letter.ChildAge</h1>
-                
+
                 @if (Model.Letter.IsAssigned)
                 {
                     <p id="letter-reserved"><i class="fa fa-times text-primary me-3"></i>List zarezerwowany</p>
@@ -31,7 +31,7 @@
                                         <a href="@imageUrl" target="_blank">
                                             <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
                                         </a>
-                                        
+
                                     </div>
                                 }
                             </div>
@@ -51,23 +51,33 @@
                     <p class="mb-4">@Model.Letter.Description</p>
                     @if (!Model.Letter.IsAssigned)
                     {
-                        <hr/>
+                        <hr />
                         <h3>Zarezerwuj list</h3>
                         <form method="post">
-                            <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
-                            <div class="form-group form-paddding">
-                                <label for="name">Imię i nazwisko</label>
-                                <input type="text" class="form-control" id="name" name="Name" placeholder="Wpisz imię i nazwisko">
+                            <div class="container col-lg-6 offset-lg-3">
+                                <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
+                                <div class="form-group mb-4">
+                                    <label asp-for="Letter.AssignedTo">Imię i nazwisko <span class="text-danger">*</span></label>
+                                    <input asp-for="Letter.AssignedTo" type="text" class="form-control" id="name" name="Letter.AssignedTo" placeholder="Wpisz imię i nazwisko" required>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label asp-for="Letter.AssignedToCompanyName">Nazwa firmy</label>
+                                    <input asp-for="Letter.AssignedToCompanyName" type="text" class="form-control" id="company" name="Letter.AssignedToCompanyName" placeholder="Wpisz nazwę firmy">
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label asp-for="Letter.AssignedToEmail">E-mail <span class="text-danger">*</span></label>
+                                    <input asp-for="Letter.AssignedToEmail" type="email" class="form-control" id="email" name="Letter.AssignedToEmail" placeholder="Wpisz adres e-mail" required>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label asp-for="Letter.AssignedToPhone">Numer telefonu <span class="text-danger">*</span></label>
+                                    <input asp-for="Letter.AssignedToPhone" type="phone" class="form-control" id="phone" name="Letter.AssignedToPhone" placeholder="Wpisz numer telefonu" required>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label asp-for="Letter.AssignedToInfo">Informacje dodatkowe</label>
+                                    <textarea asp-for="Letter.AssignedToInfo" rows="3" class="form-control" id="info" name="Letter.AssignedToInfo" placeholder="Wpisz dodatkowe informacje"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary py-3 px-5 mt-3">Zarezerwuj</button>
                             </div>
-                            <div class="form-group form-paddding">
-                                <label for="inputEmail">E-mail</label>
-                                <input type="email" class="form-control" id="email" name="Email" placeholder="Wpisz adres e-mail">
-                            </div>
-                            <div class="form-group form-paddding">
-                                <label for="phone">Numer telefonu</label>
-                                <input type="phone" class="form-control" id="phone" name="Phone" placeholder="Wpisz numer telefonu">
-                            </div>
-                            <button type="submit" class="btn btn-primary py-3 px-5 mt-3">Zarezerwuj</button>
                         </form>
                     }
                 </div>

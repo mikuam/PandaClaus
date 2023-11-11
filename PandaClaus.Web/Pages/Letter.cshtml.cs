@@ -7,6 +7,7 @@ public class LetterModel : PageModel
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
 
+    [BindProperty]
     public Letter Letter { get; set; }
 
     public LetterModel(GoogleSheetsClient client, EmailSender emailSender)
@@ -30,9 +31,11 @@ public class LetterModel : PageModel
             await _client.AssignLetterAsync(new LetterAssignment
             {
                 RowNumber = rowNumber,
-                Name = Request.Form["Name"],
-                Email = Request.Form["Email"],
-                PhoneNumber = Request.Form["Phone"],
+                Name = Letter.AssignedTo,
+                CompanyName = Letter.AssignedToCompanyName,
+                Email = Letter.AssignedToEmail,
+                PhoneNumber = Letter.AssignedToPhone,
+                Info = Letter.AssignedToInfo
             });
         }
 

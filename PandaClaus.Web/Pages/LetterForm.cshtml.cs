@@ -9,6 +9,7 @@ public class LetterFormModel : PageModel
 {
     private readonly GoogleSheetsClient _sheetsClient;
     private readonly BlobClient _blobClient;
+    private readonly EmailSender _emailSender;
 
     [BindProperty]
     [Required]
@@ -42,10 +43,11 @@ public class LetterFormModel : PageModel
     [Required]
     public List<IFormFile> LetterPhotos { get; set; }
 
-    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient)
+    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender)
     {
         _sheetsClient = sheetsClient;
         _blobClient = blobClient;
+        _emailSender = emailSender;
     }
 
     public async Task OnGetAsync()
@@ -74,12 +76,7 @@ public class LetterFormModel : PageModel
 
         var rowNumber = await _sheetsClient.AddLetter(letter);
 
-        /*
-
-        await _emailSender.SendConfirmationEmail(rowNumber);
-        
-        return RedirectToPage($"./Confirmation", new { rowNumber});
-        */
+        await _emailSender.SendLetterAdded(rowNumber);
 
         return RedirectToPage($"./LetterAddedConfirmation", new { rowNumber });
     }

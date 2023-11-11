@@ -5,7 +5,10 @@ namespace PandaClaus.Web;
 
 public class EmailSender
 {
-    private const string PageUrl = "https://pandaclausweb20231003123201.azurewebsites.net/";
+    private const string PageUrl = "https://pandaclaus.pandateam.pl/";
+    //private const string EmailFrom = "DoNotReply@pandaclausmail.pandateam.pl";
+    private const string EmailFrom = "DoNotReply@\r\n3e425720-d311-4859-9dbd-725f2a71aad6.azurecomm.net";
+
     private readonly EmailClient _emailClient;
     private readonly GoogleSheetsClient _googleSheetsClient;
 
@@ -27,7 +30,7 @@ public class EmailSender
 
         await _emailClient.SendAsync(
             WaitUntil.Completed,
-            "pandaclaus@pandateam.pl",
+            EmailFrom,
             letter.AssignedToEmail,
             subject,
             string.Empty,
@@ -37,5 +40,25 @@ public class EmailSender
     private string GetLetterUrl(Letter letter)
     {
         return PageUrl + $"Letter/?rowNumber={letter.RowNumber}";
+    }
+
+    public async Task SendLetterAdded(int rowNumber)
+    {
+        var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
+
+        var subject = "Panda Claus - potwierdzenie dodania listu";
+
+        var plainTextContent = $"Cześć {letter.ParentName}!\n\n" +
+                               $"Potwierdzamy dodanie przez Ciebie listu dla: {letter.ChildAge}\n\n" +
+                               $"List wymaga jeszcze weryfikacji przez naszych wolontariuszy. Jeżeli wszystko będzie w porządku, list zostanie opublikowany na naszej stronie internetowej." +
+                               $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus @pandateam.pl.\n\n";
+
+        await _emailClient.SendAsync(
+            WaitUntil.Completed,
+            EmailFrom,
+            letter.Email,
+            subject,
+            string.Empty,
+            plainTextContent);
     }
 }

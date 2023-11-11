@@ -126,7 +126,7 @@ public class GoogleSheetsClient
             AssignedToCompanyName = GetCellOrEmptyString(row, 13),
             AssignedToEmail = GetCellOrEmptyString(row, 14),
             AssignedToPhone = GetCellOrEmptyString(row, 15),
-            AssignedToDescription = GetCellOrEmptyString(row, 16)
+            AssignedToInfo = GetCellOrEmptyString(row, 16)
         };
 
         return letter;
@@ -152,9 +152,9 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!N{assignment.RowNumber}:R{assignment.RowNumber}";
+        var range = $"{_sheetName}!L{assignment.RowNumber}:Q{assignment.RowNumber}";
 
-        var valuesToUpdate = new List<object> { "tak", assignment.Name, assignment.Email, assignment.PhoneNumber, assignment.Description };
+        var valuesToUpdate = new List<object> { "tak", assignment.Name, assignment.CompanyName, assignment.Email, assignment.PhoneNumber, assignment.Info };
         var valueRange = new ValueRange
         {
             Values = new List<IList<object>> { valuesToUpdate }
