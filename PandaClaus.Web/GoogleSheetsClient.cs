@@ -32,7 +32,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:Q";
+        var range = $"{_sheetName}!A:S";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -41,7 +41,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:Q{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:S{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -54,15 +54,17 @@ public class GoogleSheetsClient
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
-        var range = $"{_sheetName}!A{firstEmptyRow}:L{firstEmptyRow}";
+        var range = $"{_sheetName}!A{firstEmptyRow}:N{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letter.Number,
             letter.ParentName,
             letter.PhoneNumber,
             letter.Email,
-            letter.Address,
-            letter.PaczkomatCode,
+            letter.Street,
+            letter.City,
+            letter.PostalCode,
+            letter.ChildName,
             letter.ChildAge,
             letter.Description,
             string.Join(",", letter.ImageIds),
@@ -89,7 +91,7 @@ public class GoogleSheetsClient
 
         foreach (var row in values.Skip(1))
         {
-            if (row.Count < 12)
+            if (row.Count < 14)
                 continue;
 
             var letter = MapLetter(rowNumber, row);
@@ -110,23 +112,25 @@ public class GoogleSheetsClient
             ParentName = row[1].ToString() ?? string.Empty,
             PhoneNumber = row[2].ToString() ?? string.Empty,
             Email = row[3].ToString() ?? string.Empty,
-            Address = row[4].ToString() ?? string.Empty,
-            PaczkomatCode = row[5].ToString() ?? string.Empty,
-            ChildAge = row[6].ToString() ?? string.Empty,
-            Description = row[7].ToString() ?? string.Empty,
-            ImageIds = string.IsNullOrWhiteSpace(row[8].ToString())
+            Street = row[4].ToString() ?? string.Empty,
+            City = row[5].ToString() ?? string.Empty,
+            PostalCode = row[6].ToString() ?? string.Empty,
+            ChildName = row[7].ToString() ?? string.Empty,
+            ChildAge = row[8].ToString() ?? string.Empty,
+            Description = row[9].ToString() ?? string.Empty,
+            ImageIds = string.IsNullOrWhiteSpace(row[10].ToString())
                 ? new List<string>()
-                : row[8].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
-            Added = DateTime.Parse(row[9].ToString() ?? string.Empty),
-            IsVisible = string.Equals(row[10].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[11].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                : row[10].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
+            Added = DateTime.Parse(row[11].ToString() ?? string.Empty),
+            IsVisible = string.Equals(row[12].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[13].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             
             // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 12),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 13),
-            AssignedToEmail = GetCellOrEmptyString(row, 14),
-            AssignedToPhone = GetCellOrEmptyString(row, 15),
-            AssignedToInfo = GetCellOrEmptyString(row, 16)
+            AssignedTo = GetCellOrEmptyString(row, 14),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 15),
+            AssignedToEmail = GetCellOrEmptyString(row, 16),
+            AssignedToPhone = GetCellOrEmptyString(row, 17),
+            AssignedToInfo = GetCellOrEmptyString(row, 18)
         };
 
         return letter;
@@ -152,9 +156,17 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!L{assignment.RowNumber}:Q{assignment.RowNumber}";
+        var range = $"{_sheetName}!O{assignment.RowNumber}:S{assignment.RowNumber}";
 
-        var valuesToUpdate = new List<object> { "tak", assignment.Name, assignment.CompanyName, assignment.Email, assignment.PhoneNumber, assignment.Info };
+        var valuesToUpdate = new List<object>
+        {
+            "tak",
+            assignment.Name,
+            assignment.CompanyName,
+            assignment.Email,
+            assignment.PhoneNumber,
+            assignment.Info
+        };
         var valueRange = new ValueRange
         {
             Values = new List<IList<object>> { valuesToUpdate }

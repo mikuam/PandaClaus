@@ -7,8 +7,10 @@ public class Letter
     public string ParentName { get; set; }
     public string PhoneNumber { get; set; }
     public string Email { get; set; }
-    public string Address { get; set; }
-    public string PaczkomatCode { get; set; }
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string PostalCode { get; set; }
+    public string ChildName { get; set; }
     public string ChildAge { get; set; }
     public string Description { get; set; }
     public List<string> ImageIds { get; set; }

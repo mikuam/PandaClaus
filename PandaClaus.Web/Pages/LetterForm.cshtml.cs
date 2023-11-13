@@ -1,8 +1,6 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace PandaClaus.Web.Pages;
 public class LetterFormModel : PageModel
@@ -25,11 +23,19 @@ public class LetterFormModel : PageModel
 
     [BindProperty]
     [Required]
-    public string Address { get; set; }
+    public string Street { get; set; }
 
     [BindProperty]
     [Required]
-    public string PaczkomatCode { get; set; }
+    public string City { get; set; }
+
+    [BindProperty]
+    [Required]
+    public string PostalCode { get; set; }
+
+    [BindProperty]
+    [Required]
+    public string ChildName { get; set; }
 
     [BindProperty]
     [Required]
@@ -65,8 +71,10 @@ public class LetterFormModel : PageModel
             ParentName = ParentName,
             PhoneNumber = PhoneNumber,
             Email = Email,
-            Address = Address,
-            PaczkomatCode = PaczkomatCode,
+            Street = Street,
+            City = City,
+            PostalCode = PostalCode,
+            ChildName = ChildName,
             ChildAge = ChildAge,
             Description = Description,
             ImageIds = photoIds,
@@ -78,7 +86,7 @@ public class LetterFormModel : PageModel
 
         await _emailSender.SendLetterAdded(rowNumber);
 
-        return RedirectToPage($"./LetterAddedConfirmation", new { rowNumber });
+        return RedirectToPage("./LetterAddedConfirmation", new { rowNumber });
     }
 }
 

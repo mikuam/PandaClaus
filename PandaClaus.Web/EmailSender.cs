@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using System.Runtime.CompilerServices;
+using Azure;
 using Azure.Communication.Email;
 
 namespace PandaClaus.Web;
@@ -6,7 +7,6 @@ namespace PandaClaus.Web;
 public class EmailSender
 {
     private const string PageUrl = "https://pandaclaus.pandateam.pl/";
-    //private const string EmailFrom = "DoNotReply@pandaclausmail.pandateam.pl";
     private const string EmailFrom = "DoNotReply@\r\n3e425720-d311-4859-9dbd-725f2a71aad6.azurecomm.net";
 
     private readonly EmailClient _emailClient;
@@ -36,7 +36,8 @@ public class EmailSender
             new EmailContent(subject) { PlainText = plainTextContent });
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
 
-        await _emailClient.SendAsync(WaitUntil.Completed, email);
+        // run in a background thread, don't wait for it to finish
+        Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 
     private string GetLetterUrl(Letter letter)
@@ -51,7 +52,7 @@ public class EmailSender
         var subject = "Panda Claus - potwierdzenie dodania listu";
 
         var plainTextContent = $"Cześć {letter.ParentName}!\n\n" +
-                               $"Potwierdzamy dodanie przez Ciebie listu dla: {letter.ChildAge}\n\n" +
+                               $"Potwierdzamy dodanie przez Ciebie listu dla: {letter.ChildName}\n\n" +
                                $"List wymaga jeszcze weryfikacji przez naszych wolontariuszy. Jeżeli wszystko będzie w porządku, list zostanie opublikowany na naszej stronie internetowej." +
                                $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus@pandateam.pl.\n\n" +
                                $"Pozdrawiamy,\n" +
@@ -62,7 +63,7 @@ public class EmailSender
             letter.Email,
             new EmailContent(subject) { PlainText = plainTextContent });
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
-
-        await _emailClient.SendAsync(WaitUntil.Completed, email);
+        
+        Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 }
