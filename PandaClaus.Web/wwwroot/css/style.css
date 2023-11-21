@@ -44,6 +44,31 @@
         border-color: var(--pc-red-hover);
     }
 
+    .btn-primary:focus, .btn-primary:active {
+        background-color: var(--pc-red);
+        border-color: var(--pc-red);
+        box-shadow: none
+    }
+
+.btn-outline-primary {
+    background-color: #ffffff;
+    border-color: var(--pc-red);
+    color: var(--pc-red);
+}
+
+    .btn-outline-primary:hover {
+        background-color: #ffffff;
+        border-color: var(--pc-red-hover);
+        color: var(--pc-red);
+    }
+
+    .btn-outline-primary:focus, .btn-outline-primary:active {
+        background-color: #ffffff;
+        border-color: var(--pc-red);
+        color: var(--pc-red);
+        box-shadow: none
+    }
+
 #letter-reserved, #letter-reserved i {
     color: var(--pc-red) !important;
 }
