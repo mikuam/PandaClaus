@@ -156,7 +156,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!O{assignment.RowNumber}:S{assignment.RowNumber}";
+        var range = $"{_sheetName}!N{assignment.RowNumber}:S{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {
