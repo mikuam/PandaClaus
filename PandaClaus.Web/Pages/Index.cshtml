@@ -11,7 +11,12 @@
             <div class="col-lg-12">
                 <div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
                     <h1 class="mb-3">Listy</h1>
-                    <p>Przeglądaj listy i wybierz ten, który chcesz ufundować</p>
+                    <p>Witamy w świecie Panda Claus! Przed Wami listy z marzeniami wyjątkowych dzieci - cichych superbohaterów, którzy na co dzień towarzyszą swojemu rodzeństwu w chorobie lub odchodzeniu. Wierzymy, że każde z nich znajdzie swojego PANDAstycznego Mikołaja.</p>
+                    <p>Jak to działa?</p>
+                    <p>Wybierz interesujący Cię list. Po kliknięciu zobaczysz krótki opis od rodziców dziecka oraz formularz rezerwacji. Kiedy go wypełnisz, otrzymasz na maila wszystkie techniczne informacje.</p>
+                    <p>Numery z literkami np. 15a, 15b, 15c, oznaczają listy rodzeństwa z jednej rodziny. Zależy nam, aby jedna osoba/ekipa realizowała listy jednej rodziny, dlatego prosimy, aby w miarę możliwości rezerwować wszystkie listy z danego numeru. </p>
+                    <p>Czas na realizację i dostarczenie prezentów do siedziby fundacji, Hope Spotu (Bolka 8A w Poznaniu) lub podanego w mailu paczkomatu, macie do 8 grudnia. </p>
+                    <p>Dziękujemy za Wasze zaangażowanie i dobre serca!</p>
                 </div>
             </div>
         </div>
@@ -39,7 +44,7 @@
                                     <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-3 py-1 px-3 number">@letter.Number</div>
                                 </div>
                                 <div class="p-4 pb-0">
-                                    <a class="d-block h5 mb-2" asp-area="" asp-page="/Letter" asp-route-rowNumber="@letter.RowNumber">@letter.ChildName<span>, lat </span>@letter.ChildAge</a>
+                                    <a class="d-block h5 mb-2" asp-area="" asp-page="/Letter" asp-route-rowNumber="@letter.RowNumber">@letter.ChildName<span>, </span>@letter.ChildAge <span>lat</span></a>
                                     <p>@letter.Description</p>
                                 </div>
                             </div>
