@@ -6,6 +6,10 @@ class CustomComparer : IComparer<string>
 
     public int Compare(string x, string y)
     {
+        if (string.IsNullOrWhiteSpace(x) && string.IsNullOrWhiteSpace(y)) return 0;
+        if (string.IsNullOrWhiteSpace(x)) return 1;
+        if (string.IsNullOrWhiteSpace(y)) return -1;
+
         if (x == Unknown &&  y == Unknown) return 0;
         if (x == Unknown) return 1;
         if (y == Unknown) return -1;
