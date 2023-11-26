@@ -27,7 +27,7 @@ public class EmailSender
                                $"Poniżej garść WAŻNYCH informacji:\r\n" +
                                $"Czas na realizację i dostarczenie do nas paczki jest do 8 grudnia 2023.\r\n" +
                                $"Masz dwie możliwości dostarczenia paczki:\r\n" +
-                               $"Paczkomatem Inpost do Paczkomatu POZ174M podając e-mail pandaclaus@pandateam.pl oraz numer telefonu +48 534 897 105 (jeżeli paczka nie zmieści się do Paczkomatu Inpost - daj nam znać na wyżej podany adres mailowy)\r\n" +
+                               $"Paczkomatem Inpost do Paczkomatu POZ215M podając e-mail pandaclaus@pandateam.pl oraz numer telefonu +48 534 897 105 (jeżeli paczka nie zmieści się do Paczkomatu Inpost - daj nam znać na wyżej podany adres mailowy)\r\n" +
                                $"Osobiście do siedziby naszej fundacji Hope Spot na ul. Bolka 8A w Poznaniu w dniach: 5-7 grudnia od 10:30 do 14:30 oraz 8 grudnia od 16:30 do 19:00 (inne dni i godziny po wcześniejszym umówieniu telefonicznym)\r\n" +
                                $"WAŻNE! Prosimy Cię o wyraźne oznaczenie paczki numerami listów, najlepiej w kilku miejscach.\r\n" +
                                $"Jeżeli realizujesz kilka listów, paczkę dla każdego dziecka spakuj osobno i umieść wszystkie możliwie w jednym kartonie.\r\n" +
@@ -51,7 +51,7 @@ public class EmailSender
                           "<li>Czas na realizację i dostarczenie do nas paczki jest do 8 grudnia 2023.</li>" +
                           "<li>Masz dwie możliwości dostarczenia paczki:</li>" +
                           "<ul style='text-indent:20px'>" +
-                          "<li>Paczkomatem Inpost do Paczkomatu POZ174M podając e-mail <a href=\"mailto:pandaclaus@pandateam.pl\">pandaclaus@pandateam.pl</a> oraz numer telefonu +48 534 897 105 (jeżeli paczka nie zmieści się do Paczkomatu Inpost - daj nam znać na wyżej podany adres mailowy)</li>" +
+                          "<li>Paczkomatem Inpost do Paczkomatu POZ215M podając e-mail <a href=\"mailto:pandaclaus@pandateam.pl\">pandaclaus@pandateam.pl</a> oraz numer telefonu +48 534 897 105 (jeżeli paczka nie zmieści się do Paczkomatu Inpost - daj nam znać na wyżej podany adres mailowy)</li>" +
                           "<li>Osobiście do siedziby naszej fundacji Hope Spot na ul. Bolka 8A w Poznaniu w dniach: 5-7 grudnia od 10:30 do 14:30 oraz 8 grudnia od 16:30 do 19:00 (inne dni i godziny po wcześniejszym umówieniu telefonicznym)</li>" +
                           "</ul>" +
                           "<li><strong>WAŻNE!</strong> Prosimy Cię o wyraźne oznaczenie paczki numerami listów, najlepiej w kilku miejscach.</li>" +
