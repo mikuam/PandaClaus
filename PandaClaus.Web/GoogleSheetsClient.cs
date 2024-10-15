@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using System;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
 
 namespace PandaClaus.Web;
@@ -13,9 +14,11 @@ public class GoogleSheetsClient
     private readonly string _googleSeetsCredentials;
     private readonly string _blobUrl;
     private readonly SheetsService _sheetsService;
+    private readonly BlobClient _blobClient;
 
-    public GoogleSheetsClient(IConfiguration configuration)
+    public GoogleSheetsClient(IConfiguration configuration, BlobClient blobClient)
     {
+        _blobClient = blobClient;
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
         _blobUrl = configuration["BlobUrl"]!;
@@ -45,7 +48,7 @@ public class GoogleSheetsClient
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
-        var letter = MapLetter(rowNumber, response.Values.First());
+        var letter = MapLetter(rowNumber, response.Values.First(), true);
         return letter;
     }
 
@@ -103,7 +106,7 @@ public class GoogleSheetsClient
         return letters;
     }
 
-    private Letter MapLetter(int rowNumber, IList<object> row)
+    private Letter MapLetter(int rowNumber, IList<object> row, bool createImageUrlWithSasToken = false)
     {
         var letter = new Letter
         {
@@ -120,7 +123,7 @@ public class GoogleSheetsClient
             Description = row[9].ToString() ?? string.Empty,
             ImageIds = string.IsNullOrWhiteSpace(row[10].ToString())
                 ? new List<string>()
-                : row[10].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
+                : CreateImageUrls(row[10].ToString()!.Split(','), createImageUrlWithSasToken),
             Added = DateTime.Parse(row[11].ToString() ?? string.Empty),
             IsVisible = string.Equals(row[12].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             IsAssigned = string.Equals(row[13].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
@@ -134,6 +137,24 @@ public class GoogleSheetsClient
         };
 
         return letter;
+    }
+
+    public List<string> CreateImageUrls(string[] imageIds, bool createImageUrlWithSasToken)
+    {
+        if (!createImageUrlWithSasToken)
+        {
+            return imageIds.Select(id => $"{_blobUrl}/{id}").ToList();
+        }
+
+        _blobClient.UpdateBlobContentType(imageIds[0]).GetAwaiter().GetResult();
+
+        var images = new List<string>();
+        foreach (var id in imageIds)
+        {
+            images.Add(_blobClient.GetBlobUriWithSasToken(id));
+        }
+
+        return images;
     }
 
     private static string GetCellOrEmptyString(IList<object> row, int index)
