@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using System;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
 
 namespace PandaClaus.Web;
@@ -10,7 +11,7 @@ public class GoogleSheetsClient
 {
     private readonly string _sheetName;
     private readonly string _spreadsheetId;
-    private readonly string _googleSeetsCredentials;
+    private readonly string _googleSheetsCredentials;
     private readonly string _blobUrl;
     private readonly SheetsService _sheetsService;
 
@@ -20,7 +21,7 @@ public class GoogleSheetsClient
         _sheetName = configuration["SheetName"]!;
         _blobUrl = configuration["BlobUrl"]!;
 
-        _googleSeetsCredentials = configuration["GoogleSheetsCredentials"]!;
+        _googleSheetsCredentials = configuration["GoogleSheetsCredentials"]!;
 
         var credential = GetCredentialsFromFile();
         _sheetsService = new SheetsService(new BaseClientService.Initializer()
@@ -32,7 +33,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:S";
+        var range = $"{_sheetName}!A:Q";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -41,7 +42,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:S{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:Q{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -54,7 +55,7 @@ public class GoogleSheetsClient
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
-        var range = $"{_sheetName}!A{firstEmptyRow}:N{firstEmptyRow}";
+        var range = $"{_sheetName}!A{firstEmptyRow}:Q{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letter.Number,
@@ -62,8 +63,11 @@ public class GoogleSheetsClient
             letter.PhoneNumber,
             letter.Email,
             letter.Street,
+            letter.HouseNumber,
+            letter.ApartmentNumber,
             letter.City,
             letter.PostalCode,
+            letter.PaczkomatCode,
             letter.ChildName,
             letter.ChildAge,
             letter.Description,
@@ -113,24 +117,29 @@ public class GoogleSheetsClient
             PhoneNumber = row[2].ToString() ?? string.Empty,
             Email = row[3].ToString() ?? string.Empty,
             Street = row[4].ToString() ?? string.Empty,
-            City = row[5].ToString() ?? string.Empty,
-            PostalCode = row[6].ToString() ?? string.Empty,
-            ChildName = row[7].ToString() ?? string.Empty,
-            ChildAge = row[8].ToString() ?? string.Empty,
-            Description = row[9].ToString() ?? string.Empty,
-            ImageIds = string.IsNullOrWhiteSpace(row[10].ToString())
+            HouseNumber = row[5].ToString() ?? string.Empty,
+            ApartmentNumber = row[7].ToString() ?? string.Empty,
+            City = row[8].ToString() ?? string.Empty,
+            PostalCode = row[9].ToString() ?? string.Empty,
+            ChildName = row[10].ToString() ?? string.Empty,
+            ChildAge = row[11].ToString() ?? string.Empty,
+            Description = row[12].ToString() ?? string.Empty,
+            ImageIds = string.IsNullOrWhiteSpace(row[13].ToString())
                 ? new List<string>()
-                : row[10].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
-            Added = DateTime.Parse(row[11].ToString() ?? string.Empty),
-            IsVisible = string.Equals(row[12].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[13].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                : row[13].ToString()!.Split(',').Select(url => $"{_blobUrl}/photos2024/{url}").ToList(),
+            ImageThumbnailId = string.IsNullOrWhiteSpace(row[13].ToString())
+                ? string.Empty
+                : $"{_blobUrl}/photos2024/{row[13].ToString()!.Split(',').First()}_thumbnail.jpg",
+            Added = DateTime.Parse(row[14].ToString() ?? string.Empty),
+            IsVisible = string.Equals(row[15].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[16].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             
             // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 14),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 15),
-            AssignedToEmail = GetCellOrEmptyString(row, 16),
-            AssignedToPhone = GetCellOrEmptyString(row, 17),
-            AssignedToInfo = GetCellOrEmptyString(row, 18)
+            AssignedTo = GetCellOrEmptyString(row, 17),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 18),
+            AssignedToEmail = GetCellOrEmptyString(row, 19),
+            AssignedToPhone = GetCellOrEmptyString(row, 20),
+            AssignedToInfo = GetCellOrEmptyString(row, 21)
         };
 
         return letter;
@@ -148,7 +157,7 @@ public class GoogleSheetsClient
 
     private GoogleCredential GetCredentialsFromFile()
     {
-        var data = Convert.FromBase64String(_googleSeetsCredentials);
+        var data = Convert.FromBase64String(_googleSheetsCredentials);
         var credentialsJson = System.Text.Encoding.UTF8.GetString(data);
         
         return GoogleCredential.FromJson(credentialsJson).CreateScoped(SheetsService.Scope.Spreadsheets);
@@ -156,7 +165,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!N{assignment.RowNumber}:S{assignment.RowNumber}";
+        var range = $"{_sheetName}!Q{assignment.RowNumber}:V{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {

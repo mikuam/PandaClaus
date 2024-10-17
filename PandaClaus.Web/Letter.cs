@@ -9,11 +9,15 @@ public class Letter
     public string Email { get; set; }
     public string Street { get; set; }
     public string City { get; set; }
+    public string HouseNumber { get; set; }
+    public string ApartmentNumber { get; set; }
     public string PostalCode { get; set; }
+    public string PaczkomatCode { get; set; }
     public string ChildName { get; set; }
     public string ChildAge { get; set; }
     public string Description { get; set; }
     public List<string> ImageIds { get; set; }
+    public string ImageThumbnailId { get; set; }
 
     public DateTime Added { get; set; }
     public bool IsVisible { get; set; }
