@@ -7,7 +7,7 @@ env:
   AZURE_WEBAPP_NAME: PandaClausWeb20241017155237
   AZURE_WEBAPP_PACKAGE_PATH: PandaClaus.Web/published
   CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 7.0.x
+  DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: PandaClaus.Web
 jobs:
   build:
