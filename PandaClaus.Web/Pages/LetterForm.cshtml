@@ -9,7 +9,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="mt-4 mb-4">Panda Claus 2023</h1>
+                    <h1 class="mt-4 mb-4">Panda Claus 2024</h1>
                     <p>Panda Claus powraca! Dzięki wsparciu naszych dzielnych pomocników Pandowego Mikołaja będziemy znowu spełniać marzenia rodzeństw dzieci chorych onkologicznie oraz tych dzieci, które niedawno straciły rodzeństwo. Zapraszamy do wysyłania zgłoszeń!</p>
                     <p>Zasady są bardzo proste:</p>
                     <ol>
@@ -27,70 +27,90 @@
             </div>
         </div>
         <hr class="mb-4"/>
+        
+        <!--
         <div class="container col-lg-6 offset-lg-3">
-            <p>Przyjmowanie zgłoszeń w Panda Claus 2023 została już zakończone</p>
+            <p>Przyjmowanie zgłoszeń w Panda Claus 2024 została już zakończone</p>
         </div>
-    <!--
-    <form method="post" enctype="multipart/form-data">
-        <div class="container col-lg-6 offset-lg-3">
-            <div class="form-group mb-4">
-                <label asp-for="ParentName">Imię i nazwisko rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                <input asp-for="ParentName" type="text" class="form-control" id="parentName" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                <input asp-for="PhoneNumber" type="text" class="form-control" id="phoneNumber" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                <input asp-for="Email" type="text" class="form-control" id="email" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="Street">Ulica <span class="text-danger">*</span></label>
-                <input asp-for="Street" type="text" class="form-control" id="street" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="City">Miasto<span class="text-danger">*</span></label>
-                <input asp-for="City" type="text" class="form-control" id="city" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="PostalCode">Kod pocztowy <span class="text-danger">*</span></label>
-                <input asp-for="PostalCode" type="text" class="form-control" id="postalCode" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="ChildName">Imię dziecka zgłaszanego do akcji (Jeżeli dodajesz kilkoro dzieci, dodaj je osobno)<span class="text-danger">*</span></label>
-                <input asp-for="ChildName" type="text" class="form-control" id="childName" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="ChildAge">Wiek dziecka zgłaszanego do akcji <span class="text-danger">*</span></label>
-                <input asp-for="ChildAge" type="text" class="form-control" id="childAge" required>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="Description">Opiszcie krótko swoją historię i z jakiego powodu bierzecie udział w akcji. Ta treść będzie widoczna na stronie z listem i będzie zachęcała Darczyńców do jego realizacji. <span class="text-danger">*</span></label>
-                <textarea asp-for="Description" rows="3" class="form-control" id="description" required></textarea>
-            </div>
-            <div class="form-group mb-4">
-                <label asp-for="LetterPhotos">Wyślij skan lub zdjęcie listu <span class="text-danger">*</span></label>
-                <input asp-for="LetterPhotos" type="file" class="form-control" id="file" required multiple>
-            </div>
-            <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" value="" id="privacy" required>
-                <label class="form-check-label" for="privacy">
-                    <span class="text-danger">*</span> Akceptuję politykę prywatności Fundacji Panda Team im. Michałka Tarachowicza dostępną na stronie <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">https://pandateam.pl/polityka-prywatnosci/</a>
-                </label>
-            </div>
-            <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" value="" id="rules" required>
-                <label class="form-check-label" for="rules">
-                    <span class="text-danger">*</span> Wyrażam zgodę na udział w akcji Panda Claus 2023 i akceptuję zasady akcji dostępne na stronie https://pandaclaus.pandateam.pl/Privacy <a href="https://pandaclaus.pandateam.pl/Privacy" target="_blank">https://pandaclaus.pandateam.pl/Privacy</a>
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-right">Wyślij</button>
-        </div>
-            
-    </form>
         -->
+        <form method="post" enctype="multipart/form-data">
+            <div class="container col-lg-6 offset-lg-3">
+                <div class="mb-4">
+                    <label asp-for="ParentName">Imię i nazwisko rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="ParentName" type="text" class="form-control" id="parentName" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="PhoneNumber" type="text" class="form-control" id="phoneNumber" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="Email" type="text" class="form-control" id="email" required>
+                </div>
+
+                <!-- Street, HouseNumber, ApartmentNumber in one row -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="Street">Ulica <span class="text-danger">*</span></label>
+                        <input asp-for="Street" type="text" class="form-control" id="street" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="HouseNumber">Numer domu <span class="text-danger">*</span></label>
+                        <input asp-for="HouseNumber" type="text" class="form-control" id="houseNumber" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ApartmentNumber">Numer lokalu</label>
+                        <input asp-for="ApartmentNumber" type="text" class="form-control" id="apartmentNumber">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="City">Miasto<span class="text-danger">*</span></label>
+                    <input asp-for="City" type="text" class="form-control" id="city" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="PostalCode">Kod pocztowy <span class="text-danger">*</span></label>
+                    <input asp-for="PostalCode" type="text" class="form-control" id="postalCode" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="PaczkomatCode">Kod paczkomatu InPost <span class="text-danger">*</span></label>
+                    <input asp-for="PaczkomatCode" type="text" class="form-control" id="paczkomatCode" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="ChildName">Imię dziecka zgłaszanego do akcji (Jeżeli dodajesz kilkoro dzieci, dodaj je osobno)<span class="text-danger">*</span></label>
+                    <input asp-for="ChildName" type="text" class="form-control" id="childName" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="ChildAge">Wiek dziecka zgłaszanego do akcji <span class="text-danger">*</span></label>
+                    <input asp-for="ChildAge" type="text" class="form-control" id="childAge" required>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Description">Opiszcie krótko swoją historię i z jakiego powodu bierzecie udział w akcji. Ta treść będzie widoczna na stronie z listem i będzie zachęcała Darczyńców do jego realizacji. <span class="text-danger">*</span></label>
+                    <textarea asp-for="Description" rows="3" class="form-control" id="description" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="LetterPhotos">Wyślij skan lub zdjęcie listu <span class="text-danger">*</span></label>
+                    <input asp-for="LetterPhotos" type="file" class="form-control" id="file" required multiple>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="privacy" required>
+                    <label class="form-check-label" for="privacy">
+                        <span class="text-danger">*</span> Akceptuję politykę prywatności Fundacji Panda Team im. Michałka Tarachowicza dostępną na stronie <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">https://pandateam.pl/polityka-prywatnosci/</a>
+                    </label>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="rules" required>
+                    <label class="form-check-label" for="rules">
+                        <span class="text-danger">*</span> Wyrażam zgodę na udział w akcji Panda Claus 2024 i akceptuję zasady akcji dostępne na stronie <a href="https://pandaclaus.pandateam.pl/Privacy" target="_blank">https://pandaclaus.pandateam.pl/Privacy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-end">Wyślij</button>
+            </div>
+        </form>
+
         
     </div>
 </div>

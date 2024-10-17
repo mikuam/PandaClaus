@@ -27,11 +27,23 @@ public class LetterFormModel : PageModel
 
     [BindProperty]
     [Required]
+    public string HouseNumber { get; set; }
+
+    [BindProperty]
+    [Required]
+    public string ApartmentNumber { get; set; }
+
+    [BindProperty]
+    [Required]
     public string City { get; set; }
 
     [BindProperty]
     [Required]
     public string PostalCode { get; set; }
+
+    [BindProperty]
+    [Required]
+    public string PaczkomatCode { get; set; }
 
     [BindProperty]
     [Required]
