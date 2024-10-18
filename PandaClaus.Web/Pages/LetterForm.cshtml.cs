@@ -15,6 +15,10 @@ public class LetterFormModel : PageModel
 
     [BindProperty]
     [Required]
+    public string ParentSurname { get; set; }
+
+    [BindProperty]
+    [Required]
     public string PhoneNumber { get; set; }
 
     [BindProperty]
@@ -81,6 +85,7 @@ public class LetterFormModel : PageModel
         {
             Number = "X",
             ParentName = ParentName,
+            ParentSurname = ParentSurname,
             PhoneNumber = PhoneNumber,
             Email = Email,
             Street = Street,

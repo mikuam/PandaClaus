@@ -26,8 +26,8 @@
                 </div>
             </div>
         </div>
-        <hr class="mb-4"/>
-        
+        <hr class="mb-4" />
+
         <!--
         <div class="container col-lg-6 offset-lg-3">
             <p>Przyjmowanie zgłoszeń w Panda Claus 2024 została już zakończone</p>
@@ -35,10 +35,17 @@
         -->
         <form method="post" enctype="multipart/form-data">
             <div class="container col-lg-6 offset-lg-3">
-                <div class="mb-4">
-                    <label asp-for="ParentName">Imię i nazwisko rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                    <input asp-for="ParentName" type="text" class="form-control" id="parentName" required>
+                <div class="row mb-4">
+                    <div class="mb-6">
+                        <label asp-for="ParentName">Imię rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                        <input asp-for="ParentName" type="text" class="form-control" id="parentName" required>
+                    </div>
+                    <div class="mb-6">
+                        <label asp-for="ParentSurname">Nazwisko rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                        <input asp-for="ParentSurname" type="text" class="form-control" id="parentSurname" required>
+                    </div>
                 </div>
+
                 <div class="mb-4">
                     <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
                     <input asp-for="PhoneNumber" type="text" class="form-control" id="phoneNumber" required>
@@ -48,7 +55,6 @@
                     <input asp-for="Email" type="text" class="form-control" id="email" required>
                 </div>
 
-                <!-- Street, HouseNumber, ApartmentNumber in one row -->
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <label asp-for="Street">Ulica <span class="text-danger">*</span></label>
@@ -111,6 +117,6 @@
             </div>
         </form>
 
-        
+
     </div>
 </div>

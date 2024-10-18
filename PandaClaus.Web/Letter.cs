@@ -5,6 +5,7 @@ public class Letter
     public int RowNumber { get; set; }
     public string Number { get; set; }
     public string ParentName { get; set; }
+    public string ParentSurname { get; set; }
     public string PhoneNumber { get; set; }
     public string Email { get; set; }
     public string Street { get; set; }

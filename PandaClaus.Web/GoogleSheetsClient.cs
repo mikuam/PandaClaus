@@ -33,7 +33,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:Q";
+        var range = $"{_sheetName}!A:W";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -42,7 +42,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:Q{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:W{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -55,11 +55,12 @@ public class GoogleSheetsClient
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
-        var range = $"{_sheetName}!A{firstEmptyRow}:Q{firstEmptyRow}";
+        var range = $"{_sheetName}!A{firstEmptyRow}:R{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letter.Number,
             letter.ParentName,
+            letter.ParentSurname,
             letter.PhoneNumber,
             letter.Email,
             letter.Street,
@@ -114,32 +115,34 @@ public class GoogleSheetsClient
             RowNumber = rowNumber,
             Number = row[0].ToString() ?? string.Empty,
             ParentName = row[1].ToString() ?? string.Empty,
-            PhoneNumber = row[2].ToString() ?? string.Empty,
-            Email = row[3].ToString() ?? string.Empty,
-            Street = row[4].ToString() ?? string.Empty,
-            HouseNumber = row[5].ToString() ?? string.Empty,
+            ParentSurname = row[2].ToString() ?? string.Empty,
+            PhoneNumber = row[3].ToString() ?? string.Empty,
+            Email = row[4].ToString() ?? string.Empty,
+            Street = row[5].ToString() ?? string.Empty,
+            HouseNumber = row[6].ToString() ?? string.Empty,
             ApartmentNumber = row[7].ToString() ?? string.Empty,
             City = row[8].ToString() ?? string.Empty,
             PostalCode = row[9].ToString() ?? string.Empty,
-            ChildName = row[10].ToString() ?? string.Empty,
-            ChildAge = row[11].ToString() ?? string.Empty,
-            Description = row[12].ToString() ?? string.Empty,
-            ImageIds = string.IsNullOrWhiteSpace(row[13].ToString())
+            PaczkomatCode = row[10].ToString() ?? string.Empty,
+            ChildName = row[11].ToString() ?? string.Empty,
+            ChildAge = row[12].ToString() ?? string.Empty,
+            Description = row[13].ToString() ?? string.Empty,
+            ImageIds = string.IsNullOrWhiteSpace(row[14].ToString())
                 ? new List<string>()
-                : row[13].ToString()!.Split(',').Select(url => $"{_blobUrl}/photos2024/{url}").ToList(),
-            ImageThumbnailId = string.IsNullOrWhiteSpace(row[13].ToString())
+                : row[14].ToString()!.Split(',').Select(url => $"{_blobUrl}/photos2024/{url}").ToList(),
+            ImageThumbnailId = string.IsNullOrWhiteSpace(row[14].ToString())
                 ? string.Empty
-                : $"{_blobUrl}/photos2024/{row[13].ToString()!.Split(',').First()}_thumbnail.jpg",
-            Added = DateTime.Parse(row[14].ToString() ?? string.Empty),
-            IsVisible = string.Equals(row[15].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[16].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                : $"{_blobUrl}/photos2024/{row[14].ToString()!.Split(',').First()}_thumbnail.jpg",
+            Added = DateTime.Parse(row[15].ToString() ?? string.Empty),
+            IsVisible = string.Equals(row[16].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             
             // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 17),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 18),
-            AssignedToEmail = GetCellOrEmptyString(row, 19),
-            AssignedToPhone = GetCellOrEmptyString(row, 20),
-            AssignedToInfo = GetCellOrEmptyString(row, 21)
+            AssignedTo = GetCellOrEmptyString(row, 18),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 19),
+            AssignedToEmail = GetCellOrEmptyString(row, 20),
+            AssignedToPhone = GetCellOrEmptyString(row, 21),
+            AssignedToInfo = GetCellOrEmptyString(row, 22)
         };
 
         return letter;
@@ -165,7 +168,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!Q{assignment.RowNumber}:V{assignment.RowNumber}";
+        var range = $"{_sheetName}!R{assignment.RowNumber}:W{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {
