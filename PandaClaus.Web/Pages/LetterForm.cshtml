@@ -47,8 +47,8 @@
                 </div>
 
                 <div class="mb-4">
-                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                    <input asp-for="PhoneNumber" type="text" class="form-control" id="phoneNumber" required>
+                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego (format: 9 cyfr) <span class="text-danger">*</span></label>
+                    <input asp-for="PhoneNumber" type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{9}" required>
                 </div>
                 <div class="mb-4">
                     <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
@@ -75,8 +75,8 @@
                     <input asp-for="City" type="text" class="form-control" id="city" required>
                 </div>
                 <div class="mb-4">
-                    <label asp-for="PostalCode">Kod pocztowy <span class="text-danger">*</span></label>
-                    <input asp-for="PostalCode" type="text" class="form-control" id="postalCode" required>
+                    <label asp-for="PostalCode">Kod pocztowy (format: XX-XXX)<span class="text-danger">*</span></label>
+                    <input asp-for="PostalCode" type="text" class="form-control" id="postalCode" pattern="[0-9]{2}-[0-9]{3}" required>
                 </div>
                 <div class="mb-4">
                     <label asp-for="PaczkomatCode">Kod paczkomatu InPost <span class="text-danger">*</span></label>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="mb-4">
                     <label asp-for="ChildAge">Wiek dziecka zgłaszanego do akcji <span class="text-danger">*</span></label>
-                    <input asp-for="ChildAge" type="text" class="form-control" id="childAge" required>
+                    <input asp-for="ChildAge" type="number" class="form-control" id="childAge" required>
                 </div>
                 <div class="mb-4">
                     <label asp-for="Description">Opiszcie krótko swoją historię i z jakiego powodu bierzecie udział w akcji. Ta treść będzie widoczna na stronie z listem i będzie zachęcała Darczyńców do jego realizacji. <span class="text-danger">*</span></label>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="mb-4">
                     <label asp-for="LetterPhotos">Wyślij skan lub zdjęcie listu <span class="text-danger">*</span></label>
-                    <input asp-for="LetterPhotos" type="file" class="form-control" id="file" required multiple>
+                    <input asp-for="LetterPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
                 </div>
 
                 <div class="form-check mb-4">
