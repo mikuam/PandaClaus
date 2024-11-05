@@ -2,10 +2,10 @@
 :root {
     --primary: #ACD3CC;
     --secondary: #FF6922;
-    --light: #EFFDF5;
+    --light: #fffffa;
     --bs-light: #ACD3CC;
-    --dark: #0E2E50;
-    --pc-red: #ac422a;
+    --dark: #232323;
+    --pc-red: #E53423;
     --pc-red-hover: #d1634b;
     --pc-light-text: #fffdfd;
 }
