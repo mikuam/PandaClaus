@@ -19,6 +19,17 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowInPostOrigin", policy =>
+    {
+        policy.WithOrigins("https://geowidget-app.inpost.pl")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Add only if you need to support credentials
+    });
+});
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
@@ -36,6 +47,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("AllowInPostOrigin");
 
 app.UseAuthorization();
 
