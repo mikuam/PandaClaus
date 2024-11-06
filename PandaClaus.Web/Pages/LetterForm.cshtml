@@ -1,19 +1,20 @@
 ﻿@page
 @model LetterFormModel
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "Dodaj List";
 }
 
-
-<link rel="stylesheet" href="https://geowidget.inpost.pl/inpost-geowidget.css" />
-<script src='https://geowidget.inpost.pl/inpost-geowidget.js' defer></script>
-<script>
+@section HeaderJS{
+    <link rel="stylesheet" href="https://geowidget.inpost.pl/inpost-geowidget.css" />
+    <script src='https://geowidget.inpost.pl/inpost-geowidget.js' defer></script>
+    <script>
     console.log('added event listener');
     document.addEventListener('onpointselect', (event) => {
         console.log('Selected point: ', point.name, point);
         document.getElementById('paczkomatCode').value = point.name;
     });
 </script>
+}
 
 <div class="container-xxl bg-white p-0">
     <div class="container-xxl py-5">
