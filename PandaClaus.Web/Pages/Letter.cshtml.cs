@@ -10,6 +10,9 @@ public class LetterModel : PageModel
     [BindProperty]
     public Letter Letter { get; set; }
 
+    [BindProperty]
+    public bool IsAdmin { get; set; }
+
     public LetterModel(GoogleSheetsClient client, EmailSender emailSender)
     {
         _emailSender = emailSender;
@@ -18,6 +21,9 @@ public class LetterModel : PageModel
 
     public async Task OnGetAsync(int rowNumber)
     {
+        var isAdminValue = Request.HttpContext.Session.GetString("IsAdmin");
+        IsAdmin = isAdminValue is not null && isAdminValue == "true";
+
         Letter = await _client.FetchLetterAsync(rowNumber);
     }
 

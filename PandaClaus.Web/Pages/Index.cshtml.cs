@@ -23,7 +23,8 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var isAdmin = Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode;
+        var isAdmin = IsAdmin();
+        Request.HttpContext.Session.SetString("IsAdmin", isAdmin ? "true" : "false");
 
         var result = (await _client.FetchLetters()).ToList();
         var filter = Request.Query["filter"].ToString();
@@ -60,6 +61,15 @@ public class IndexModel : PageModel
 
         result.ForEach(l => l.Description = TrimLength(l.Description));
         Letters = result.OrderBy(l => l.Number, new CustomComparer()).ToList();
+    }
+
+    private bool IsAdmin()
+    {
+        var isAdminValue = Request.HttpContext.Session.GetString("IsAdmin");
+        var isAdminFromSession = isAdminValue is not null && isAdminValue == "true";
+
+        return isAdminFromSession ||
+               (Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode);
     }
 
     private string TrimLength(string text)
