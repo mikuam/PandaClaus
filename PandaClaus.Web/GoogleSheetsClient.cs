@@ -2,7 +2,9 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using PandaClaus.Web.Core;
 using System;
+using System.Text.RegularExpressions;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
 
 namespace PandaClaus.Web;
@@ -14,9 +16,12 @@ public class GoogleSheetsClient
     private readonly string _googleSheetsCredentials;
     private readonly string _blobUrl;
     private readonly SheetsService _sheetsService;
+    private readonly LetterNumerationService _letterNumerationService;
 
-    public GoogleSheetsClient(IConfiguration configuration)
+    public GoogleSheetsClient(IConfiguration configuration, LetterNumerationService letterNumerationService)
     {
+        _letterNumerationService = letterNumerationService;
+
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
         _blobUrl = configuration["BlobUrl"]!;
@@ -55,10 +60,11 @@ public class GoogleSheetsClient
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
+        var letterNumber = _letterNumerationService.GetNextLetterNumber(letters, letter);
         var range = $"{_sheetName}!A{firstEmptyRow}:R{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
-            letter.Number,
+            letterNumber,
             letter.ParentName,
             letter.ParentSurname,
             letter.PhoneNumber,

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
 using PandaClaus.Web;
+using PandaClaus.Web.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
     options.MultipartHeadersLengthLimit = 10 * 1024 * 1024; // 10MB
 });
+builder.Services.AddScoped<LetterNumerationService>();
 
 builder.Services.AddCors(options =>
 {
