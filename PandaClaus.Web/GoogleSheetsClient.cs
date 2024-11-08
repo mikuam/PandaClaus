@@ -78,7 +78,7 @@ public class GoogleSheetsClient
             letter.ChildName,
             letter.ChildAge,
             letter.Description,
-            string.Join(",", letter.ImageIds),
+            string.Join(",", letter.ImageUrls),
             letter.Added.ToString("yyyy-MM-dd HH:mm:ss"),
             letter.IsVisible ? "tak" : "nie",
             "nie"
@@ -134,9 +134,15 @@ public class GoogleSheetsClient
             ChildAge = row[12].ToString() ?? string.Empty,
             Description = row[13].ToString() ?? string.Empty,
             ImageIds = string.IsNullOrWhiteSpace(row[14].ToString())
-                ? new List<string>()
+                ? []
+                : row[14].ToString()!.Split(',').ToList(),
+            ImageUrls = string.IsNullOrWhiteSpace(row[14].ToString())
+                ? []
                 : row[14].ToString()!.Split(',').Select(url => $"{_blobUrl}/photos2024/{url}").ToList(),
             ImageThumbnailId = string.IsNullOrWhiteSpace(row[14].ToString())
+                ? string.Empty
+                : row[14].ToString()!.Split(',').First(),
+            ImageThumbnailUrl = string.IsNullOrWhiteSpace(row[14].ToString())
                 ? string.Empty
                 : $"{_blobUrl}/photos2024/{row[14].ToString()!.Split(',').First()}_thumbnail.jpg",
             Added = DateTime.Parse(row[15].ToString() ?? string.Empty),
@@ -185,6 +191,21 @@ public class GoogleSheetsClient
             assignment.PhoneNumber,
             assignment.Info
         };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
+    }
+
+    internal async Task UpdateImageIds(Letter letter)
+    {
+        var range = $"{_sheetName}!O{letter.RowNumber}:O{letter.RowNumber}";
+
+        var valuesToUpdate = new List<object> { string.Join(",", letter.ImageIds) };
+
         var valueRange = new ValueRange
         {
             Values = new List<IList<object>> { valuesToUpdate }

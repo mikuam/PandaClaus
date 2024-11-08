@@ -4,51 +4,67 @@
     ViewData["Title"] = "List";
 }
 
+@section HeaderJS {
+    <script>
+        function confirmDelete() {
+            return confirm("Czy na pewno chcesz usunąć to zdjęcie?");
+        }
+    </script>
+}
+
 <div class="container-xxl bg-white p-0">
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
                 <h1 class="mb-4">@Model.Letter.ChildName<span>, lat </span>@Model.Letter.ChildAge</h1>
-                
+
                 <h2>Numer listu: @Model.Letter.Number</h2>
                 @if (Model.Letter.IsAssigned)
                 {
                     <p id="letter-reserved"><i class="fa fa-times text-primary me-3"></i>List zarezerwowany</p>
                 }
 
-                <div class="col-lg-12 wow fadeIn" data-wow-delay="0.1s">
-                    <div class="overflow-hidden carousel-background p-5 pe-0 carousel-width">
-                        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-                            <div class="carousel-indicators">
-                                @for (int i = 0; i < Model.Letter.ImageIds.Count(); i++)
-                                {
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
-                                }
+                <div class="col-lg-12 wow fadeIn d-flex flex-wrap" data-wow-delay="0.1s" style="gap: 20px;">
+                    @foreach (var imageUrl in Model.Letter.ImageUrls)
+                    {   <div style="width: 340px;">
+                            <div style="height: 300px;">
+                                <a href="@imageUrl" target="_blank">
+                                    <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
+                                </a>
+                                
                             </div>
-                            <div class="carousel-inner">
-                                @foreach (var imageUrl in Model.Letter.ImageIds)
-                                {
-                                    <div class="carousel-item carousel-big-image @(Model.Letter.ImageIds.First() == imageUrl ? "active" : "")">
-                                        <a href="@imageUrl" target="_blank">
-                                            <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
-                                        </a>
-
-                                    </div>
-                                }
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Poprzedni</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Następny</span>
+                            @if (Model.IsAdmin)
+                            {
+                                <form method="post">
+                                    <input type="hidden" name="imageUrl" value="@imageUrl" />
+                                    <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
+                                            asp-route-rowNumber="@Model.Letter.RowNumber" class="btn btn-primary btn-sm mt-3 float-none"
+                                            onclick="return confirmDelete();">
+                                        Usuń
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+                @if (Model.IsAdmin)
+                {
+                    <h2>Dodaj zdjęcie</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
+                        <div class="mb-4">
+                            <label asp-for="UploadPhotos">Wyślij skan lub zdjęcie listu<span class="text-danger">*</span></label>
+                            <input asp-for="UploadPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
+                            <button type="submit" asp-page-handler="uploadImage" asp-route-rowNumber="@Model.Letter.RowNumber"
+                                    class="btn btn-primary btn-sm mt-3 float-end">
+                                Dodaj zdjęcie
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </form>
+                }
 
                 <div class="col-lg-12 wow fadeIn" data-wow-delay="0.5s">
+                    <h3>Opis</h3>
                     <p class="mb-4">@Model.Letter.Description</p>
                     @if (!Model.Letter.IsAssigned)
                     {

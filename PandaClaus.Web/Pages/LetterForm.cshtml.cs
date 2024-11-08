@@ -97,7 +97,7 @@ public class LetterFormModel : PageModel
             ChildName = ChildName,
             ChildAge = ChildAge,
             Description = Description,
-            ImageIds = photoIds,
+            ImageUrls = photoIds,
             Added = DateTime.Now,
             IsVisible = false
         };

@@ -36,7 +36,7 @@
                             <div class="property-item rounded overflow-hidden">
                                 <div class="position-relative overflow-hidden letter-small-image">
                                     <a asp-area="" asp-page="/Letter" asp-route-rowNumber="@letter.RowNumber">
-                                        <img class="img-fluid" src="@letter.ImageThumbnailId" alt="letter image">
+                                        <img class="img-fluid" src="@letter.ImageThumbnailUrl" alt="letter image">
                                     </a>
                                     @if (letter.IsAssigned)
                                     {
