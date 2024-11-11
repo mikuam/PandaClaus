@@ -59,6 +59,15 @@ public class IndexModel : PageModel
             result = result.Where(l => l.IsVisible).ToList();
         }
 
+        var search = Request.Query["search"].ToString();
+        if (!string.IsNullOrEmpty(search))
+        {
+            result = result.Where(l =>
+                l.Description.Contains(search) 
+                || l.ChildName.Contains(search)
+                || l.Number.Contains(search)).ToList();
+        }
+
         result.ForEach(l => l.Description = TrimLength(l.Description));
         Letters = result.OrderBy(l => l.Number, new CustomComparer()).ToList();
     }

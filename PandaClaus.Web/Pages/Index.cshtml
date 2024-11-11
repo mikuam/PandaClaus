@@ -22,9 +22,16 @@
             </div>
         </div>
         <div class="col-lg-12 mb-5 text-center">
-            <a href="/?filter=all" class="btn @Model.ButtonFiltersAll">Wszystkie</a>
-            <a href="/?filter=available" class="btn @Model.ButtonFiltersAvailable">Dostępne</a>
-            <a href="/?filter=reserved" class="btn @Model.ButtonFiltersReserved">Zarezerwowane</a>
+            <a href="/?filter=all&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersAll">Wszystkie</a>
+            <a href="/?filter=available&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersAvailable">Dostępne</a>
+            <a href="/?filter=reserved&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersReserved">Zarezerwowane</a>
+        </div>
+        
+        <div class="col-lg-12 mb-3 text-center">
+            <form method="get" action="/">
+                <input type="text" name="search" class="form-control d-inline-block w-50" placeholder="Szukaj..." value="@Request.Query["search"]" />
+                <button type="submit" class="btn btn-primary">Szukaj</button>
+            </form>
         </div>
 
         <div class="tab-content">
