@@ -30,4 +30,5 @@ public class Letter
     public string AssignedToEmail { get; set; }
     public string AssignedToPhone { get; set; }
     public string AssignedToInfo { get; set; }
+    public string Status { get; set; }
 }
