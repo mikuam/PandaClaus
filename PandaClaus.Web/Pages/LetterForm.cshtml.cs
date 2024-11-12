@@ -55,7 +55,7 @@ public class LetterFormModel : PageModel
 
     [BindProperty]
     [Required]
-    public string ChildAge { get; set; }
+    public int ChildAge { get; set; }
 
     [BindProperty]
     [Required]
