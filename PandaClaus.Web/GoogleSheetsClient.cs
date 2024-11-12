@@ -38,7 +38,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:W";
+        var range = $"{_sheetName}!A:Z";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -47,7 +47,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:W{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -154,7 +154,10 @@ public class GoogleSheetsClient
             AssignedToCompanyName = GetCellOrEmptyString(row, 19),
             AssignedToEmail = GetCellOrEmptyString(row, 20),
             AssignedToPhone = GetCellOrEmptyString(row, 21),
-            AssignedToInfo = GetCellOrEmptyString(row, 22)
+            AssignedToInfo = GetCellOrEmptyString(row, 22),
+            Uwagi = GetCellOrEmptyString(row, 23),
+            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.DODANY : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true),
+            Gabaryt = GetCellOrEmptyString(row, 25).FirstOrDefault()
         };
 
         return letter;
@@ -213,5 +216,10 @@ public class GoogleSheetsClient
         var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
         updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await updateRequest.ExecuteAsync();
+    }
+
+    internal async Task UpdateStatus(int letterNumber, string status, string uwagi, string gabaryt)
+    {
+        throw new NotImplementedException();
     }
 }

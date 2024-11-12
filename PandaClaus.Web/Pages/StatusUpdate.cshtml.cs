@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Diagnostics.Metrics;
 
 namespace PandaClaus.Web.Pages;
 public class StatusUpdateModel : PageModel
@@ -9,13 +10,16 @@ public class StatusUpdateModel : PageModel
     private readonly BlobClient _blobClient;
 
     [BindProperty]
-    public string LetterNumber { get; set; }
-
-    [BindProperty]
     public Letter Letter { get; set; }
 
     [BindProperty]
-    public bool IsAdmin { get; set; }
+    public string Status { get; set; }
+
+    [BindProperty]
+    public string Uwagi { get; set; }
+
+    [BindProperty]
+    public string Gabaryt { get; set; }
 
     public StatusUpdateModel(GoogleSheetsClient client, EmailSender emailSender, BlobClient blobClient)
     {
@@ -24,23 +28,33 @@ public class StatusUpdateModel : PageModel
         _blobClient = blobClient;
     }
 
-    public async Task OnGetAsync(int rowNumber)
+    public async Task OnGetAsync()
     {
-        IsAdmin = CheckIsAdmin();
-
-        Letter = await _client.FetchLetterAsync(rowNumber);
+        if (int.TryParse(Request.Query["number"].ToString(), out var number))
+        {
+            Letter = await _client.FetchLetterAsync(number);
+        }
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostSetLetterNumberAsync()
     {
-        var rowNumber = int.Parse(Request.Form["RowNumber"]!);
+        var letterNumber = Request.Form["letterNumber"].ToString();
+        var allLetters = await _client.FetchLetters();
+        var letter = allLetters.FirstOrDefault(l => l.Number.Equals(letterNumber, StringComparison.CurrentCultureIgnoreCase));
 
-        var letter = await _client.FetchLetterAsync(rowNumber);
+        if (letter == null)
+        {
+            return RedirectToPage("./StatusUpdate");
+        }
+
+        Letter = letter;
+
+        /*
         if (!letter.IsAssigned)
         {
             await _client.AssignLetterAsync(new LetterAssignment
             {
-                RowNumber = rowNumber,
+                RowNumber = letter.RowNumber,
                 Name = Letter.AssignedTo,
                 CompanyName = Letter.AssignedToCompanyName,
                 Email = Letter.AssignedToEmail,
@@ -50,29 +64,22 @@ public class StatusUpdateModel : PageModel
         }
 
         await _emailSender.SendConfirmationEmail(rowNumber);
-        
-        return RedirectToPage("./Confirmation", new { rowNumber});
+        */
+        return RedirectToPage("./StatusUpdate", new { number = letter.RowNumber });
     }
 
-    public async Task<IActionResult> OnPostDeleteImageAsync(int rowNumber, string imageUrl)
+    public async Task<IActionResult> OnPostSetStatusAsync()
     {
-        if (CheckIsAdmin())
+        if (int.TryParse(Request.Form["number"].ToString(), out var number))
         {
-            Letter = await _client.FetchLetterAsync(rowNumber);
+            var status = Request.Query["status"].ToString();
+            var uwagi = Request.Form["uwagi"].ToString();
+            var gabaryt = Request.Form["gabaryt"].ToString();
 
-            var imageUrlToRemove = Letter.ImageUrls.FirstOrDefault(i => i.Contains(imageUrl));
-            if (imageUrlToRemove is not null)
-            {
-                var imageIdToRemove = Letter.ImageIds.FirstOrDefault(imageUrlToRemove.Contains);
-                if (imageIdToRemove is not null && Letter.ImageIds.Contains(imageIdToRemove))
-                {
-                    Letter.ImageIds.Remove(imageIdToRemove);
-                    await _client.UpdateImageIds(Letter);
-                }
-            }
+            await _client.UpdateStatus(number, status, uwagi, gabaryt);
         }
 
-        return RedirectToPage("./StatusUpdate", new { rowNumber });
+        return RedirectToPage("./StatusUpdate");
     }
 }
 

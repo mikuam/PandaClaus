@@ -1,4 +1,6 @@
-﻿namespace PandaClaus.Web;
+﻿using PandaClaus.Web.Core;
+
+namespace PandaClaus.Web;
 
 public class Letter
 {
@@ -30,5 +32,7 @@ public class Letter
     public string AssignedToEmail { get; set; }
     public string AssignedToPhone { get; set; }
     public string AssignedToInfo { get; set; }
-    public string Status { get; set; }
+    public string Uwagi { get; set; }
+    public LetterStatus Status { get; set; }
+    public char Gabaryt { get; set; } 
 }

@@ -1,27 +1,21 @@
 ﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using PandaClaus.Web.Core
 @model StatusUpdateModel
 @{
-    ViewData["Title"] = "List";
-}
-
-@section HeaderJS {
-    <script>
-        function confirmDelete() {
-            return confirm("Czy na pewno chcesz usunąć to zdjęcie?");
-        }
-    </script>
+    ViewData["Title"] = "Zmień status";
 }
 
 <div class="container-xxl bg-white p-0">
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
-                @if (string.IsNullOrWhiteSpace(Model.Letter.Number))
+                @if (Model.Letter == null)
                 {
                     <div class="col-lg-12 mb-3 text-center">
-                        <form method="get" action="/">
-                            <input type="text" name="search" class="form-control d-inline-block w-50" placeholder="Podaj numer listu" value="@Request.Query["number"]"/>
-                            <button type="submit" class="btn btn-primary">Szukaj</button>
+                        <form method="post">
+                            <input type="text" name="letterNumber" class="form-control d-inline-block w-50" placeholder="Podaj numer listu" />
+                            <button type="submit" class="btn btn-primary" asp-page-handler="setLetterNumber">Szukaj</button>
                         </form>
                     </div>
                 }
@@ -30,97 +24,71 @@
                     <h1 class="mb-4">@Model.Letter.ChildName<span>, lat </span>@Model.Letter.ChildAge</h1>
 
                     <h2>Numer listu: @Model.Letter.Number</h2>
-                    <h2>Status: </h2>
-                }
-            </div>
-            
+                    <h2>Status: @Model.Letter.Status</h2>
 
+                    <div class="row">
+                        <div class="progress" style="height: 30px;">
 
-            <div class="row g-5 align-items-center">
-                <h1 class="mb-4">@Model.Letter.ChildName<span>, lat </span>@Model.Letter.ChildAge</h1>
-
-                <h2>Numer listu: @Model.Letter.Number</h2>
-                @if (Model.Letter.IsAssigned)
-                {
-                    <p id="letter-reserved"><i class="fa fa-times text-primary me-3"></i>List zarezerwowany</p>
-                }
-
-                <div class="col-lg-12 wow fadeIn d-flex flex-wrap" data-wow-delay="0.1s" style="gap: 20px;">
-                    @foreach (var imageUrl in Model.Letter.ImageUrls)
-                    {
-                        <div style="width: 340px;">
-                            <div style="height: 300px;">
-                                <a href="@imageUrl" target="_blank">
-                                    <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
-                                </a>
-
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.DODANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="16" aria-valuemin="0" aria-valuemax="100">
+                                Dodany
                             </div>
-                            @if (Model.IsAdmin)
-                            {
-                                <form method="post">
-                                    <input type="hidden" name="imageUrl" value="@imageUrl" />
-                                    <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
-                                            asp-route-rowNumber="@Model.Letter.RowNumber" class="btn btn-primary btn-sm mt-3 float-none"
-                                            onclick="return confirmDelete();">
-                                        Usuń
-                                    </button>
-                                </form>
-                            }
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.DOSTARCZONY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+                                Dostarczony
+                            </div>
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.SPRAWDZONY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                Sprawdzony
+                            </div>
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.SPAKOWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">
+                                Spakowany
+                            </div>
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.UDEKOROWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100">
+                                Udekorowany
+                            </div>
+                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.ZAADRESOWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                Zaadresowany
+                            </div>
                         </div>
-                    }
-                </div>
-                @if (Model.IsAdmin)
-                {
-                    <h2>Dodaj zdjęcie</h2>
-                    <form method="post" enctype="multipart/form-data">
-                        <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
+                    </div>
+                    <form method="post">
+                        <input type="hidden" name="number" value="@Model.Letter.RowNumber" />
+                        
                         <div class="mb-4">
-                            <label asp-for="UploadPhotos">Wyślij skan lub zdjęcie listu<span class="text-danger">*</span></label>
-                            <input asp-for="UploadPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
-                            <button type="submit" asp-page-handler="uploadImage" asp-route-rowNumber="@Model.Letter.RowNumber"
-                                    class="btn btn-primary btn-sm mt-3 float-end">
-                                Dodaj zdjęcie
-                            </button>
+                            <label asp-for="Letter.Uwagi">Uwagi - widoczne tylko dla wolontariuszy</label>
+                            <textarea asp-for="Letter.Uwagi" rows="3" class="form-control" id="Uwagi" value="@Model.Letter.Uwagi"></textarea>
                         </div>
+
+                        @switch (Model.Letter.Status)
+                        {
+                            case LetterStatus.DODANY:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="DOSTARCZONY">Oznacz jako dostarczony</button>
+                                break;
+                            case LetterStatus.DOSTARCZONY:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPRAWDZONY">Oznacz jako sprawdzony</button>
+                                break;
+                            case LetterStatus.SPRAWDZONY:
+                                <div class="mb-3">
+                                    <label for="gabaryt" class="form-label">Gabaryt</label>
+                                    <select id="gabaryt" name="gabaryt" class="form-select">
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="N">N</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPAKOWANY">Oznacz jako spakowany</button>
+                                break;
+                            case LetterStatus.SPAKOWANY:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="UDEKOROWANY">Oznacz jako udekorowany</button>
+                                break;
+                            case LetterStatus.UDEKOROWANY:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="ZAADRESOWANY">Oznacz jako zaadresowany</button>
+                                break;
+                        }
+
                     </form>
                 }
-
-                <div class="col-lg-12 wow fadeIn" data-wow-delay="0.5s">
-                    <h3>Opis</h3>
-                    <p class="mb-4">@Model.Letter.Description</p>
-                    @if (!Model.Letter.IsAssigned)
-                    {
-                        <hr />
-                        <h3>Zarezerwuj list</h3>
-                        <form method="post">
-                            <div class="container col-lg-6 offset-lg-3">
-                                <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedTo">Imię i nazwisko <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedTo" type="text" class="form-control" id="name" name="Letter.AssignedTo" placeholder="Wpisz imię i nazwisko" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToCompanyName">Nazwa firmy</label>
-                                    <input asp-for="Letter.AssignedToCompanyName" type="text" class="form-control" id="company" name="Letter.AssignedToCompanyName" placeholder="Wpisz nazwę firmy">
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToEmail">E-mail <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedToEmail" type="email" class="form-control" id="email" name="Letter.AssignedToEmail" placeholder="Wpisz adres e-mail" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToPhone">Numer telefonu <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedToPhone" type="phone" class="form-control" id="phone" name="Letter.AssignedToPhone" placeholder="Wpisz numer telefonu" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToInfo">Informacje dodatkowe</label>
-                                    <textarea asp-for="Letter.AssignedToInfo" rows="3" class="form-control" id="info" name="Letter.AssignedToInfo" placeholder="Wpisz dodatkowe informacje"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary py-3 px-5 mt-3">Zarezerwuj</button>
-                            </div>
-                        </form>
-                    }
-                </div>
             </div>
+
         </div>
     </div>
 </div>
