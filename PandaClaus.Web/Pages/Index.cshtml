@@ -10,14 +10,32 @@
         <div class="row g-0 gx-5 align-items-end">
             <div class="col-lg-12">
                 <div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
-                    <h1 class="mb-3">Listy</h1>
-                    <p>Witamy w świecie Panda Claus! Przed Wami listy z marzeniami wyjątkowych dzieci - cichych superbohaterów, którzy na co dzień towarzyszą swojemu rodzeństwu w chorobie lub odchodzeniu. Wierzymy, że każde z nich znajdzie swojego PANDAstycznego Mikołaja.</p>
-                    <p>Jak to działa?</p>
-                    <p>Wybierz interesujący Cię list. Po kliknięciu zobaczysz krótki opis od rodziców dziecka oraz formularz rezerwacji. Kiedy go wypełnisz, otrzymasz na maila wszystkie techniczne informacje.</p>
-                    <p>Numery z literkami np. 15a, 15b, 15c, oznaczają listy rodzeństwa z jednej rodziny. Zależy nam, aby jedna osoba/ekipa realizowała listy jednej rodziny, dlatego prosimy, aby w miarę możliwości rezerwować wszystkie listy z danego numeru. </p>
-                    <p>Czas na realizację i dostarczenie prezentów do siedziby fundacji, Hope Spotu (Bolka 8A w Poznaniu) lub podanego w mailu paczkomatu, macie do 8 grudnia. </p>
-                    <p>Dzieci często w listach wymieniają kilka swoich marzeń. Nie musisz spełniać wszystkich, wybierz tyle, ile możesz, a na pewno wywołasz uśmiech na twarzach maluchów.</p>
-                    <p>Dziękujemy za Wasze zaangażowanie i dobre serca!</p>
+                    <p>Drogi Pomocniku Panda Claus’a,</p>
+                    <p>Oto przed Tobą lista z marzeniami naszych podopiecznych — wyjątkowych cichych bohaterów, którzy niosą na swoich barkach ogromny ciężar choroby lub utraty swojego rodzeństwa. To właśnie oni czekają na spełnienie swoich marzeń. Wierzymy, że dzięki Tobie się one spełnią. Twój prezent będzie niósł im radość w tym wyjątkowym czasie.  Poniżej znajdziesz wszystkie niezbędne informacje dotyczące Twojego zaangażowania w akcję.</p>
+                    <p><b>Jak przebiega akcja i jak możesz pomóc?</b></p>
+                    <ol>
+                        <li><b>Wybierz list</b> – możesz wybrać jeden lub kilka listów, a następnie spełnić dziecięce marzenie! Po kliknięciu zobaczysz krótki opis od rodziców dziecka oraz formularz rezerwacji. Kiedy go wypełnisz, otrzymasz na maila wszystkie techniczne informacje.</li>
+                        <li><b>Kup prezent</b> – w liście każde dziecko podało swoje imię, wiek oraz wymarzony prezent, którego wartość nie powinna przekraczać 350 zł (oczywiście, to do Ciebie należy decyzja, ile pieniędzy przeznaczysz na prezent).</li>
+                        <li><b>Dostarcz paczkę do Panda Claus’a</b> – wybrany przez Ciebie prezent należy dostarczyć najpóźniej do dnia 7 grudnia 2024 roku. Pamiętaj, aby w miarę możliwości prezent zmieścił się do <b>Paczkomatu InPost</b>. Szczegółowe informacje dotyczące wysyłki lub dostarczenia prezentów wyślemy do Ciebie e-mailem.</li>
+                    </ol>
+                    <p>Dodatkowe informacje:</p>
+                    <ul>
+                        <li>Numery z literkami np. 15a, 15b, 15c, oznaczają listy rodzeństwa z jednej rodziny. Zależy nam, aby jedna osoba/ekipa realizowała listy jednej rodziny, dlatego prosimy, aby w miarę możliwości rezerwować wszystkie listy z danego numeru.</li>
+                        <li>Czas na realizację i dostarczenie prezentów do naszego magazynu lub podanego w mailu paczkomatu macie do 7 grudnia.</li>
+                        <li>Dzieci często w listach wymieniają kilka swoich marzeń. Nie musisz spełniać wszystkich, wybierz tyle, ile możesz, a na pewno wywołasz uśmiech na twarzach maluchów.</li>
+                        <li>Organizator zapewnia, że wszystkie listy są autentyczne i pochodzą od dzieci spełniających warunki uczestnictwa. W liście dziecko umieszcza jedynie swoje imię i wiek – listy nie zawierają danych osobowych.</li>
+                    </ul>
+                    <p>Wszystkie paczki zostaną sprawdzone i przygotowane do wysyłki w trakcie FINAŁU akcji, który odbędzie się 13 i 14 grudnia w hali nr 10 Międzynarodowych Targów Poznańskich. Już teraz zapraszamy Cię do pomocy.</p>
+                    <p>Przesyłki dotrą do dzieci najpóźniej do 24 grudnia 2024 r., dzięki współpracy z naszym Partnerem – firmą InPost sp. z o.o., która zapewni dostarczenie paczek do paczkomatów lub kurierem.</p>
+                    <p>Wszystkie szczegółowe informacje, w tym politykę prywatności, znajdziesz na stronie <a href="https://pandateam.pl/" target="_blank">Fundacji Panda Team</a>. </p>
+                    <p>Jeśli masz dodatkowe pytania, skontaktuj się z nami mailowo: <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a>.</p>
+                    <p>Dziękujemy za Twoje zaangażowanie, wsparcie i okazane serce! Twoja pomoc sprawi, że choć na chwilę poczują się wyjątkowo i mają szansę pomyśleć o czymś przyjemnym.</p>
+                    <p>Z wyrazami wdzięczności,<br />Elfy z Fundacji Panda Team</p>
+                    <p><b>Partnerzy akcji:</b></p>
+                </div>
+                <div style="text-align: center;">
+                    <img src="~/img/inpost_logo.png" alt="InPost logo" />
+                    <img src="~/img/grupa_mtp_logo.png" alt="Grupa MTP logo" height="100" />
                 </div>
             </div>
         </div>
@@ -26,7 +44,7 @@
             <a href="/?filter=available&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersAvailable">Dostępne</a>
             <a href="/?filter=reserved&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersReserved">Zarezerwowane</a>
         </div>
-        
+
         <div class="col-lg-12 mb-3 text-center">
             <form method="get" action="/">
                 <input type="text" name="search" class="form-control d-inline-block w-50" placeholder="Szukaj..." value="@Request.Query["search"]" />
