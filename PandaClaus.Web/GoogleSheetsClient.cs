@@ -157,7 +157,7 @@ public class GoogleSheetsClient
             AssignedToInfo = GetCellOrEmptyString(row, 22),
             Uwagi = GetCellOrEmptyString(row, 23),
             Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.DODANY : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true),
-            Gabaryt = GetCellOrEmptyString(row, 25).FirstOrDefault()
+            Gabaryt = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 25)) ? Gabaryt.A : Enum.Parse<Gabaryt>(GetCellOrEmptyString(row, 25), true)
         };
 
         return letter;
@@ -218,8 +218,22 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    internal async Task UpdateStatus(int letterNumber, string status, string uwagi, string gabaryt)
+    public async Task UpdateStatus(int rowNumber, string status, string uwagi, string gabaryt)
     {
-        throw new NotImplementedException();
+        var range = $"{_sheetName}!X{rowNumber}:Z{rowNumber}";
+
+        var valuesToUpdate = new List<object>
+        {
+            uwagi,
+            status,
+            gabaryt
+        };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
     }
 }

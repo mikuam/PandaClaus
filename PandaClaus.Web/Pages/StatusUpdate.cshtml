@@ -10,18 +10,20 @@
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
+                <h1>@Request.Query["message"]</h1>
+
                 @if (Model.Letter == null)
                 {
                     <div class="col-lg-12 mb-3 text-center">
                         <form method="post">
-                            <input type="text" name="letterNumber" class="form-control d-inline-block w-50" placeholder="Podaj numer listu" />
+                            <input type="text" name="letterNumber" class="form-control d-inline-block w-50" placeholder="Podaj numer listu"/>
                             <button type="submit" class="btn btn-primary" asp-page-handler="setLetterNumber">Szukaj</button>
                         </form>
                     </div>
                 }
                 else
                 {
-                    <h1 class="mb-4">@Model.Letter.ChildName<span>, lat </span>@Model.Letter.ChildAge</h1>
+                    <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge</h1>
 
                     <h2>Numer listu: @Model.Letter.Number</h2>
                     <h2>Status: @Model.Letter.Status</h2>
@@ -50,11 +52,11 @@
                         </div>
                     </div>
                     <form method="post">
-                        <input type="hidden" name="number" value="@Model.Letter.RowNumber" />
-                        
+                        <input type="hidden" name="number" value="@Model.Letter.RowNumber"/>
+
                         <div class="mb-4">
-                            <label asp-for="Letter.Uwagi">Uwagi - widoczne tylko dla wolontariuszy</label>
-                            <textarea asp-for="Letter.Uwagi" rows="3" class="form-control" id="Uwagi" value="@Model.Letter.Uwagi"></textarea>
+                            <label for="uwagi">Uwagi - widoczne tylko dla wolontariuszy</label>
+                            <textarea rows="3" class="form-control" id="uwagi" name="uwagi">@Model.Letter.Uwagi</textarea>
                         </div>
 
                         @switch (Model.Letter.Status)
@@ -68,11 +70,11 @@
                             case LetterStatus.SPRAWDZONY:
                                 <div class="mb-3">
                                     <label for="gabaryt" class="form-label">Gabaryt</label>
-                                    <select id="gabaryt" name="gabaryt" class="form-select">
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                        <option value="N">N</option>
+                                    <select id="gabaryt" name="gabaryt" class="form-select" asp-for="@Model.Letter.Gabaryt">
+                                        <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
+                                        <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
+                                        <option value="C">C (41 × 38 × 64 cm, max 25kg)</option>
+                                        <option value="N">N - niestandardowy (wpisz w Uwagach dlaczego)</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPAKOWANY">Oznacz jako spakowany</button>
