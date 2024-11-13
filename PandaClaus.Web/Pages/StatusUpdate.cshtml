@@ -23,7 +23,7 @@
                 }
                 else
                 {
-                    <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge</h1>
+                    <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge.FormatAsAge()</h1>
 
                     <h2>Numer listu: @Model.Letter.Number</h2>
                     <h2>Status: @Model.Letter.Status</h2>
