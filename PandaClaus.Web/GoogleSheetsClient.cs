@@ -131,7 +131,7 @@ public class GoogleSheetsClient
             PostalCode = row[9].ToString() ?? string.Empty,
             PaczkomatCode = row[10].ToString() ?? string.Empty,
             ChildName = row[11].ToString() ?? string.Empty,
-            ChildAge = row[12].ToString() ?? string.Empty,
+            ChildAge = string.IsNullOrWhiteSpace(row[12].ToString()) ? 0 : int.Parse(row[12].ToString()!),
             Description = row[13].ToString() ?? string.Empty,
             ImageIds = string.IsNullOrWhiteSpace(row[14].ToString())
                 ? []

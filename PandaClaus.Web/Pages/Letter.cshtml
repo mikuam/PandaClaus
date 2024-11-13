@@ -1,4 +1,5 @@
 ﻿@page
+@using PandaClaus.Web.Core
 @model LetterModel
 @{
     ViewData["Title"] = "List";
@@ -16,7 +17,7 @@
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
-                <h1 class="mb-4">@Model.Letter.ChildName<span>, lat </span>@Model.Letter.ChildAge</h1>
+                <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge.FormatAsAge()</h1>
 
                 <h2>Numer listu: @Model.Letter.Number</h2>
                 @if (Model.Letter.IsAssigned)

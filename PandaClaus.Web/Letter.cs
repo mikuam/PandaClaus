@@ -17,7 +17,7 @@ public class Letter
     public string PostalCode { get; set; }
     public string PaczkomatCode { get; set; }
     public string ChildName { get; set; }
-    public string ChildAge { get; set; }
+    public int ChildAge { get; set; }
     public string Description { get; set; }
     public List<string> ImageIds { get; set; }
     public List<string> ImageUrls { get; set; }
