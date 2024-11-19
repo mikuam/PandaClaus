@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PandaClaus.Web.Core;
 using System.ComponentModel.DataAnnotations;
 
 namespace PandaClaus.Web.Pages;
