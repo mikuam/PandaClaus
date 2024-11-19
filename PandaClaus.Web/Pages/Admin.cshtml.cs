@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
 
@@ -12,6 +13,7 @@ public class AdminModel : PageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly ICsvExporter _csvExporter;
+    private readonly BlobClient _blobClient;
 
     [BindProperty]
     public string LetterNumbers { get; set; }
@@ -22,10 +24,11 @@ public class AdminModel : PageModel
     [BindProperty]
     public int LetterCount { get; set; }
 
-    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter)
+    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient)
     {
         _client = client;
         _csvExporter = csvExporter;
+        _blobClient = blobClient;
     }
 
     public async Task<IActionResult> OnGetAsync(int rowNumber)
@@ -45,7 +48,7 @@ public class AdminModel : PageModel
     {
         if (CheckIsAdmin())
         {
-            var letters = await _client.FetchLetters();
+            var letters = (await _client.FetchLetters()).Where(l => l.Status == LetterStatus.UDEKOROWANY);
             var csvExport = _csvExporter.Export(letters.Take(letterCount));
 
             var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);
@@ -71,7 +74,38 @@ public class AdminModel : PageModel
             var stream = new MemoryStream(byteArray);
             var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
 
+            foreach (var letter in letters)
+            {
+                _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi, letter.Gabaryt);
+            }
+
             return File(stream, "text/csv", fileName);
+        }
+
+        return RedirectToPage("./Index");
+    }
+
+    public async Task<IActionResult> OnPostUpdateContentTypeAsync()
+    {
+        if (CheckIsAdmin())
+        {
+            var letters = await _client.FetchLetters();
+            var images = letters.SelectMany(l => l.ImageIds).Distinct().ToList();
+
+            foreach (var image in images)
+            {
+                var contentType = ImageHelper.GetContentType(image);
+
+                if (!string.IsNullOrWhiteSpace(contentType))
+                {
+
+                    await _blobClient.UpdateContentType(image, contentType);
+                }
+                else
+                {
+                    
+                }
+            }
         }
 
         return RedirectToPage("./Index");

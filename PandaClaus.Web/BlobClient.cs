@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using PandaClaus.Web.Core;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
@@ -27,6 +29,10 @@ public class BlobClient
             var thumbnailId = imageId + "_thumbnail" + ".jpg";  // Use .jpg extension for thumbnails
 
             await containerClient.UploadBlobAsync(imageId, file.OpenReadStream());
+
+            var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(file.FileName) };
+            await containerClient.GetBlobClient(imageId).SetHttpHeadersAsync(blobHttpHeader);
+
             imageIds.Add(imageId);
 
             await GenerateAndUploadThumbnail(file, containerClient, thumbnailId);
@@ -49,7 +55,26 @@ public class BlobClient
         await image.SaveAsync(memoryStream, new JpegEncoder());
         memoryStream.Position = 0;  // Reset the stream position for uploading
 
-        // Upload the thumbnail
+        // Upload the thumbnail with content type
         await containerClient.UploadBlobAsync(thumbnailId, memoryStream);
+
+        var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(thumbnailId) };
+        await containerClient.GetBlobClient(thumbnailId).SetHttpHeadersAsync(blobHttpHeader);
+    }
+
+    internal async Task UpdateContentType(string image, string contentType)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient("photos2024");
+        var blobClient = containerClient.GetBlobClient(image);
+
+        var blobProperties = await blobClient.GetPropertiesAsync();
+
+        if (blobProperties.Value.ContentType.StartsWith("image"))
+        {
+            return;
+        }
+
+        // Set the updated headers back to the blob
+        await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType, ContentHash = blobProperties.Value.ContentHash });
     }
 }
