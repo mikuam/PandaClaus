@@ -15,6 +15,9 @@
 
                 <form method="post">
                     <h3>Opcja 1</h3>
+                    
+                    <p>Generowanie listów po numerach, niezależnie od statusu.</p>
+
                     <div class="mb-4">
                         <label asp-for="LetterNumbers">Numery listów(oddzielone przecinkiem)</label>
                         <input asp-for="LetterNumbers" type="text" class="form-control" id="letterNumbers">
@@ -27,6 +30,8 @@
                     <br/>
                     <hr/>
                     <h3>Opcja 2</h3>
+                    
+                    <p>Generowanie listów w statusie UDEKOROWANY. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY.</p>
 
                     <div class="mb-4">
                         <label for="letterCount">Ilość listów</label>
@@ -38,6 +43,11 @@
                     </div>
                     <button type="submit" asp-page-handler="exportNext" class="btn btn-primary btn-sm mt-3 float-none">
                         Generuj
+                    </button>
+                    
+                    <hr/>
+                    <button type="submit" asp-page-handler="updateContentType" class="btn btn-primary btn-sm mt-3 float-none">
+                        Update Content Type
                     </button>
                 </form>
             </div>

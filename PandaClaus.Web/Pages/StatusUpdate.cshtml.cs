@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
 public class StatusUpdateModel : PageModel
@@ -42,11 +43,12 @@ public class StatusUpdateModel : PageModel
     {
         if (int.TryParse(Request.Form["number"].ToString(), out var rowNumber))
         {
-            var status = Request.Query["status"].ToString();
+            var status = Enum.Parse<LetterStatus>(Request.Query["status"].ToString());
             var uwagi = Request.Form["uwagi"].ToString();
-            var gabaryt = string.IsNullOrWhiteSpace(Request.Form["gabaryt"].ToString())
+            var gabarytValue = string.IsNullOrWhiteSpace(Request.Form["gabaryt"].ToString())
                 ? Letter.Gabaryt.ToString()
                 : Request.Form["gabaryt"].ToString();
+            var gabaryt = Enum.Parse<Gabaryt>(gabarytValue);
 
             await _client.UpdateStatus(rowNumber, status, uwagi, gabaryt);
         }

@@ -218,15 +218,15 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateStatus(int rowNumber, string status, string uwagi, string gabaryt)
+    public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi, Gabaryt gabaryt)
     {
         var range = $"{_sheetName}!X{rowNumber}:Z{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
             uwagi,
-            status,
-            gabaryt
+            status.ToString(),
+            gabaryt.ToString()
         };
         var valueRange = new ValueRange
         {
