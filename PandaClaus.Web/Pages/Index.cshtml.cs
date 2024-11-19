@@ -4,6 +4,7 @@ namespace PandaClaus.Web.Pages;
 public class IndexModel : PageModel
 {
     private const string AdminParameter = "adminCode";
+    private const string EarlyAccessParameter = "earlyAccess";
     private const string ActiveButton = "btn-primary";
     private const string InActiveButton = "btn-outline-primary";
 
@@ -25,6 +26,9 @@ public class IndexModel : PageModel
     {
         var isAdmin = IsAdmin();
         Request.HttpContext.Session.SetString("IsAdmin", isAdmin ? "true" : "false");
+
+        var isEarlyAccess = IsEarlyAccess();
+        Request.HttpContext.Session.SetString("IsEarlyAccess", isEarlyAccess ? "true" : "false");
 
         var result = (await _client.FetchLetters()).ToList();
         var filter = Request.Query["filter"].ToString();
@@ -54,7 +58,7 @@ public class IndexModel : PageModel
                 break;
         }
 
-        if (!isAdmin)
+        if (!isAdmin && !isEarlyAccess)
         {
             result = result.Where(l => l.IsVisible).ToList();
         }
@@ -70,6 +74,15 @@ public class IndexModel : PageModel
 
         result.ForEach(l => l.Description = TrimLength(l.Description));
         Letters = result.OrderBy(l => l.Number, new CustomComparer()).ToList();
+    }
+
+    private bool IsEarlyAccess()
+    {
+        var isEarlAccessValue = Request.HttpContext.Session.GetString("IsEarlyAccess");
+        var isEarlyAccessFromSession = isEarlAccessValue is not null && isEarlAccessValue == "true";
+
+        return isEarlyAccessFromSession ||
+               (Request.Query.ContainsKey(EarlyAccessParameter) && Request.Query[EarlyAccessParameter] == "true");
     }
 
     private bool IsAdmin()
