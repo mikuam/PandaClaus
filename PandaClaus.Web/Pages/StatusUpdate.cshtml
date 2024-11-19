@@ -59,6 +59,16 @@
                             <textarea rows="3" class="form-control" id="uwagi" name="uwagi">@Model.Letter.Uwagi</textarea>
                         </div>
 
+                        <div class="mb-3 @(Model.Letter.Status == LetterStatus.SPRAWDZONY ? "" : "d-none")">
+                            <label for="gabaryt" class="form-label">Gabaryt</label>
+                            <select id="gabaryt" name="gabaryt" class="form-select" asp-for="@Model.Letter.Gabaryt">
+                                <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
+                                <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
+                                <option value="C">C (41 × 38 × 64 cm, max 25kg)</option>
+                                <option value="N">N - niestandardowy (wpisz w Uwagach dlaczego)</option>
+                            </select>
+                        </div>
+
                         @switch (Model.Letter.Status)
                         {
                             case LetterStatus.DODANY:
@@ -68,15 +78,6 @@
                                 <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPRAWDZONY">Oznacz jako sprawdzony</button>
                                 break;
                             case LetterStatus.SPRAWDZONY:
-                                <div class="mb-3">
-                                    <label for="gabaryt" class="form-label">Gabaryt</label>
-                                    <select id="gabaryt" name="gabaryt" class="form-select" asp-for="@Model.Letter.Gabaryt">
-                                        <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
-                                        <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
-                                        <option value="C">C (41 × 38 × 64 cm, max 25kg)</option>
-                                        <option value="N">N - niestandardowy (wpisz w Uwagach dlaczego)</option>
-                                    </select>
-                                </div>
                                 <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPAKOWANY">Oznacz jako spakowany</button>
                                 break;
                             case LetterStatus.SPAKOWANY:

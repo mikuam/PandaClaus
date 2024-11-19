@@ -48,14 +48,10 @@ public class AdminModel : PageModel
     {
         if (CheckIsAdmin())
         {
-            var letters = (await _client.FetchLetters()).Where(l => l.Status == LetterStatus.UDEKOROWANY);
-            var csvExport = _csvExporter.Export(letters.Take(letterCount));
-
-            var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);
-            var stream = new MemoryStream(byteArray);
-            var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-
-            return File(stream, "text/csv", fileName);
+            var letters = (await _client.FetchLetters())
+                .Where(l => l.Status == LetterStatus.UDEKOROWANY)
+                .Take(letterCount);
+            return GenerateFileAndUpdateStatus(letters);
         }
 
         return RedirectToPage("./Index");
@@ -68,18 +64,7 @@ public class AdminModel : PageModel
             var letterNumbersSeparate = letterNumbers.Split(',').Select(l => l.Trim().ToLowerInvariant());
 
             var letters = (await _client.FetchLetters()).Where(l => letterNumbersSeparate.Contains(l.Number.ToLowerInvariant()));
-            var csvExport = _csvExporter.Export(letters);
-
-            var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);
-            var stream = new MemoryStream(byteArray);
-            var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-
-            foreach (var letter in letters)
-            {
-                _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi, letter.Gabaryt);
-            }
-
-            return File(stream, "text/csv", fileName);
+            return GenerateFileAndUpdateStatus(letters);
         }
 
         return RedirectToPage("./Index");
@@ -98,7 +83,6 @@ public class AdminModel : PageModel
 
                 if (!string.IsNullOrWhiteSpace(contentType))
                 {
-
                     await _blobClient.UpdateContentType(image, contentType);
                 }
                 else
@@ -109,6 +93,22 @@ public class AdminModel : PageModel
         }
 
         return RedirectToPage("./Index");
+    }
+
+    private IActionResult GenerateFileAndUpdateStatus(IEnumerable<Letter> letters)
+    {
+        var csvExport = _csvExporter.Export(letters);
+
+        foreach (var letter in letters)
+        {
+            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi, letter.Gabaryt);
+        }
+
+        var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);
+        var stream = new MemoryStream(byteArray);
+        var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+
+        return File(stream, "text/csv", fileName);
     }
 
     private bool CheckIsAdmin()
