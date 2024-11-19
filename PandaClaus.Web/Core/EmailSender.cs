@@ -5,7 +5,7 @@ namespace PandaClaus.Web;
 
 public class EmailSender
 {
-    private const string PageUrl = "https://pandaclaus.pandateam.pl/";
+    private const string PageUrl = "https://pandaclaus.pl/";
     private const string EmailFrom = "DoNotReply@\r\n3e425720-d311-4859-9dbd-725f2a71aad6.azurecomm.net";
 
     private readonly EmailClient _emailClient;
@@ -22,8 +22,9 @@ public class EmailSender
         var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
 
         var subject = "Potwierdzenie rezerwacji listu oraz ważne informacje";
-        var plainTextContent = @"Drodzy PANDAstyczni Darczyńcy!
+        var plainTextContent = $@"Drodzy PANDAstyczni Darczyńcy!
 Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus 
+Gratulujemy {letter.AssignedTo}! Potwierdzamy realizowanie wybranego przez Ciebie listu nr {letter.Number}. List znajdziesz pod tym adresem: {GetLetterUrl(letter)}
 Jak wiecie, w tym roku mieliśmy rekordową liczbę zgłoszonych listów — dokładnie 240! Akcja z roku na rok rośnie i jest coraz większym wyzwaniem logistycznym. W związku z tym przypominamy najważniejsze zasady i dziękujemy Wam za wyrozumiałość.
 Paczki muszą być oznaczone numerami listów — to BARDZO ważne i pozwoli nam uniknąć pomyłek.
 Proszę o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek. Bardzo złym pomysłem jest zamawianie zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.
@@ -41,8 +42,11 @@ Już teraz zapraszamy Was do zgłaszania się do wolontariatu podczas finału, k
 Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 ";
 
-        var htmlContent = @"<h1>Drodzy PANDAstyczni Darczyńcy!</h1>
+        //List znajdziesz pod tym adresem: <a href=\"{GetLetterUrl(letter)}\">{GetLetterUrl(letter)}</a>
+
+        var htmlContent = $@"<h1>Drodzy PANDAstyczni Darczyńcy!</h1>
 <p>Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus.</p>
+<p>Gratulujemy {letter.AssignedTo}! Potwierdzamy realizowanie wybranego przez Ciebie listu nr {letter.Number}. List znajdziesz pod tym adresem: <a href=\""{GetLetterUrl(letter)}\"">{GetLetterUrl(letter)}</a></p>
 <p>Jak wiecie, w tym roku mieliśmy rekordową liczbę zgłoszonych listów — dokładnie 240! Akcja z roku na rok rośnie i jest coraz większym wyzwaniem logistycznym. W związku z tym przypominamy najważniejsze zasady i dziękujemy Wam za wyrozumiałość:</p>
 <p>Paczki muszą być oznaczone numerami listów — to BARDZO ważne i pozwoli nam uniknąć pomyłek.</p>
 <p><b>Proszę o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek.</b> Bardzo złym pomysłem jest zamawianie zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.</p>
