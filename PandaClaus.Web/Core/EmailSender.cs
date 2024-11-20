@@ -29,6 +29,7 @@ Jak wiecie, w tym roku mieliśmy rekordową liczbę zgłoszonych listów — dok
 Paczki muszą być oznaczone numerami listów — to BARDZO ważne i pozwoli nam uniknąć pomyłek.
 Proszę o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek. Bardzo złym pomysłem jest zamawianie zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.
 Jeżeli realizujesz kilka listów, paczkę dla każdego dziecka spakuj osobno i umieść wszystkie możliwie w jednym kartonie.
+Do listu możesz dołączyć upominek dla rodziców dziecka, list lub kartkę oraz słodycze itd.
 W tym roku naszym Partnerem jest InPost, dlatego paczki muszą mieć rozmiary zgodne z wymaganiami Paczkomatów InPost.
 Paczkę wyślij Paczkomatem InPost pod numer POZ82M.
 (jeżeli paczka nie zmieści się do Paczkomatu Inpost — daj nam znać na wyżej podany adres mailowy. Prosimy, nie nadawaj paczki kurierem bez informowania nas o tym)
@@ -49,6 +50,7 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 <p>Paczki muszą być oznaczone numerami listów — to BARDZO ważne i pozwoli nam uniknąć pomyłek.</p>
 <p><b>Proszę o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek.</b> Bardzo złym pomysłem jest zamawianie zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.</p>
 <p>Jeżeli realizujesz kilka listów, paczkę dla każdego dziecka spakuj osobno i umieść wszystkie możliwie w jednym kartonie.</p>
+<p>Do listu możesz dołączyć upominek dla rodziców dziecka, list lub kartkę oraz słodycze itd.</p>
 <p>W tym roku naszym Partnerem jest InPost, dlatego paczki muszą mieć rozmiary zgodne z wymaganiami <b>Paczkomatów InPost</b>.</p>
 <p><b>Paczkę wyślij Paczkomatem InPost</b> pod numer <b>POZ82M</b>. (jeżeli paczka nie zmieści się do Paczkomatu Inpost — daj nam znać na wyżej podany adres mailowy. Prosimy, <p>nie nadawaj</p> paczki kurierem bez informowania nas o tym)</p>
 <p>Nadając przesyłkę, podaj e-mail: <a href=""mailto:pandaclaus@pandateam.pl"">pandaclaus@pandateam.pl</a> oraz numer telefonu: +48 534 897 105.</p>
