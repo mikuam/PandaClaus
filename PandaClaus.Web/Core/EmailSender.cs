@@ -42,8 +42,6 @@ Już teraz zapraszamy Was do zgłaszania się do wolontariatu podczas finału, k
 Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 ";
 
-        //List znajdziesz pod tym adresem: <a href=\"{GetLetterUrl(letter)}\">{GetLetterUrl(letter)}</a>
-
         var htmlContent = $@"<h1>Drodzy PANDAstyczni Darczyńcy!</h1>
 <p>Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus.</p>
 <p>Gratulujemy {letter.AssignedTo}! Potwierdzamy realizowanie wybranego przez Ciebie listu nr {letter.Number}. List znajdziesz pod tym adresem: <a href=\""{GetLetterUrl(letter)}\"">{GetLetterUrl(letter)}</a></p>
@@ -61,7 +59,6 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
     <li>7 grudnia od 10:30 do 14:30</li>
 </ul>
 <p>Z góry BARDZO dziękujemy za dostosowanie się do naszych szczegółowych wytycznych. Pomoże nam to sprawnie przeprowadzić akcję i dostarczyć prezenty do naszych podopiecznych :)</p>
-<p class=""note"">Z góry <span class=""highlight"">BARDZO</span> dziękujemy za dostosowanie się do naszych szczegółowych wytycznych. Pomoże nam to sprawnie przeprowadzić akcję i dostarczyć prezenty do naszych podopiecznych :)</p>
 <p>Już teraz zapraszamy Was do zgłaszania się do wolontariatu podczas finału, który odbędzie się 13 i 14 grudnia (pt-sob) w hali nr 10 Międzynarodowych Targów Poznańskich. Chęć pomocy można zgłosić poprzez formularz dostępny na stronie <a href=""https://forms.gle/xn8UMCst3uSTwoeV9"" target=""_blank"">https://forms.gle/xn8UMCst3uSTwoeV9</a> (wolontariaty pracownicze proszę zgłaszać e-mailowo). Będzie nam miło, jak pomożecie nam w finale! :) </p>
 <p>Z całym #pandateam życzymy wszystkiego PANDAstycznego!</p>";
 
