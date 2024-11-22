@@ -8,7 +8,7 @@
 <!-- List Start -->
 <div class="container-xxl py-5">
     <div class="container">
-        <div class="row g-0 gx-5 align-items-end">
+        <div class="row g-0 gx-5 mb-5 align-items-end">
             <div class="col-lg-12">
                 <div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
                     <p>Drogi Pomocniku Panda Claus’a,</p>
@@ -35,13 +35,13 @@
                     <p><b>Partnerzy akcji:</b></p>
                 </div>
                 <div style="text-align: center;">
-                    <img src="~/img/inpost_logo.png" alt="InPost logo" />
-                    <img src="~/img/grupa_mtp_logo.png" alt="Grupa MTP logo" height="100" />
+                    <img src="~/img/inpost_logo.png" class="m-3 m-lg-5" alt="InPost logo" />
+                    <img src="~/img/grupa_mtp_logo.png" class="m-3 m-lg-5" alt="Grupa MTP logo" height="100" />
                 </div>
             </div>
         </div>
         <div class="col-lg-12 mb-5 text-center">
-            <h4>Listy czekające na pandowego Mikołaja: @Model.Letters.Count(l => l is { IsAssigned: false, IsVisible: true })</h4>
+            <p>Listy czekające na pandowego Mikołaja: <strong>@Model.Letters.Count(l => l is { IsAssigned: false, IsVisible: true })</strong></p>
         </div>
         <div class="col-lg-12 mb-5 text-center">
             <a href="/?filter=all&search=@Request.Query["search"]" class="btn @Model.ButtonFiltersAll">Wszystkie</a>
