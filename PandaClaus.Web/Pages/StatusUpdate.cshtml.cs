@@ -10,6 +10,15 @@ public class StatusUpdateModel : PageModel
     [BindProperty]
     public Letter Letter { get; set; }
 
+    [BindProperty]
+    public Gabaryt Package1Size { get; set; }
+
+    [BindProperty]
+    public Gabaryt Package2Size { get; set; }
+
+    [BindProperty]
+    public Gabaryt Package3Size { get; set; }
+
     public StatusUpdateModel(GoogleSheetsClient client)
     {
         _client = client;
@@ -45,14 +54,33 @@ public class StatusUpdateModel : PageModel
         {
             var status = Enum.Parse<LetterStatus>(Request.Query["status"].ToString());
             var uwagi = Request.Form["uwagi"].ToString();
-            var gabarytValue = string.IsNullOrWhiteSpace(Request.Form["gabaryt"].ToString())
-                ? Letter.Gabaryt.ToString()
-                : Request.Form["gabaryt"].ToString();
-            var gabaryt = Enum.Parse<Gabaryt>(gabarytValue);
 
-            await _client.UpdateStatus(rowNumber, status, uwagi, gabaryt);
+            await _client.UpdateStatus(rowNumber, status, uwagi);
+
+            if (status == LetterStatus.SPAKOWANY)
+            {
+                Letter = await _client.FetchLetterAsync(rowNumber);
+
+                var package1Size = GetPackageSize("package1Size");
+                var package2Size = GetPackageSize("package2Size");
+                var package3Size = GetPackageSize("package3Size");
+
+                if (package1Size == Gabaryt.None)
+                {
+                    package1Size = Gabaryt.A;
+                }
+                var packages = new List<Gabaryt> { package1Size, package2Size, package3Size }.Where(p => p != Gabaryt.None);
+                await _client.CreatePackages(Letter.Number, packages);
+            }
         }
 
         return RedirectToPage("./StatusUpdate", new { message = "Status zaktualizowany pomyślnie" });
+    }
+
+    private Gabaryt GetPackageSize(string parameterName)
+    {
+        return string.IsNullOrWhiteSpace(Request.Form[parameterName].ToString())
+            ? Package1Size
+            : Enum.Parse<Gabaryt>(Request.Form[parameterName].ToString());
     }
 }

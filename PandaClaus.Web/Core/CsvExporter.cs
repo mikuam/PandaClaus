@@ -1,18 +1,27 @@
 ﻿using System.Text;
-using PandaClaus.Web.Pages;
+using PandaClaus.Web.Core.DTOs;
 
 namespace PandaClaus.Web.Core;
 
+public interface ICsvExporter
+{
+    string Export(Dictionary<Letter, IEnumerable<Package>> lettersWithPackages);
+}
+
 public class CsvExporter : ICsvExporter
 {
-    public string Export(IEnumerable<Letter> enumerable)
+    public string Export(Dictionary<Letter, IEnumerable<Package>> lettersWithPackages)
     {
         var csv = new StringBuilder();
         csv.AppendLine("e-mail;telefon;rozmiar;paczkomat;numer_referencyjny;dodatkowa_ochrona;za_pobraniem;imie_i_nazwisko;nazwa_firmy;ulica;kod_pocztowy;miejscowosc;typ_przesylki;paczka_w_weekend");
 
-        foreach (var letter in enumerable)
+        foreach (var (letter, packages) in lettersWithPackages)
         {
-            csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{letter.Gabaryt};{letter.PaczkomatCode};PANDA_{letter.Number};10;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};paczkomat;NIE");
+            foreach (var package in packages)
+            {
+                var packageId = $"PANDA_{letter.Number}-{package.PackageNumber}/{package.TotalPackages}";
+                csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{package.Size};{letter.PaczkomatCode};{packageId};10;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};paczkomat;NIE");
+            }
         }
 
         return csv.ToString();

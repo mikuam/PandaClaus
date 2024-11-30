@@ -4,11 +4,6 @@ using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
 
-public interface ICsvExporter
-{
-    string Export(IEnumerable<Letter> enumerable);
-}
-
 public class AdminModel : PageModel
 {
     private readonly GoogleSheetsClient _client;
@@ -51,7 +46,7 @@ public class AdminModel : PageModel
             var letters = (await _client.FetchLetters())
                 .Where(l => l.Status == LetterStatus.UDEKOROWANY)
                 .Take(letterCount);
-            return GenerateFileAndUpdateStatus(letters);
+            return await GenerateFileAndUpdateStatus(letters);
         }
 
         return RedirectToPage("./Index");
@@ -64,7 +59,7 @@ public class AdminModel : PageModel
             var letterNumbersSeparate = letterNumbers.Split(',').Select(l => l.Trim().ToLowerInvariant());
 
             var letters = (await _client.FetchLetters()).Where(l => letterNumbersSeparate.Contains(l.Number.ToLowerInvariant()));
-            return GenerateFileAndUpdateStatus(letters);
+            return await GenerateFileAndUpdateStatus(letters);
         }
 
         return RedirectToPage("./Index");
@@ -95,13 +90,17 @@ public class AdminModel : PageModel
         return RedirectToPage("./Index");
     }
 
-    private IActionResult GenerateFileAndUpdateStatus(IEnumerable<Letter> letters)
+    private async Task<IActionResult> GenerateFileAndUpdateStatus(IEnumerable<Letter> letters)
     {
-        var csvExport = _csvExporter.Export(letters);
+        var letterNumbers = letters.Select(l => l.Number).ToList();
+        var packages = (await _client.FetchPackages()).Where(p => letterNumbers.Contains(p.LetterNumber));
+
+        var lettersWithPackages = letters.ToDictionary(l => l, l => packages.Where(p => p.LetterNumber == l.Number));
+        var csvExport = _csvExporter.Export(lettersWithPackages);
 
         foreach (var letter in letters)
         {
-            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi, letter.Gabaryt);
+            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi);
         }
 
         var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);

@@ -3,8 +3,7 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using PandaClaus.Web.Core;
-using System;
-using System.Text.RegularExpressions;
+using PandaClaus.Web.Core.DTOs;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
 
 namespace PandaClaus.Web;
@@ -12,6 +11,7 @@ namespace PandaClaus.Web;
 public class GoogleSheetsClient
 {
     private readonly string _sheetName;
+    private readonly string _packageSheetName;
     private readonly string _spreadsheetId;
     private readonly string _googleSheetsCredentials;
     private readonly string _blobUrl;
@@ -24,6 +24,7 @@ public class GoogleSheetsClient
 
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
+        _packageSheetName = configuration["PackageSheetName"]!;
         _blobUrl = configuration["BlobUrl"]!;
 
         _googleSheetsCredentials = configuration["GoogleSheetsCredentials"]!;
@@ -38,7 +39,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:Z";
+        var range = $"{_sheetName}!A:Y";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -47,7 +48,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:Y{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -156,8 +157,7 @@ public class GoogleSheetsClient
             AssignedToPhone = GetCellOrEmptyString(row, 21),
             AssignedToInfo = GetCellOrEmptyString(row, 22),
             Uwagi = GetCellOrEmptyString(row, 23),
-            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.DODANY : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true),
-            Gabaryt = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 25)) ? Gabaryt.A : Enum.Parse<Gabaryt>(GetCellOrEmptyString(row, 25), true)
+            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.DODANY : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true)
         };
 
         return letter;
@@ -218,15 +218,14 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi, Gabaryt gabaryt)
+    public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi)
     {
-        var range = $"{_sheetName}!X{rowNumber}:Z{rowNumber}";
+        var range = $"{_sheetName}!X{rowNumber}:Y{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
             uwagi,
-            status.ToString(),
-            gabaryt.ToString()
+            status.ToString()
         };
         var valueRange = new ValueRange
         {
@@ -235,5 +234,66 @@ public class GoogleSheetsClient
         var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
         updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await updateRequest.ExecuteAsync();
+    }
+
+    public async Task CreatePackages(string letterNumber, IEnumerable<Gabaryt> sizes)
+    {
+        var packages = await FetchPackages();
+        var firstEmptyRow = packages.Count + 2;
+
+        var rowNumber = firstEmptyRow;
+        foreach (var size in sizes)
+        {
+            var range = $"{_packageSheetName}!A{rowNumber}:D{rowNumber}";
+
+            var valuesToUpdate = new List<object>
+            {
+                letterNumber,
+                rowNumber - firstEmptyRow + 1,
+                sizes.Count(),
+                size.ToString()
+            };
+            var valueRange = new ValueRange
+            {
+                Values = new List<IList<object>> { valuesToUpdate }
+            };
+            var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+            updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            await updateRequest.ExecuteAsync();
+
+            rowNumber++;
+        }
+    }
+
+    public async Task<List<Package>> FetchPackages()
+    {
+        var range = $"{_packageSheetName}!A:D";
+        var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
+        var response = await request.ExecuteAsync();
+        return MapToPackages(response.Values);
+    }
+
+    private List<Package> MapToPackages(IList<IList<object>> values)
+    {
+        var packages = new List<Package>();
+        var rowNumber = 2;
+        foreach (var row in values.Skip(1))
+        {
+            if (row.Count < 4)
+                continue;
+
+            var package = new Package
+            {
+                RowNumber = rowNumber,
+                LetterNumber = row[0].ToString() ?? string.Empty,
+                PackageNumber = string.IsNullOrWhiteSpace(row[1].ToString()) ? 0 : int.Parse(row[1].ToString()!),
+                TotalPackages = string.IsNullOrWhiteSpace(row[2].ToString()) ? 0 : int.Parse(row[2].ToString()!),
+                Size = string.IsNullOrWhiteSpace(row[3].ToString()) ? Gabaryt.A : Enum.Parse<Gabaryt>(row[3].ToString()!, true)
+            };
+
+            rowNumber++;
+            packages.Add(package);
+        }
+        return packages;
     }
 }

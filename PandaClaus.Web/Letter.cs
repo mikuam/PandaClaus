@@ -34,5 +34,4 @@ public class Letter
     public string AssignedToInfo { get; set; }
     public string Uwagi { get; set; }
     public LetterStatus Status { get; set; }
-    public Gabaryt Gabaryt { get; set; } 
 }
