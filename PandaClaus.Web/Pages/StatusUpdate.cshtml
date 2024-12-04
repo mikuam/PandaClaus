@@ -14,9 +14,10 @@
 
                 @if (Model.Letter == null)
                 {
+                    <h2>Podaj numer listu</h2>
                     <div class="col-lg-12 mb-3 text-center">
                         <form method="post">
-                            <input type="text" name="letterNumber" class="form-control d-inline-block w-50" placeholder="Podaj numer listu" />
+                            <input type="text" name="letterNumber" class="form-control d-inline-block w-50 mx-2" placeholder="Podaj numer listu" />
                             <button type="submit" class="btn btn-primary" asp-page-handler="setLetterNumber">Szukaj</button>
                         </form>
                     </div>
@@ -26,31 +27,20 @@
                     <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge.FormatAsAge()</h1>
 
                     <h2>Numer listu: @Model.Letter.Number</h2>
-                    <h2>Status: @Model.Letter.Status</h2>
+                    <h2>Status: @StatusHelper.GetStatusDescription(@Model.Letter?.Status ?? LetterStatus.NIE_WIADOMO)</h2>
 
-                    <div class="row">
-                        <div class="progress" style="height: 30px;">
-
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.DODANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="16" aria-valuemin="0" aria-valuemax="100">
-                                Dodany
-                            </div>
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.DOSTARCZONY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
-                                Dostarczony
-                            </div>
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.SPRAWDZONY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                                Sprawdzony
-                            </div>
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.SPAKOWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">
-                                Spakowany
-                            </div>
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.UDEKOROWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100">
-                                Udekorowany
-                            </div>
-                            <div class="progress-bar @(Model.Letter.Status == LetterStatus.ZAADRESOWANY ? "bg-success" : "bg-primary")" role="progressbar" style="width: 16%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                Zaadresowany
-                            </div>
-                        </div>
+                    <div>
+                        <ul class="list-group">
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.NIE_WIADOMO ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.NIE_WIADOMO)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.DOSTARCZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.DOSTARCZONE)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.W_TRAKCIE_SPRAWDZANIA ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.W_TRAKCIE_SPRAWDZANIA)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.ODLOZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.ODLOZONE)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.SPRAWDZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.SPRAWDZONE)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.SPAKOWANE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.SPAKOWANE)</li>
+                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.ZAADRESOWANE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.ZAADRESOWANE)</li>
+                        </ul>
                     </div>
+
                     <form method="post">
                         <input type="hidden" name="number" value="@Model.Letter.RowNumber" />
 
@@ -59,7 +49,7 @@
                             <textarea rows="3" class="form-control" id="uwagi" name="uwagi">@Model.Letter.Uwagi</textarea>
                         </div>
 
-                        <div class="@(Model.Letter.Status == LetterStatus.SPRAWDZONY ? "" : "d-none")">
+                        <div class="@(Model.Letter.Status == LetterStatus.SPRAWDZONE ? "" : "d-none")">
                             <div class="mb-3">
                                 <label for="package1Size" class="form-label">Paczka 1 - gabaryt</label>
                                 <select id="package1Size" name="package1Size" class="form-select" asp-for="@Model.Package1Size" required>
@@ -94,20 +84,26 @@
 
                         @switch (Model.Letter.Status)
                         {
-                            case LetterStatus.DODANY:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="DOSTARCZONY">Oznacz jako dostarczony</button>
+                            case LetterStatus.NIE_WIADOMO:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="DOSTARCZONE">Zmień status na: Dostarczono paczki</button>
                                 break;
-                            case LetterStatus.DOSTARCZONY:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPRAWDZONY">Oznacz jako sprawdzony</button>
+                            case LetterStatus.DOSTARCZONE:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="W_TRAKCIE_SPRAWDZANIA">Zmień status na: Paczki w trakcie sprawdzania</button>
                                 break;
-                            case LetterStatus.SPRAWDZONY:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPAKOWANY">Oznacz jako spakowany</button>
+                            case LetterStatus.W_TRAKCIE_SPRAWDZANIA:
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary me-2" asp-page-handler="setStatus" asp-route-status="SPRAWDZONE">Zmień status na: Paczki sprawdzone</button>
+                                    <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="ODLOZONE">Zmień status na: Paczki odłożone do ponownego sprawdzenia</button>
+                                </div>
                                 break;
-                            case LetterStatus.SPAKOWANY:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="UDEKOROWANY">Oznacz jako udekorowany</button>
+                            case LetterStatus.ODLOZONE:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="W_TRAKCIE_SPRAWDZANIA">Zmień status na: Paczki w trakcie sprawdzania</button>
                                 break;
-                            case LetterStatus.UDEKOROWANY:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="ZAADRESOWANY">Oznacz jako zaadresowany</button>
+                            case LetterStatus.SPRAWDZONE:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="SPAKOWANE">Zmień status na: Paczki spakowane</button>
+                                break;
+                            case LetterStatus.SPAKOWANE:
+                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="ZAADRESOWANE">Zmień status na: Paczki zaadresowane</button>
                                 break;
                         }
 

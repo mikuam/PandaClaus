@@ -157,7 +157,7 @@ public class GoogleSheetsClient
             AssignedToPhone = GetCellOrEmptyString(row, 21),
             AssignedToInfo = GetCellOrEmptyString(row, 22),
             Uwagi = GetCellOrEmptyString(row, 23),
-            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.DODANY : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true)
+            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true)
         };
 
         return letter;

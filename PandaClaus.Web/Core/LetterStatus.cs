@@ -2,10 +2,11 @@
 
 public enum LetterStatus
 {
-    DODANY = 0,
-    DOSTARCZONY = 1,
-    SPRAWDZONY = 2,
-    SPAKOWANY = 3,
-    UDEKOROWANY = 4,
-    ZAADRESOWANY = 5
+    NIE_WIADOMO = 0,
+    DOSTARCZONE = 1,
+    W_TRAKCIE_SPRAWDZANIA = 2,
+    ODLOZONE = 3,
+    SPRAWDZONE = 4,
+    SPAKOWANE = 5,
+    ZAADRESOWANE = 6
 }

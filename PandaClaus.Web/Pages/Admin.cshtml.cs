@@ -44,7 +44,7 @@ public class AdminModel : PageModel
         if (CheckIsAdmin())
         {
             var letters = (await _client.FetchLetters())
-                .Where(l => l.Status == LetterStatus.UDEKOROWANY)
+                .Where(l => l.Status == LetterStatus.SPAKOWANE)
                 .Take(letterCount);
             return await GenerateFileAndUpdateStatus(letters);
         }
@@ -100,7 +100,7 @@ public class AdminModel : PageModel
 
         foreach (var letter in letters)
         {
-            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANY, letter.Uwagi);
+            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, letter.Uwagi);
         }
 
         var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);

@@ -57,7 +57,7 @@ public class StatusUpdateModel : PageModel
 
             await _client.UpdateStatus(rowNumber, status, uwagi);
 
-            if (status == LetterStatus.SPAKOWANY)
+            if (status == LetterStatus.SPAKOWANE)
             {
                 Letter = await _client.FetchLetterAsync(rowNumber);
 
