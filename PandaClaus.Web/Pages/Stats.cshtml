@@ -11,23 +11,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PandaClaus</title>
+    <title>Panda Claus - Statystyki</title>
     <link rel="stylesheet" href="~/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
-
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="~/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
 </head>
 <body class="bg-white">
     <div class="container-fluid bg-white">
@@ -83,7 +69,7 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-header">
-                            <p class="h5">Paczek do sprawdzenia</p>
+                            <p class="h5">Listów do sprawdzenia</p>
                         </div>
                         <div class="card-body">
                             <p class="stats-card text-primary">@Model.Statistics.DoSprawdzenia</p>
@@ -124,6 +110,10 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script>
+        setTimeout(function(){
+            location.reload();
+        }, 30000);
+    </script>
 </body>
 </html>
