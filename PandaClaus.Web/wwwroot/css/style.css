@@ -554,3 +554,8 @@
 .carousel-width {
     max-width: 600px;
 }
+
+.stats-card {
+    font-size: 107px;
+    font-weight: bold;
+}
