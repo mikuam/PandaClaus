@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection.Emit;
+using System.Text;
 using PandaClaus.Web.Core.DTOs;
 
 namespace PandaClaus.Web.Core;
@@ -20,7 +21,7 @@ public class CsvExporter : ICsvExporter
             foreach (var package in packages)
             {
                 var packageId = $"PANDA_{letter.Number}-{package.PackageNumber}/{package.TotalPackages}";
-                csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{package.Size};{letter.PaczkomatCode};{packageId};0;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};paczkomat;NIE");
+                csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{package.Size};{letter.PaczkomatCode};{packageId};0;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};{GetDeliveryType(package.Size)};NIE");
             }
         }
 
@@ -34,5 +35,10 @@ public class CsvExporter : ICsvExporter
         return string.IsNullOrWhiteSpace(letter.ApartmentNumber)
             ? line
             : line + " / " + letter.ApartmentNumber;
+    }
+
+    private string GetDeliveryType(Gabaryt gabaryt)
+    {
+        return gabaryt == Gabaryt.N ? "kurier" : "paczkomat";
     }
 }
