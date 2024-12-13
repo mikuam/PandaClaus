@@ -39,6 +39,6 @@ public class CsvExporter : ICsvExporter
 
     private string GetDeliveryType(Gabaryt gabaryt)
     {
-        return gabaryt == Gabaryt.N ? "kurier" : "paczkomat";
+        return gabaryt == Gabaryt.N || gabaryt == Gabaryt.D ? "kurier" : "paczkomat";
     }
 }
