@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PandaClaus.Web.Pages;
-public class PrivacyModel : PageModel
+public class PrivacyModel : BasePageModel
 {
     private readonly ILogger<PrivacyModel> _logger;
 

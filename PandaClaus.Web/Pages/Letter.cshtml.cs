@@ -5,7 +5,7 @@ using PandaClaus.Web.Core;
 using System.ComponentModel.DataAnnotations;
 
 namespace PandaClaus.Web.Pages;
-public class LetterModel : PageModel
+public class LetterModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
@@ -13,9 +13,6 @@ public class LetterModel : PageModel
 
     [BindProperty]
     public Letter Letter { get; set; }
-
-    [BindProperty]
-    public bool IsAdmin { get; set; }
 
     [BindProperty]
     public List<IFormFile> UploadPhotos { get; set; }
@@ -29,8 +26,6 @@ public class LetterModel : PageModel
 
     public async Task OnGetAsync(int rowNumber)
     {
-        IsAdmin = CheckIsAdmin();
-
         Letter = await _client.FetchLetterAsync(rowNumber);
     }
 
@@ -59,7 +54,7 @@ public class LetterModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteImageAsync(int rowNumber, string imageUrl)
     {
-        if (CheckIsAdmin())
+        if (IsAdmin)
         {
             Letter = await _client.FetchLetterAsync(rowNumber);
 
@@ -80,7 +75,7 @@ public class LetterModel : PageModel
 
     public async Task<IActionResult> OnPostUploadImageAsync(int rowNumber)
     {
-        if (CheckIsAdmin())
+        if (IsAdmin)
         {
             Letter = await _client.FetchLetterAsync(rowNumber);
             var photoIds = await _blobClient.UploadPhotos(UploadPhotos);
@@ -92,12 +87,6 @@ public class LetterModel : PageModel
         }
 
         return RedirectToPage("./Letter", new { rowNumber });
-    }
-
-    private bool CheckIsAdmin()
-    {
-        var isAdminValue = Request.HttpContext.Session.GetString("IsAdmin");
-        return isAdminValue is not null && isAdminValue == "true";
     }
 }
 

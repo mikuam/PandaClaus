@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PandaClaus.Web.Pages;
-public class IndexModel : PageModel
+public class IndexModel : BasePageModel
 {
     private const string AdminParameter = "adminCode";
     private const string EarlyAccessParameter = "earlyAccess";
@@ -24,8 +24,13 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var isAdmin = IsAdmin();
-        Request.HttpContext.Session.SetString("IsAdmin", isAdmin ? "true" : "false");
+        var isAdminFromQuery = Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode;
+        if (isAdminFromQuery)
+        {
+            Request.HttpContext.Session.SetString("IsAdmin", "true");
+        }
+
+        Request.HttpContext.Session.SetString("IsAdmin", IsAdmin ? "true" : "false");
 
         var isEarlyAccess = IsEarlyAccess();
         Request.HttpContext.Session.SetString("IsEarlyAccess", isEarlyAccess ? "true" : "false");
@@ -58,7 +63,7 @@ public class IndexModel : PageModel
                 break;
         }
 
-        if (!isAdmin && !isEarlyAccess)
+        if (!IsAdmin && !isEarlyAccess)
         {
             result = result.Where(l => l.IsVisible).ToList();
         }
@@ -83,15 +88,6 @@ public class IndexModel : PageModel
 
         return isEarlyAccessFromSession ||
                (Request.Query.ContainsKey(EarlyAccessParameter) && Request.Query[EarlyAccessParameter] == "true");
-    }
-
-    private bool IsAdmin()
-    {
-        var isAdminValue = Request.HttpContext.Session.GetString("IsAdmin");
-        var isAdminFromSession = isAdminValue is not null && isAdminValue == "true";
-
-        return isAdminFromSession ||
-               (Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode);
     }
 
     private string TrimLength(string text)

@@ -2,18 +2,22 @@ using Microsoft.AspNetCore.Http.Features;
 using PandaClaus.Web;
 using PandaClaus.Web.Core;
 using PandaClaus.Web.Pages;
+using PandaClaus.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-IConfiguration configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", false, true)
-    .AddEnvironmentVariables()
-    .Build();
 
-builder.Services.AddSingleton(configuration);
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<GoogleSheetsClient>();
 builder.Services.AddScoped<BlobClient>();
 builder.Services.AddScoped<EmailSender>();
+
+// Add HttpClient for InPost API
+builder.Services.AddHttpClient<InPostApiClient>();
+builder.Services.AddScoped<InPostApiClient>();
+
+builder.Services.AddScoped<InPostShipmentRequestBuilder>();
+
 builder.Services.Configure<FormOptions>(options =>
 {
     options.ValueLengthLimit = 10 * 1024 * 1024; // 10MB

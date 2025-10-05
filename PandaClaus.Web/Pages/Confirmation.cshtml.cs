@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PandaClaus.Web.Pages;
-public class ConfirmationModel : PageModel
+public class ConfirmationModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
 

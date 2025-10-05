@@ -11,10 +11,24 @@
                 <h1 class="mb-4">Panel admina</h1>
                 <h2 style="color: red">@Request.Query["message"]</h2>
                 
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success" role="alert">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+                
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
+                
                 <p>Generowanie pliku eksportu do przesyłek InPost. Po wygenerwaniu pliku w formacie CSV, należy go użyć na tej stronie <a href="https://manager.paczkomaty.pl/shipments/send/import" target="_blank">https://manager.paczkomaty.pl/shipments/send/import</a> do wygenerowania etykiet.</p>
 
                 <form method="post">
-                    <h3>Opcja 1</h3>
+                    <h3>Opcja 1 - Eksport CSV</h3>
                     
                     <p>Generowanie listów po numerach, niezależnie od statusu. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY</p>
 
@@ -24,14 +38,14 @@
                     </div>
                     <button type="submit" asp-page-handler="exportFromNumbers"
                             asp-route-letterNumbers="@Model.LetterNumbers" class="btn btn-primary btn-sm mt-3 float-none">
-                        Generuj
+                        Generuj CSV
                     </button>
 
                     <br/>
                     <hr/>
-                    <h3>Opcja 2</h3>
+                    <h3>Opcja 2 - Eksport CSV</h3>
                     
-                    <p>Generowanie listów w statusie UDEKOROWANY. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY.</p>
+                    <p>Generowanie listów w statusie SPAKOWANE. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY.</p>
 
                     <div class="mb-4">
                         <label for="letterCount">Ilość listów</label>
@@ -42,11 +56,24 @@
                         </select>
                     </div>
                     <button type="submit" asp-page-handler="exportNext" class="btn btn-primary btn-sm mt-3 float-none">
-                        Generuj
+                        Generuj CSV
                     </button>
                     
                     <hr/>
-                    <button type="submit" asp-page-handler="updateContentType" class="btn btn-primary btn-sm mt-3 float-none">
+                    <h3>Opcja 3 - Integracja InPost API</h3>
+                    
+                    <p>Automatyczne tworzenie przesyłek przez InPost ShipX API. Wybierz numery listów, które mają zostać wysłane.</p>
+
+                    <div class="mb-4">
+                        <label for="inpostLetterNumbers">Numery listów do InPost API (oddzielone przecinkiem)</label>
+                        <input type="text" name="inpostLetterNumbers" class="form-control" id="inpostLetterNumbers">
+                    </div>
+                    <button type="submit" asp-page-handler="sendToInPost" class="btn btn-success btn-sm mt-3 float-none">
+                        Utwórz przesyłki InPost
+                    </button>
+                    
+                    <hr/>
+                    <button type="submit" asp-page-handler="updateContentType" class="btn btn-secondary btn-sm mt-3 float-none">
                         Update Content Type
                     </button>
                 </form>

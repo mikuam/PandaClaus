@@ -1,36 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PandaClaus.Web.Core;
+using PandaClaus.Web.Services;
 
 namespace PandaClaus.Web.Pages;
 
-public class AdminModel : PageModel
+public class AdminModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly ICsvExporter _csvExporter;
     private readonly BlobClient _blobClient;
+    private readonly InPostApiClient _inPostApiClient;
+    private readonly InPostShipmentRequestBuilder _shipmentRequestBuilder;
 
     [BindProperty]
     public string LetterNumbers { get; set; }
 
     [BindProperty]
-    public bool IsAdmin { get; set; }
-
-    [BindProperty]
     public int LetterCount { get; set; }
 
-    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient)
+    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient, 
+        InPostApiClient inPostApiClient, InPostShipmentRequestBuilder shipmentRequestBuilder)
     {
         _client = client;
         _csvExporter = csvExporter;
         _blobClient = blobClient;
+        _inPostApiClient = inPostApiClient;
+        _shipmentRequestBuilder = shipmentRequestBuilder;
     }
 
     public async Task<IActionResult> OnGetAsync(int rowNumber)
-    
     {
-        IsAdmin = CheckIsAdmin();
-
         if (!IsAdmin)
         {
             return RedirectToPage("./Index");
@@ -41,7 +41,7 @@ public class AdminModel : PageModel
 
     public async Task<IActionResult> OnPostExportNextAsync(int letterCount)
     {
-        if (CheckIsAdmin())
+        if (IsAdmin)
         {
             var letters = (await _client.FetchLetters())
                 .Where(l => l.Status == LetterStatus.SPAKOWANE)
@@ -54,7 +54,7 @@ public class AdminModel : PageModel
 
     public async Task<IActionResult> OnPostExportFromNumbersAsync(string letterNumbers)
     {
-        if (CheckIsAdmin())
+        if (IsAdmin)
         {
             var letterNumbersSeparate = letterNumbers.Split(',').Select(l => l.Trim().ToLowerInvariant());
 
@@ -65,9 +65,22 @@ public class AdminModel : PageModel
         return RedirectToPage("./Index");
     }
 
+    public async Task<IActionResult> OnPostSendToInPostAsync(string inpostLetterNumbers)
+    {
+        if (IsAdmin)
+        {
+            var letterNumbersSeparate = inpostLetterNumbers.Split(',').Select(l => l.Trim().ToLowerInvariant());
+            var letters = (await _client.FetchLetters()).Where(l => letterNumbersSeparate.Contains(l.Number.ToLowerInvariant()));
+            
+            return await SendPackagesToInPost(letters);
+        }
+
+        return RedirectToPage("./Index");
+    }
+
     public async Task<IActionResult> OnPostUpdateContentTypeAsync()
     {
-        if (CheckIsAdmin())
+        if (IsAdmin)
         {
             var letters = await _client.FetchLetters();
             var images = letters.SelectMany(l => l.ImageIds).Distinct().ToList();
@@ -110,10 +123,42 @@ public class AdminModel : PageModel
         return File(stream, "text/csv", fileName);
     }
 
-    private bool CheckIsAdmin()
+    public async Task<IActionResult> SendPackagesToInPost(IEnumerable<Letter> letters)
     {
-        var isAdminValue = Request.HttpContext.Session.GetString("IsAdmin");
-        return isAdminValue is not null && isAdminValue == "true";
+        if (!IsAdmin)
+        {
+            return RedirectToPage("./Index");
+        }
+
+        var letterNumbers = letters.Select(l => l.Number).ToList();
+        var packages = (await _client.FetchPackages()).Where(p => letterNumbers.Contains(p.LetterNumber));
+
+        var lettersWithPackages = letters.ToDictionary(l => l, l => packages.Where(p => p.LetterNumber == l.Number));
+
+        try
+        {
+            // Use the new service to create shipment requests
+            var shipmentRequests = _shipmentRequestBuilder.CreateShipmentRequests(lettersWithPackages);
+
+            // Send requests to InPost API
+            var shipmentResponses = await _inPostApiClient.CreateMultipleShipmentsAsync(shipmentRequests);
+
+            // Update letter status to indicate shipments were created
+            foreach (var letter in letters)
+            {
+                await _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, 
+                    $"Utworzono przesyłki InPost: {shipmentResponses.Count} z {shipmentRequests.Count}");
+            }
+
+            // Return success message with created shipments count
+            TempData["SuccessMessage"] = $"Pomyślnie utworzono {shipmentResponses.Count} z {shipmentRequests.Count} przesyłek InPost.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Błąd podczas tworzenia przesyłek InPost: {ex.Message}";
+        }
+
+        return Page();
     }
 }
 
