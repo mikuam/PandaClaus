@@ -39,7 +39,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:Y";
+        var range = $"{_sheetName}!A:Z";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -48,7 +48,7 @@ public class GoogleSheetsClient
 
     public async Task<Letter> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:Y{rowNumber}";
+        var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -62,7 +62,7 @@ public class GoogleSheetsClient
         var firstEmptyRow = letters.Count + 2;
 
         var letterNumber = _letterNumerationService.GetNextLetterNumber(letters, letter);
-        var range = $"{_sheetName}!A{firstEmptyRow}:R{firstEmptyRow}";
+        var range = $"{_sheetName}!A{firstEmptyRow}:S{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letterNumber,
@@ -79,6 +79,7 @@ public class GoogleSheetsClient
             letter.ChildName,
             letter.ChildAge,
             letter.Description,
+            letter.Presents,
             string.Join(",", letter.ImageUrls),
             letter.Added.ToString("yyyy-MM-dd HH:mm:ss"),
             letter.IsVisible ? "tak" : "nie",
@@ -134,30 +135,31 @@ public class GoogleSheetsClient
             ChildName = row[11].ToString() ?? string.Empty,
             ChildAge = string.IsNullOrWhiteSpace(row[12].ToString()) ? 0 : int.Parse(row[12].ToString()!),
             Description = row[13].ToString() ?? string.Empty,
-            ImageIds = string.IsNullOrWhiteSpace(row[14].ToString())
-                ? []
-                : row[14].ToString()!.Split(',').ToList(),
-            ImageUrls = string.IsNullOrWhiteSpace(row[14].ToString())
-                ? []
-                : row[14].ToString()!.Split(',').Select(url => $"{_blobUrl}/photos2024/{url}").ToList(),
-            ImageThumbnailId = string.IsNullOrWhiteSpace(row[14].ToString())
+            Presents = row[14].ToString() ?? string.Empty,
+            ImageIds = string.IsNullOrWhiteSpace(row[15].ToString())
+                ? new List<string>()
+                : row[15].ToString()!.Split(',').ToList(),
+            ImageUrls = string.IsNullOrWhiteSpace(row[15].ToString())
+                ? new List<string>()
+                : row[15].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
+            ImageThumbnailId = string.IsNullOrWhiteSpace(row[15].ToString())
                 ? string.Empty
-                : row[14].ToString()!.Split(',').First(),
-            ImageThumbnailUrl = string.IsNullOrWhiteSpace(row[14].ToString())
+                : row[15].ToString()!.Split(',').First(),
+            ImageThumbnailUrl = string.IsNullOrWhiteSpace(row[15].ToString())
                 ? string.Empty
-                : $"{_blobUrl}/photos2024/{row[14].ToString()!.Split(',').First()}_thumbnail.jpg",
-            Added = DateTime.Parse(row[15].ToString() ?? string.Empty),
-            IsVisible = string.Equals(row[16].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                : $"{_blobUrl}/{row[15].ToString()!.Split(',').First()}_thumbnail.jpg",
+            Added = DateTime.Parse(row[16].ToString() ?? string.Empty),
+            IsVisible = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[18].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             
             // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 18),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 19),
-            AssignedToEmail = GetCellOrEmptyString(row, 20),
-            AssignedToPhone = GetCellOrEmptyString(row, 21),
-            AssignedToInfo = GetCellOrEmptyString(row, 22),
-            Uwagi = GetCellOrEmptyString(row, 23),
-            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 24)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 24), true)
+            AssignedTo = GetCellOrEmptyString(row, 19),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 20),
+            AssignedToEmail = GetCellOrEmptyString(row, 21),
+            AssignedToPhone = GetCellOrEmptyString(row, 22),
+            AssignedToInfo = GetCellOrEmptyString(row, 23),
+            Uwagi = GetCellOrEmptyString(row, 24),
+            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 25)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 25), true)
         };
 
         return letter;
@@ -226,6 +228,26 @@ public class GoogleSheetsClient
         {
             uwagi,
             status.ToString()
+        };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
+    }
+
+    public async Task UpdateLetterDetailsWithChild(int rowNumber, string childName, int childAge, string description, string presents)
+    {
+        var range = $"{_sheetName}!L{rowNumber}:O{rowNumber}";
+
+        var valuesToUpdate = new List<object>
+        {
+            childName,
+            childAge,
+            description,
+            presents
         };
         var valueRange = new ValueRange
         {

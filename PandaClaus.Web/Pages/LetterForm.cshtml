@@ -52,11 +52,11 @@
         </div>
         <hr class="mb-4" />
 
-        
+        @*
         <div class="container col-lg-6 offset-lg-3">
             <p>Przyjmowanie zgłoszeń w Panda Claus 2024 zostało już zakończone</p>
         </div>
-        @*
+        *@
         <form method="post" enctype="multipart/form-data">
             <div class="container col-lg-6 offset-lg-3">
                 <div class="row mb-4">
@@ -122,6 +122,10 @@
                     <textarea asp-for="Description" rows="3" class="form-control" id="description" required></textarea>
                 </div>
                 <div class="mb-4">
+                    <label asp-for="Presents">Opisz listę prezentów, o które prosi dziecko<span class="text-danger">*</span></label>
+                    <textarea asp-for="Presents" rows="3" class="form-control" id="presents" required></textarea>
+                </div>
+                <div class="mb-4">
                     <label asp-for="LetterPhotos">Wyślij skan lub zdjęcie listu <span class="text-danger">*</span></label>
                     <input asp-for="LetterPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
                 </div>
@@ -143,7 +147,7 @@
                 <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-end">Wyślij</button>
             </div>
         </form>
-        *@
+
 
     </div>
 </div>

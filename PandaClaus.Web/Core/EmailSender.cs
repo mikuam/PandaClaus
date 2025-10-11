@@ -71,7 +71,7 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
 
         // run in a background thread, don't wait for it to finish
-        Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
+        _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 
     private string GetLetterUrl(Letter letter)
@@ -97,7 +97,7 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
             letter.Email,
             new EmailContent(subject) { PlainText = plainTextContent });
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
-        
-        Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
+
+        _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 }

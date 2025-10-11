@@ -65,8 +65,38 @@
                 }
 
                 <div class="col-lg-12 wow fadeIn" data-wow-delay="0.5s">
-                    <h3>Opis</h3>
-                    <p class="mb-4">@Model.Letter.Description</p>
+                    @if (Model.IsAdmin)
+                    {
+                        <form method="post" asp-page-handler="updateDetails" asp-route-rowNumber="@Model.Letter.RowNumber">
+                            <div class="mb-4">
+                                <label class="form-label">Imię dziecka</label>
+                                <input name="ChildName" type="text" class="form-control" value="@Model.Letter.ChildName" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Wiek dziecka</label>
+                                <input name="ChildAge" type="number" class="form-control" value="@Model.Letter.ChildAge" min="0" max="18" required>
+                            </div>
+                            <h3>Opis</h3>
+                            <div class="mb-4">
+                                <textarea name="Description" rows="3" class="form-control" placeholder="Opis">@Model.Letter.Description</textarea>
+                            </div>
+                            <h3>Prezenty, o które prosi dziecko</h3>
+                            <div class="mb-4">
+                                <textarea name="Presents" rows="3" class="form-control" placeholder="Prezenty">@Model.Letter.Presents</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm mt-3">
+                                Zapisz zmiany
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <h3>Opis</h3>
+                        <p class="mb-4" style="white-space: pre-wrap;">@Model.Letter.Description</p>
+                        <h3>Prezenty, o które prosi dziecko</h3>
+                        <p class="mb-4" style="white-space: pre-wrap;">@Model.Letter.Presents</p>
+                    }
+
                     @if (!Model.Letter.IsAssigned)
                     {
                         <hr />

@@ -1,8 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using PandaClaus.Web.Core;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace PandaClaus.Web.Pages;
 public class LetterModel : BasePageModel
@@ -84,6 +80,21 @@ public class LetterModel : BasePageModel
                 Letter.ImageIds.AddRange(photoIds);
                 await _client.UpdateImageIds(Letter);
             }
+        }
+
+        return RedirectToPage("./Letter", new { rowNumber });
+    }
+
+    public async Task<IActionResult> OnPostUpdateDetailsAsync(int rowNumber)
+    {
+        if (IsAdmin)
+        {
+            var childName = Request.Form["ChildName"].ToString();
+            var childAge = int.Parse(Request.Form["ChildAge"].ToString());
+            var description = Request.Form["Description"].ToString();
+            var presents = Request.Form["Presents"].ToString();
+            
+            await _client.UpdateLetterDetailsWithChild(rowNumber, childName, childAge, description, presents);
         }
 
         return RedirectToPage("./Letter", new { rowNumber });

@@ -4,34 +4,35 @@ namespace PandaClaus.Web;
 
 public class Letter
 {
-    public int RowNumber { get; set; }
-    public string Number { get; set; }
-    public string ParentName { get; set; }
-    public string ParentSurname { get; set; }
-    public string PhoneNumber { get; set; }
-    public string Email { get; set; }
-    public string Street { get; set; }
-    public string City { get; set; }
-    public string HouseNumber { get; set; }
-    public string ApartmentNumber { get; set; }
-    public string PostalCode { get; set; }
-    public string PaczkomatCode { get; set; }
-    public string ChildName { get; set; }
-    public int ChildAge { get; set; }
-    public string Description { get; set; }
-    public List<string> ImageIds { get; set; }
-    public List<string> ImageUrls { get; set; }
-    public string ImageThumbnailId { get; set; }
-    public string ImageThumbnailUrl { get; set; }
+    public required int RowNumber { get; set; }
+    public required string Number { get; set; }
+    public required string ParentName { get; set; }
+    public required string ParentSurname { get; set; }
+    public required string PhoneNumber { get; set; }
+    public required string Email { get; set; }
+    public required string Street { get; set; }
+    public required string City { get; set; }
+    public required string HouseNumber { get; set; }
+    public string ApartmentNumber { get; set; } = string.Empty;
+    public required string PostalCode { get; set; }
+    public string PaczkomatCode { get; set; } = string.Empty;
+    public required string ChildName { get; set; }
+    public required int ChildAge { get; set; }
+    public required string Description { get; set; }
+    public required string Presents { get; set; }
+    public required List<string> ImageIds { get; set; }
+    public required List<string> ImageUrls { get; set; }
+    public string ImageThumbnailId { get; set; } = string.Empty;
+    public string ImageThumbnailUrl { get; set; } = string.Empty;
 
-    public DateTime Added { get; set; }
-    public bool IsVisible { get; set; }
-    public bool IsAssigned { get; set; }
-    public string AssignedTo { get; set; }
-    public string AssignedToCompanyName { get; set; }
-    public string AssignedToEmail { get; set; }
-    public string AssignedToPhone { get; set; }
-    public string AssignedToInfo { get; set; }
-    public string Uwagi { get; set; }
-    public LetterStatus Status { get; set; }
+    public required DateTime Added { get; set; }
+    public required bool IsVisible { get; set; }
+    public required bool IsAssigned { get; set; }
+    public string AssignedTo { get; set; } = string.Empty;
+    public string AssignedToCompanyName { get; set; } = string.Empty;
+    public string AssignedToEmail { get; set; } = string.Empty;
+    public string AssignedToPhone { get; set; } = string.Empty;
+    public string AssignedToInfo { get; set; } = string.Empty;
+    public string Uwagi { get; set; } = string.Empty;
+    public LetterStatus Status { get; set; } = LetterStatus.NIE_WIADOMO;
 }

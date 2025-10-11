@@ -64,6 +64,10 @@ public class LetterFormModel : PageModel
 
     [BindProperty]
     [Required]
+    public string Presents { get; set; }
+
+    [BindProperty]
+    [Required]
     public List<IFormFile> LetterPhotos { get; set; }
 
     public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender)
@@ -84,23 +88,27 @@ public class LetterFormModel : PageModel
 
         var letter = new Letter
         {
-            Number = "X",
+            RowNumber = 0, // Will be set by Google Sheets
+            Number = "X", // Temporary, will be updated by the service
             ParentName = ParentName,
             ParentSurname = ParentSurname,
             PhoneNumber = PhoneNumber,
             Email = Email,
             Street = Street,
             HouseNumber = HouseNumber,
-            ApartmentNumber = ApartmentNumber,
+            ApartmentNumber = ApartmentNumber ?? string.Empty,
             City = City,
             PostalCode = PostalCode,
-            PaczkomatCode = PaczkomatCode,
+            PaczkomatCode = PaczkomatCode ?? string.Empty,
             ChildName = ChildName,
             ChildAge = ChildAge,
             Description = Description,
+            Presents = Presents,
+            ImageIds = [],
             ImageUrls = photoIds,
             Added = DateTime.Now,
-            IsVisible = false
+            IsVisible = false,
+            IsAssigned = false
         };
 
         var rowNumber = await _sheetsClient.AddLetter(letter);

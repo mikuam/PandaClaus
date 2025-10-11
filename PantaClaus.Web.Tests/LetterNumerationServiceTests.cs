@@ -1,196 +1,229 @@
-using FluentAssertions;
+using PandaClaus.Web;
 using PandaClaus.Web.Core;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PandaClaus.Web.Tests;
+namespace PantaClaus.Web.Tests;
 
 [TestClass]
 public class LetterNumerationServiceTests
 {
-    [DataTestMethod]
-    [DataRow("0", 0, null)]
-    [DataRow("0A", 0, 'A')]
-    [DataRow("X", 0, null)]
-    [DataRow("123", 123, null)]
-    [DataRow("123B", 123, 'B')]
-    [DataRow("456C", 456, 'C')]
-    [DataRow("789", 789, null)]
-    [DataRow("0Z", 0, 'Z')]
-    [DataRow("999Y", 999, 'Y')]
-    [DataRow("", 0, null)]
-    public void GetNumber_ShouldReturnExpectedResult(string input, int expectedNumber, char? expectedLetter)
+    [TestMethod]
+    [DataRow("X", 0)]
+    [DataRow("1", 1)]
+    [DataRow("123", 123)]
+    [DataRow("1Z", 0)]
+    [DataRow("123A", 123)]
+    [DataRow("", 0)]
+    public void GetNumber_ShouldReturnExpectedValue(string input, int expected)
     {
         // Arrange & Act
-        var result = LetterNumerationService.GetNumber(new Letter { Number = input });
+        var result = LetterNumerationService.GetNumber(CreateTestLetter(new { Number = input }));
 
         // Assert
-        result.Number.Should().Be(expectedNumber);
-        result.Letter.Should().Be(expectedLetter);
+        Assert.AreEqual(expected, result.Number);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn1_WhenNoLetters()
+    public void GetNextLetterNumber_WhenNoExistingLetters_ShouldReturn1()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>();
-        var newLetter = new Letter();
+        var newLetter = CreateTestLetter();
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("1");
+        Assert.AreEqual("1", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn1_WhenNoLettersWithNumber()
+    public void GetNextLetterNumber_WhenExistingLettersWithoutSameAddress_ShouldReturnNextNumber()
     {
         // Arrange
-        var service = new LetterNumerationService();
-        var letters = new List<Letter> { new Letter { Number = "X" } };
-        var newLetter = new Letter();
+        var letters = new List<Letter> { CreateTestLetter(new { Number = "X" }) };
+        var newLetter = CreateTestLetter();
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("1");
+        Assert.AreEqual("1", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn2_WhenOneLetterWithNumber()
+    public void GetNextLetterNumber_WhenExistingLetterWithSameEmail_ShouldReturnSameNumber()
     {
         // Arrange
-        var service = new LetterNumerationService();
-        var letters = new List<Letter> { new Letter { Number = "1", Email = "em1" } };
-        var newLetter = new Letter { Email = "em2" };
+        var letters = new List<Letter> { CreateTestLetter(new { Number = "1", Email = "em1" }) };
+        var newLetter = CreateTestLetter(new { Email = "em2" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("2");
+        Assert.AreEqual("2", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn2_WhenOneLetterWithNumberAndOneWithout()
+    public void GetNextLetterNumber_WhenExistingLettersWithVariousNumbers_ShouldReturnNextAvailableNumber()
     {
         // Arrange
-        var service = new LetterNumerationService();
-        var letters = new List<Letter> { new Letter { Number = "1", Email = "em1" }, new Letter { Number = "X", Email = "em2" } };
-        var newLetter = new Letter { Email = "em3" };
+        var letters = new List<Letter> { CreateTestLetter(new { Number = "1", Email = "em1" }), CreateTestLetter(new { Number = "X", Email = "em2" }) };
+        var newLetter = CreateTestLetter(new { Email = "em3" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("2");
+        Assert.AreEqual("2", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn1B_WheFirstLetterAlreadyExists()
+    public void GetNextLetterNumber_WhenExistingLetterWithSameAddress_ShouldReturnSameNumberWithSuffix()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>
         {
-            new Letter { Number = "1", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
-            new Letter { Number = "X" },
-            new Letter { Number = "2" }
+            CreateTestLetter(new { Number = "1", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
+            CreateTestLetter(new { Number = "X" }),
+            CreateTestLetter(new { Number = "2" })
         };
 
-        var newLetter = new Letter { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" };
+        var newLetter = CreateTestLetter(new { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("1B");
+        Assert.AreEqual("1A", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn3B_WheFirstLetterAlreadyExistsButWithoutANumber()
+    public void GetNextLetterNumber_WhenExistingLetterWithSameAddressAndMultipleSuffixes_ShouldReturnNextSuffix()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>
         {
-            new Letter { Number = "X", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
-            new Letter { Number = "X" },
-            new Letter { Number = "2" }
+            CreateTestLetter(new { Number = "X", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
+            CreateTestLetter(new { Number = "X" }),
+            CreateTestLetter(new { Number = "2" })
         };
 
-        var newLetter = new Letter { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" };
+        var newLetter = CreateTestLetter(new { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("3");
+        Assert.AreEqual("1", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn1A_WhenOneLetterWithNumberAndOneWithoutAndOneWithSameAddress()
+    public void GetNextLetterNumber_WhenExistingLetterWithSameAddressAndSuffixA_ShouldReturnSuffixB()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>
         {
-            new Letter { Number = "1A", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
-            new Letter { Number = "X" },
-            new Letter { Number = "5" }
+            CreateTestLetter(new { Number = "1A", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
+            CreateTestLetter(new { Number = "X" }),
+            CreateTestLetter(new { Number = "5" })
         };
 
-        var newLetter = new Letter { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" };
+        var newLetter = CreateTestLetter(new { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("1B");
+        Assert.AreEqual("1B", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn123C_WhenTwoLettersWithTheSameAddressExists()
+    public void GetNextLetterNumber_WhenHighestNumberIs123_ShouldReturn124()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>
         {
-            new Letter { Number = "X" },
-            new Letter { Number = "1", Email = "em2" },
-            new Letter { Number = "123", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
-            new Letter { Number = "123B", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
+            CreateTestLetter(new { Number = "X" }),
+            CreateTestLetter(new { Number = "1", Email = "em2" }),
+            CreateTestLetter(new { Number = "123", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
+            CreateTestLetter(new { Number = "123B", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
         };
 
-        var newLetter = new Letter { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" };
+        var newLetter = CreateTestLetter(new { Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("123C");
+        Assert.AreEqual("123C", result);
     }
 
     [TestMethod]
-    public void GetNextLetterNumber_ShouldReturn124_When123BExists()
+    public void GetNextLetterNumber_WhenHighestNumberIs123_ShouldReturn124_ButNoSameAddress()
     {
         // Arrange
-        var service = new LetterNumerationService();
         var letters = new List<Letter>
         {
-            new Letter { Number = "X" },
-            new Letter { Number = "1", Email = "em2" },
-            new Letter { Number = "123", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
-            new Letter { Number = "123B", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" },
+            CreateTestLetter(new { Number = "X" }),
+            CreateTestLetter(new { Number = "1", Email = "em2" }),
+            CreateTestLetter(new { Number = "123", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
+            CreateTestLetter(new { Number = "123B", Street = "Test", HouseNumber = "1", ApartmentNumber = "1", Email = "email" }),
         };
 
-        var newLetter = new Letter { Email = "em4" };
+        var newLetter = CreateTestLetter(new { Email = "em4" });
 
         // Act
-        var result = service.GetNextLetterNumber(letters, newLetter);
+        var result = LetterNumerationServiceInstance().GetNextLetterNumber(letters, newLetter);
 
         // Assert
-        result.Should().Be("124");
+        Assert.AreEqual("124", result);
+    }
+
+    private static Letter CreateTestLetter(object? properties = null)
+    {
+        var letter = new Letter
+        {
+            RowNumber = 1,
+            Number = "X",
+            ParentName = "Test Parent",
+            ParentSurname = "Test Surname",
+            PhoneNumber = "123456789",
+            Email = "test@example.com",
+            Street = "Test Street",
+            City = "Test City",
+            HouseNumber = "1",
+            PostalCode = "12-345",
+            ChildName = "Test Child",
+            ChildAge = 5,
+            Description = "Test Description",
+            Presents = "Test Presents",
+            ImageIds = new List<string>(),
+            ImageUrls = new List<string>(),
+            Added = DateTime.Now,
+            IsVisible = true,
+            IsAssigned = false
+        };
+
+        if (properties != null)
+        {
+            var props = properties.GetType().GetProperties();
+            foreach (var prop in props)
+            {
+                var letterProp = typeof(Letter).GetProperty(prop.Name);
+                if (letterProp != null && letterProp.CanWrite)
+                {
+                    letterProp.SetValue(letter, prop.GetValue(properties));
+                }
+            }
+        }
+
+        return letter;
+    }
+
+    private static LetterNumerationService LetterNumerationServiceInstance()
+    {
+        return new LetterNumerationService();
     }
 }

@@ -11,17 +11,20 @@ public class BlobClient
 {
     private readonly BlobServiceClient _blobServiceClient;
 
+    private readonly string _blobContainerName;
+
     public BlobClient(IConfiguration configuration)
     {
         var blobUrl = configuration["BlobUrl"];
-        var blobSasToken = configuration["BlobSasToken"];
+        var blobSasToken = configuration["BlobContainerSasToken"];
+        _blobContainerName = configuration["BlobContainerName"] ?? "photos2024";
 
         _blobServiceClient = new BlobServiceClient(new Uri($"{blobUrl}?{blobSasToken}"));
     }
 
     public async Task<List<string>> UploadPhotos(List<IFormFile> files)
     {
-        var containerClient = _blobServiceClient.GetBlobContainerClient("photos2024");
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
         var imageIds = new List<string>();
         foreach (var file in files)
         {
@@ -64,7 +67,7 @@ public class BlobClient
 
     internal async Task UpdateContentType(string image, string contentType)
     {
-        var containerClient = _blobServiceClient.GetBlobContainerClient("photos2024");
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
         var blobClient = containerClient.GetBlobClient(image);
 
         var blobProperties = await blobClient.GetPropertiesAsync();
