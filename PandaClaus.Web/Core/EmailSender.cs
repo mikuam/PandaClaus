@@ -1,5 +1,9 @@
 ﻿using Azure;
 using Azure.Communication.Email;
+using QRCoder;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace PandaClaus.Web;
 
@@ -15,6 +19,9 @@ public class EmailSender
     {
         _googleSheetsClient = googleSheetsClient;
         _emailClient = new EmailClient(configuration["EmailConnectionString"]!);
+        
+        // Set QuestPDF license
+        QuestPDF.Settings.License = LicenseType.Community;
     }
 
     public async Task SendConfirmationEmail(int rowNumber)
@@ -43,6 +50,9 @@ Już teraz zapraszamy Was do zgłaszania się do wolontariatu podczas finału, k
 Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 ";
 
+        var receiveConfirmationUrl = CreateReceiveConfirmationUrl(letter);
+        var qrCodeBase64 = GenerateQRCodeBase64(receiveConfirmationUrl);
+
         var htmlContent = $@"<h1>Drodzy PANDAstyczni Darczyńcy!</h1>
 <p>Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus.</p>
 <p>Gratulujemy {letter.AssignedTo}! Potwierdzamy realizowanie wybranego przez Ciebie listu nr {letter.Number}. List znajdziesz pod tym adresem: <a href=\""{GetLetterUrl(letter)}\"">{GetLetterUrl(letter)}</a></p>
@@ -62,16 +72,92 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 </ul>
 <p>Z góry BARDZO dziękujemy za dostosowanie się do naszych szczegółowych wytycznych. Pomoże nam to sprawnie przeprowadzić akcję i dostarczyć prezenty do naszych podopiecznych :)</p>
 <p>Już teraz zapraszamy Was do zgłaszania się do wolontariatu podczas finału, który odbędzie się 13 i 14 grudnia (pt-sob) w hali nr 10 Międzynarodowych Targów Poznańskich. Chęć pomocy można zgłosić poprzez formularz dostępny na stronie <a href=""https://forms.gle/xn8UMCst3uSTwoeV9"" target=""_blank"">https://forms.gle/xn8UMCst3uSTwoeV9</a> (wolontariaty pracownicze proszę zgłaszać e-mailowo). Będzie nam miło, jak pomożecie nam w finale! :) </p>
-<p>Z całym #pandateam życzymy wszystkiego PANDAstycznego!</p>";
+<p>Z całym #pandateam życzymy wszystkiego PANDAstycznego!</p>
+<hr/>
+<h2>Potwierdzenie odbioru paczki</h2>
+<p><b>Aby potwierdzić odbiór paczki, zeskanuj poniższy kod QR lub kliknij w link:</b></p>
+<p style=""text-align: center;"">
+    <a href=\""{receiveConfirmationUrl}\""><img src=""data:image/png;base64,{qrCodeBase64}"" alt=""QR Code - Potwierdzenie odbioru paczki"" style=""max-width: 300px;"" /></a>
+</p>
+<p><a href=\""{receiveConfirmationUrl}\"">{receiveConfirmationUrl}</a></p>
+<p><b>Kod QR do wydruku</b> znajduje się również w załączonym pliku PDF.</p>";
 
-    var email = new EmailMessage(
+        var email = new EmailMessage(
             EmailFrom,
             letter.AssignedToEmail,
             new EmailContent(subject) { PlainText = plainTextContent, Html = htmlContent });
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
 
+        // Generate PDF with QR code and attach it
+        var pdfBytes = GenerateQRCodePdf(receiveConfirmationUrl, letter.Number);
+        var pdfAttachment = new EmailAttachment($"PandaClaus_QRCode_List_{letter.Number}.pdf", "application/pdf", new BinaryData(pdfBytes));
+        email.Attachments.Add(pdfAttachment);
+
         // run in a background thread, don't wait for it to finish
         _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
+    }
+
+    private string GenerateQRCodeBase64(string url)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        var qrCodeBytes = qrCode.GetGraphic(20);
+        return Convert.ToBase64String(qrCodeBytes);
+    }
+
+    private byte[] GenerateQRCodePdf(string url, string letterNumber)
+    {
+        var qrCodeBytes = GenerateQRCodeBytes(url);
+        
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(2, Unit.Centimetre);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(14));
+
+                page.Content()
+                    .Column(column =>
+                    {
+                        column.Spacing(20);
+
+                        column.Item().AlignCenter().Text("Panda Claus 2025")
+                            .FontSize(28).Bold().FontColor(Colors.Blue.Medium);
+
+                        column.Item().AlignCenter().Text("Potwierdzenie dostarczenia paczki")
+                            .FontSize(20).SemiBold();
+
+                        column.Item().AlignCenter().Text($"List numer: {letterNumber}")
+                            .FontSize(18).Bold();
+
+                        column.Item().PaddingTop(20).AlignCenter()
+                            .Image(qrCodeBytes)
+                            .FitWidth();
+
+                        column.Item().PaddingTop(20).AlignCenter().Text("Zeskanuj kod QR, aby potwierdzić dostarczenie paczki")
+                            .FontSize(16);
+
+                        column.Item().PaddingTop(10).AlignCenter().Text(url)
+                            .FontSize(10).Italic();
+
+                        column.Item().PaddingTop(30).Text("Dziękujemy za wsparcie akcji Panda Claus!")
+                            .FontSize(14).SemiBold().AlignCenter();
+                    });
+            });
+        });
+
+        return document.GeneratePdf();
+    }
+
+    private byte[] GenerateQRCodeBytes(string url)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        return qrCode.GetGraphic(20);
     }
 
     private string GetLetterUrl(Letter letter)
@@ -99,5 +185,30 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
 
         _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
+    }
+
+    public async Task SendPackageReceived(int rowNumber)
+    {
+        var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
+
+        var subject = "Panda Claus - potwierdzenie dostarczenia paczek dla listu";
+
+        var plainTextContent = $"Cześć {letter.AssignedTo}!\n\n" +
+                               $"Potwierdzamy dostarczenie przez Ciebie paczek do listu numer {letter.Number} dla: {letter.ChildName}\n\n" +
+                               $"Paczka znajduje się teraz w naszym magazynie i podczas finału akcji zostanie przygotowana do wysłania do potrzebującego dziecka." +
+                               $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus@pandateam.pl.\n\n" +
+                               $"Pozdrawiamy,\n" +
+                               $"Zespół Panda Team";
+
+        var email = new EmailMessage(
+            EmailFrom,
+            letter.AssignedToEmail,
+            new EmailContent(subject) { PlainText = plainTextContent });
+        email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
+    }
+
+    private string CreateReceiveConfirmationUrl(Letter letter)
+    {
+        return PageUrl + $"ReceiveConfirmation?rowNumber={letter.RowNumber}&code={letter.Number}";
     }
 }

@@ -6,6 +6,7 @@ namespace PandaClaus.Web.Pages;
 public class StatusUpdateModel : PageModel
 {
     private readonly GoogleSheetsClient _client;
+    private readonly EmailSender _emailSender;
 
     [BindProperty]
     public Letter Letter { get; set; }
@@ -19,8 +20,9 @@ public class StatusUpdateModel : PageModel
     [BindProperty]
     public Gabaryt Package3Size { get; set; }
 
-    public StatusUpdateModel(GoogleSheetsClient client)
+    public StatusUpdateModel(GoogleSheetsClient client, EmailSender emailSender)
     {
+        _emailSender = emailSender;
         _client = client;
     }
 
@@ -56,6 +58,10 @@ public class StatusUpdateModel : PageModel
             var uwagi = Request.Form["uwagi"].ToString();
 
             await _client.UpdateStatus(rowNumber, status, uwagi);
+            if (status == LetterStatus.DOSTARCZONE)
+            {
+                await _emailSender.SendPackageReceived(rowNumber);
+            }
 
             if (status == LetterStatus.SPAKOWANE)
             {
