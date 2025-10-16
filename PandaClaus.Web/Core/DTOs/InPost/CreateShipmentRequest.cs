@@ -10,4 +10,5 @@ public class CreateShipmentRequest
     public CustomAttributesData? CustomAttributes { get; set; }
     public string? Service { get; set; } = "inpost_locker_standard";
     public string? Reference { get; set; }
+    public bool OnlyChoiceOfOffer { get; set; } = true;
 }

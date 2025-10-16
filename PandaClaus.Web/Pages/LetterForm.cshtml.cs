@@ -9,6 +9,7 @@ public class LetterFormModel : PageModel
     private readonly GoogleSheetsClient _sheetsClient;
     private readonly BlobClient _blobClient;
     private readonly EmailSender _emailSender;
+    private readonly IConfiguration _configuration;
 
     [BindProperty]
     [Required]
@@ -70,11 +71,14 @@ public class LetterFormModel : PageModel
     [Required]
     public List<IFormFile> LetterPhotos { get; set; }
 
-    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender)
+    public string InPostGeoWidgetToken => _configuration["InPostGeoWidgetToken"] ?? string.Empty;
+
+    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender, IConfiguration configuration)
     {
         _sheetsClient = sheetsClient;
         _blobClient = blobClient;
         _emailSender = emailSender;
+        _configuration = configuration;
     }
 
     public async Task OnGetAsync()

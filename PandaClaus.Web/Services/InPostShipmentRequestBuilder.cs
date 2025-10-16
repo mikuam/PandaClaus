@@ -42,14 +42,9 @@ public class InPostShipmentRequestBuilder
             {
                 Template = GetInPostTemplate(package.Size)
             },
-            Insurance = new InsuranceData
-            {
-                Amount = GetInsuranceAmount(package.Size),
-                Currency = "PLN"
-            },
             CustomAttributes = CreateCustomAttributes(letter, package.Size),
             Service = GetInPostService(package.Size),
-            Reference = $"PandaClaus-{letter.Number}-{package.PackageNumber}"
+            Reference = package.PackageId
         };
     }
 

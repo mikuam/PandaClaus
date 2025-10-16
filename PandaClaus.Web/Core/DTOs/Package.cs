@@ -7,4 +7,5 @@ public record Package
     public int PackageNumber { get; init; }
     public int TotalPackages { get; init; }
     public Gabaryt Size { get; init; }
+    public string PackageId { get; init; }
 }

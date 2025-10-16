@@ -185,7 +185,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!R{assignment.RowNumber}:W{assignment.RowNumber}";
+        var range = $"{_sheetName}!S{assignment.RowNumber}:X{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -207,7 +207,7 @@ public class GoogleSheetsClient
 
     internal async Task UpdateImageIds(Letter letter)
     {
-        var range = $"{_sheetName}!O{letter.RowNumber}:O{letter.RowNumber}";
+        var range = $"{_sheetName}!P{letter.RowNumber}:P{letter.RowNumber}";
 
         var valuesToUpdate = new List<object> { string.Join(",", letter.ImageIds) };
 
@@ -222,7 +222,7 @@ public class GoogleSheetsClient
 
     public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi)
     {
-        var range = $"{_sheetName}!X{rowNumber}:Y{rowNumber}";
+        var range = $"{_sheetName}!Y{rowNumber}:Z{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -266,14 +266,16 @@ public class GoogleSheetsClient
         var rowNumber = firstEmptyRow;
         foreach (var size in sizes)
         {
-            var range = $"{_packageSheetName}!A{rowNumber}:D{rowNumber}";
+            var range = $"{_packageSheetName}!A{rowNumber}:E{rowNumber}";
 
+            var packageNumber = rowNumber - firstEmptyRow + 1;
             var valuesToUpdate = new List<object>
             {
                 letterNumber,
-                rowNumber - firstEmptyRow + 1,
+                packageNumber,
                 sizes.Count(),
-                size.ToString()
+                size.ToString(),
+                $"PandaClaus2025-{letterNumber}-{packageNumber}"
             };
             var valueRange = new ValueRange
             {
@@ -289,7 +291,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Package>> FetchPackages()
     {
-        var range = $"{_packageSheetName}!A:D";
+        var range = $"{_packageSheetName}!A:E";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
         return MapToPackages(response.Values);
@@ -301,7 +303,7 @@ public class GoogleSheetsClient
         var rowNumber = 2;
         foreach (var row in values.Skip(1))
         {
-            if (row.Count < 4)
+            if (row.Count < 5)
                 continue;
 
             var package = new Package
@@ -310,7 +312,8 @@ public class GoogleSheetsClient
                 LetterNumber = row[0].ToString() ?? string.Empty,
                 PackageNumber = string.IsNullOrWhiteSpace(row[1].ToString()) ? 0 : int.Parse(row[1].ToString()!),
                 TotalPackages = string.IsNullOrWhiteSpace(row[2].ToString()) ? 0 : int.Parse(row[2].ToString()!),
-                Size = string.IsNullOrWhiteSpace(row[3].ToString()) ? Gabaryt.A : Enum.Parse<Gabaryt>(row[3].ToString()!, true)
+                Size = string.IsNullOrWhiteSpace(row[3].ToString()) ? Gabaryt.A : Enum.Parse<Gabaryt>(row[3].ToString()!, true),
+                PackageId = string.IsNullOrWhiteSpace(row[4].ToString()) ? string.Empty : row[4].ToString()!
             };
 
             rowNumber++;

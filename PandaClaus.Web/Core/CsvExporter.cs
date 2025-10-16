@@ -20,8 +20,7 @@ public class CsvExporter : ICsvExporter
         {
             foreach (var package in packages)
             {
-                var packageId = $"PANDA_{letter.Number}-{package.PackageNumber}/{package.TotalPackages}";
-                csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{package.Size};{letter.PaczkomatCode};{packageId};0;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};{GetDeliveryType(package.Size)};NIE");
+                csv.AppendLine($"{letter.Email};{letter.PhoneNumber};{package.Size};{letter.PaczkomatCode};{package.PackageId};0;0;{letter.ParentName} {letter.ParentSurname};;{GetStreetWithNumber(letter)};{letter.PostalCode};{letter.City};{GetDeliveryType(package.Size)};NIE");
             }
         }
 

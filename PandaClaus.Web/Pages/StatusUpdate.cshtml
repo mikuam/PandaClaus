@@ -110,6 +110,9 @@
                                 break;
                         }
 
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="@Model.Letter.Status">Zapisz bez zmiany statusu</button>
+                        </div>
                     </form>
                 }
             </div>

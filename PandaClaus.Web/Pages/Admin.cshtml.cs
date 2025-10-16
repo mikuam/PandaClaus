@@ -67,6 +67,11 @@ public class AdminModel : BasePageModel
 
     public async Task<IActionResult> OnPostSendToInPostAsync(string inpostLetterNumbers)
     {
+        if (string.IsNullOrWhiteSpace(inpostLetterNumbers))
+        {
+            return RedirectToPage("./Index");
+        }
+
         if (IsAdmin)
         {
             var letterNumbersSeparate = inpostLetterNumbers.Split(',').Select(l => l.Trim().ToLowerInvariant());

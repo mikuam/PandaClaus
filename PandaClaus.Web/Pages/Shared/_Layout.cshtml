@@ -39,13 +39,14 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto">
-                        @* <a class="nav-item nav-link" asp-area="" asp-page="/LetterForm">Dodaj list</a> *@
+                        <a class="nav-item nav-link" asp-area="" asp-page="/LetterForm">Dodaj list</a>
                         @{
                             var baseModel = Model as BasePageModel;
                         }
                         @if (baseModel?.IsAdmin == true)
                         {
                             <a class="nav-item nav-link" asp-area="" asp-page="/Admin">Admin panel</a>
+                            <a class="nav-item nav-link" asp-area="" asp-page="/StatusUpdate">Status Listu</a>
                         }
                         <a href="https://pandateam.pl/" class="nav-item nav-link" target="_blank">Panda Team</a>
                         <a class="nav-item nav-link" asp-area="" asp-page="/Index">Listy</a>
