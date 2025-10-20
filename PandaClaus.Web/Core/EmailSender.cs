@@ -143,7 +143,10 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
                         column.Item().PaddingTop(10).AlignCenter().Text(url)
                             .FontSize(10).Italic();
 
-                        column.Item().PaddingTop(30).Text("Dziękujemy za wsparcie akcji Panda Claus!")
+                        column.Item().PaddingTop(30).Text("Wydrukuj i dołącz do paczki")
+                            .FontSize(16).Bold().AlignCenter();
+
+                        column.Item().PaddingTop(10).Text("Dziękujemy za wsparcie akcji Panda Claus!")
                             .FontSize(14).SemiBold().AlignCenter();
                     });
             });
@@ -195,16 +198,24 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 
         var plainTextContent = $"Cześć {letter.AssignedTo}!\n\n" +
                                $"Potwierdzamy dostarczenie przez Ciebie paczek do listu numer {letter.Number} dla: {letter.ChildName}\n\n" +
-                               $"Paczka znajduje się teraz w naszym magazynie i podczas finału akcji zostanie przygotowana do wysłania do potrzebującego dziecka." +
-                               $"Wszelkie pytania prosimy kierować na adres e - mail pandaclaus@pandateam.pl.\n\n" +
+                               $"Paczka znajduje się teraz w naszym magazynie i podczas finału akcji zostanie przygotowana do wysłania do potrzebującego dziecka.\n\n" +
+                               $"Wszelkie pytania prosimy kierować na adres e-mail: pandaclaus@pandateam.pl.\n\n" +
                                $"Pozdrawiamy,\n" +
                                $"Zespół Panda Team";
+
+        var htmlContent = $@"<h1>Cześć {letter.AssignedTo}!</h1>
+<p>Potwierdzamy dostarczenie przez Ciebie paczek do listu numer <strong>{letter.Number}</strong> dla: <strong>{letter.ChildName}</strong></p>
+<p>Paczka znajduje się teraz w naszym magazynie i podczas finału akcji zostanie przygotowana do wysłania do potrzebującego dziecka.</p>
+<p>Wszelkie pytania prosimy kierować na adres e-mail: <a href=""mailto:pandaclaus@pandateam.pl"">pandaclaus@pandateam.pl</a>.</p>
+<p>Pozdrawiamy,<br/>Zespół Panda Team</p>";
 
         var email = new EmailMessage(
             EmailFrom,
             letter.AssignedToEmail,
-            new EmailContent(subject) { PlainText = plainTextContent });
+            new EmailContent(subject) { PlainText = plainTextContent, Html = htmlContent });
         email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
+
+        _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 
     private string CreateReceiveConfirmationUrl(Letter letter)

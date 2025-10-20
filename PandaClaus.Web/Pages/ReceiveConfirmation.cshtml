@@ -1,0 +1,85 @@
+@page
+@model ReceiveConfirmationModel
+@{
+    ViewData["Title"] = "Potwierdzenie odbioru paczki";
+}
+
+<div class="container-xxl bg-white p-0">
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="mb-4">Panda Claus 2025</h1>
+                    <h2 class="mb-4">Potwierdzenie dostarczenia paczki</h2>
+
+                    @if (Model.Letter != null)
+                    {
+                        <div class="alert alert-info">
+                            <h4>List numer: @Model.Letter.Number</h4>
+                            <p><strong>Dziecko:</strong> @Model.Letter.ChildName, @Model.Letter.ChildAge lat</p>
+                            <p><strong>Darczy?ca:</strong> @Model.Letter.AssignedTo</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Message))
+                    {
+                        <div class="alert @(Model.ShowForm ? "alert-warning" : "alert-success") alert-dismissible fade show" role="alert">
+                            <i class="fa @(Model.ShowForm ? "fa-exclamation-triangle" : "fa-check-circle") me-2"></i>
+                            @Model.Message
+                        </div>
+                    }
+
+                    @if (Model.ShowForm && Model.Letter != null)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Czy paczka zosta?a dostarczona?</h4>
+                                
+                                <form method="post" id="confirmForm">
+                                    <input type="hidden" name="rowNumber" value="@Model.Letter.RowNumber" />
+                                    <input type="hidden" name="code" value="@Model.Letter.Number" />
+                                    
+                                    <div class="mb-4">
+                                        <label for="numberOfBoxes" class="form-label">Ile paczek zosta?o dostarczonych?</label>
+                                        <input type="number" class="form-control" id="numberOfBoxes" name="numberOfBoxes" 
+                                               value="1" min="1" max="10" required>
+                                        <div class="form-text">Podaj liczb? dostarczonych paczek/kartonów</div>
+                                    </div>
+
+                                    <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
+                                        <button type="submit" asp-page-handler="Confirm" class="btn btn-success btn-lg px-5">
+                                            <i class="fa fa-check me-2"></i>Tak, paczka dostarczona
+                                        </button>
+                                        <button type="submit" asp-page-handler="Decline" class="btn btn-danger btn-lg px-5">
+                                            <i class="fa fa-times me-2"></i>Nie, paczka nie dotar?a
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <p class="text-muted">
+                                <i class="fa fa-info-circle me-2"></i>
+                                W przypadku problemów z dostarczeniem paczki, skontaktuj si? z nami: 
+                                <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a>
+                            </p>
+                        </div>
+                    }
+                    else if (!Model.ShowForm && string.IsNullOrEmpty(Model.Message))
+                    {
+                        <div class="alert alert-warning">
+                            <p>Nie znaleziono listu do potwierdzenia. Sprawd? link i spróbuj ponownie.</p>
+                        </div>
+                    }
+
+                    <div class="mt-4 text-center">
+                        <a href="/" class="btn btn-outline-primary">
+                            <i class="fa fa-home me-2"></i>Powrót do strony g?ównej
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
