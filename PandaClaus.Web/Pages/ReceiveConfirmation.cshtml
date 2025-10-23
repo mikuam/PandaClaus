@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model ReceiveConfirmationModel
 @{
     ViewData["Title"] = "Potwierdzenie odbioru paczki";
@@ -9,15 +9,12 @@
         <div class="container">
             <div class="row g-5 align-items-center justify-content-center">
                 <div class="col-lg-8">
-                    <h1 class="mb-4">Panda Claus 2025</h1>
-                    <h2 class="mb-4">Potwierdzenie dostarczenia paczki</h2>
+                    <h1 class="mb-4">Potwierdzenie dostarczenia paczki</h1>
 
                     @if (Model.Letter != null)
                     {
                         <div class="alert alert-info">
                             <h4>List numer: @Model.Letter.Number</h4>
-                            <p><strong>Dziecko:</strong> @Model.Letter.ChildName, @Model.Letter.ChildAge lat</p>
-                            <p><strong>Darczy?ca:</strong> @Model.Letter.AssignedTo</p>
                         </div>
                     }
 
@@ -40,44 +37,35 @@
                                     <input type="hidden" name="code" value="@Model.Letter.Number" />
                                     
                                     <div class="mb-4">
-                                        <label for="numberOfBoxes" class="form-label">Ile paczek zosta?o dostarczonych?</label>
+                                        <label for="numberOfBoxes" class="form-label">Ile paczek zostało dostarczonych?</label>
                                         <input type="number" class="form-control" id="numberOfBoxes" name="numberOfBoxes" 
                                                value="1" min="1" max="10" required>
-                                        <div class="form-text">Podaj liczb? dostarczonych paczek/karton�w</div>
+                                        <div class="form-text">Podaj liczbę dostarczonych paczek/kartonów</div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="securityCode" class="form-label">Kod zabezpieczający <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="securityCode" name="securityCode" 
+                                               placeholder="Wpisz kod zabezpieczający" required>
+                                        <div class="form-text">Kod zabezpieczający znajdziesz u organizatora akcji</div>
                                     </div>
 
                                     <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
                                         <button type="submit" asp-page-handler="Confirm" class="btn btn-success btn-lg px-5">
-                                            <i class="fa fa-check me-2"></i>Tak, paczka dostarczona
-                                        </button>
-                                        <button type="submit" asp-page-handler="Decline" class="btn btn-danger btn-lg px-5">
-                                            <i class="fa fa-times me-2"></i>Nie, paczka nie dotar?a
+                                            <i class="fa fa-check me-2"></i>Potwierdź dostarczenie paczki
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        <div class="mt-4 text-center">
-                            <p class="text-muted">
-                                <i class="fa fa-info-circle me-2"></i>
-                                W przypadku problem�w z dostarczeniem paczki, skontaktuj si? z nami: 
-                                <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a>
-                            </p>
-                        </div>
                     }
                     else if (!Model.ShowForm && string.IsNullOrEmpty(Model.Message))
                     {
                         <div class="alert alert-warning">
-                            <p>Nie znaleziono listu do potwierdzenia. Sprawd? link i spr�buj ponownie.</p>
+                            <p>Nie znaleziono listu do potwierdzenia. Sprawdź link i spróbuj ponownie.</p>
                         </div>
                     }
-
-                    <div class="mt-4 text-center">
-                        <a href="/" class="btn btn-outline-primary">
-                            <i class="fa fa-home me-2"></i>Powr�t do strony g?�wnej
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>

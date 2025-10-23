@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PandaClaus.Web.Core;
 
@@ -8,6 +8,7 @@ public class ReceiveConfirmationModel : PageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
+    private readonly IConfiguration _configuration;
 
     [BindProperty]
     public Letter? Letter { get; set; }
@@ -16,15 +17,19 @@ public class ReceiveConfirmationModel : PageModel
     public int NumberOfBoxes { get; set; } = 1;
 
     [BindProperty]
+    public string SecurityCode { get; set; }
+
+    [BindProperty]
     public bool? IsConfirmed { get; set; }
 
     public string? Message { get; set; }
     public bool ShowForm { get; set; } = true;
 
-    public ReceiveConfirmationModel(GoogleSheetsClient client, EmailSender emailSender)
+    public ReceiveConfirmationModel(GoogleSheetsClient client, EmailSender emailSender, IConfiguration configuration)
     {
         _client = client;
         _emailSender = emailSender;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> OnGetAsync(int rowNumber, string code)
@@ -34,7 +39,7 @@ public class ReceiveConfirmationModel : PageModel
         // Validate the code matches the letter number
         if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))
         {
-            Message = "Nieprawid?owy kod potwierdzenia.";
+            Message = "Nieprawidłowy kod potwierdzenia.";
             ShowForm = false;
             return Page();
         }
@@ -42,7 +47,7 @@ public class ReceiveConfirmationModel : PageModel
         // Check if already confirmed
         if (Letter.Status >= LetterStatus.DOSTARCZONE)
         {
-            Message = $"Paczka dla listu numer {Letter.Number} zosta?a ju? potwierdzona jako dostarczona.";
+            Message = $"Paczka dla listu numer {Letter.Number} została już potwierdzona jako dostarczona.";
             ShowForm = false;
             return Page();
         }
@@ -57,8 +62,18 @@ public class ReceiveConfirmationModel : PageModel
         // Validate the code
         if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))
         {
-            Message = "Nieprawid?owy kod potwierdzenia.";
+            Message = "Nieprawidłowy kod potwierdzenia.";
             ShowForm = false;
+            return Page();
+        }
+
+        // Validate the security code
+        var expectedSecurityCode = _configuration["PackageConfirmationCode"];
+        if (string.IsNullOrWhiteSpace(SecurityCode) || 
+            !string.Equals(SecurityCode, expectedSecurityCode, StringComparison.OrdinalIgnoreCase))
+        {
+            Message = "Nieprawidłowy kod bezpieczeństwa. Skontaktuj się z organizatorem.";
+            ShowForm = true;
             return Page();
         }
 
@@ -75,28 +90,8 @@ public class ReceiveConfirmationModel : PageModel
         // Send confirmation email
         await _emailSender.SendPackageReceived(rowNumber);
 
-        Message = $"Dzi?kujemy! Potwierdzono dostarczenie {NumberOfBoxes} paczek dla listu numer {Letter.Number}.";
+        Message = $"Dziękujemy! Potwierdzono dostarczenie {NumberOfBoxes} paczek dla listu numer {Letter.Number}.";
         ShowForm = false;
-
-        return Page();
-    }
-
-    public async Task<IActionResult> OnPostDeclineAsync(int rowNumber, string code)
-    {
-        Letter = await _client.FetchLetterAsync(rowNumber);
-
-        // Validate the code
-        if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))
-        {
-            Message = "Nieprawid?owy kod potwierdzenia.";
-            ShowForm = false;
-            return Page();
-        }
-
-        Message = $"Zg?oszono brak dostarczenia paczki dla listu numer {Letter.Number}. Skontaktujemy si? z Tob? w sprawie.";
-        ShowForm = false;
-
-        // Optionally: You could send a notification to admins here
 
         return Page();
     }

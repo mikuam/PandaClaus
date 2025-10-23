@@ -10,7 +10,7 @@ namespace PandaClaus.Web;
 public class EmailSender
 {
     private const string PageUrl = "https://pandaclaus.pl/";
-    private const string EmailFrom = "DoNotReply@\r\n3e425720-d311-4859-9dbd-725f2a71aad6.azurecomm.net";
+    private const string EmailFrom = "DoNotReply@pandaclaus.pl";
 
     private readonly EmailClient _emailClient;
     private readonly GoogleSheetsClient _googleSheetsClient;
@@ -75,11 +75,7 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 <p>Z całym #pandateam życzymy wszystkiego PANDAstycznego!</p>
 <hr/>
 <h2>Potwierdzenie odbioru paczki</h2>
-<p><b>Aby potwierdzić odbiór paczki, zeskanuj poniższy kod QR lub kliknij w link:</b></p>
-<p style=""text-align: center;"">
-    <a href=\""{receiveConfirmationUrl}\""><img src=""data:image/png;base64,{qrCodeBase64}"" alt=""QR Code - Potwierdzenie odbioru paczki"" style=""max-width: 300px;"" /></a>
-</p>
-<p><a href=\""{receiveConfirmationUrl}\"">{receiveConfirmationUrl}</a></p>
+<p><b>Wydrukuj i przyklej załączony kod QR na wszystkie wysłane do nas paczki!</b></p>
 <p><b>Kod QR do wydruku</b> znajduje się również w załączonym pliku PDF.</p>";
 
         var email = new EmailMessage(
@@ -125,29 +121,20 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
                         column.Spacing(20);
 
                         column.Item().AlignCenter().Text("Panda Claus 2025")
-                            .FontSize(28).Bold().FontColor(Colors.Blue.Medium);
+                            .FontSize(28).Bold().FontColor(Colors.Red.Medium);
 
-                        column.Item().AlignCenter().Text("Potwierdzenie dostarczenia paczki")
-                            .FontSize(20).SemiBold();
+                        column.Item().AlignCenter().Text($"{letterNumber}")
+                            .FontSize(100).Bold();
 
-                        column.Item().AlignCenter().Text($"List numer: {letterNumber}")
-                            .FontSize(18).Bold();
+                        column.Item().PaddingTop(50).AlignCenter().Text("Zeskanuj kod QR, aby potwierdzić dostarczenie paczki")
+                            .FontSize(16);
 
                         column.Item().PaddingTop(20).AlignCenter()
-                            .Image(qrCodeBytes)
-                            .FitWidth();
-
-                        column.Item().PaddingTop(20).AlignCenter().Text("Zeskanuj kod QR, aby potwierdzić dostarczenie paczki")
-                            .FontSize(16);
+                            .Width(250)
+                            .Image(qrCodeBytes);
 
                         column.Item().PaddingTop(10).AlignCenter().Text(url)
                             .FontSize(10).Italic();
-
-                        column.Item().PaddingTop(30).Text("Wydrukuj i dołącz do paczki")
-                            .FontSize(16).Bold().AlignCenter();
-
-                        column.Item().PaddingTop(10).Text("Dziękujemy za wsparcie akcji Panda Claus!")
-                            .FontSize(14).SemiBold().AlignCenter();
                     });
             });
         });
