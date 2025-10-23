@@ -35,6 +35,12 @@ public class ReceiveConfirmationModel : PageModel
     public async Task<IActionResult> OnGetAsync(int rowNumber, string code)
     {
         Letter = await _client.FetchLetterAsync(rowNumber);
+        if (Letter == null)
+        {
+            Message = "Nie znaleziono listu.";
+            ShowForm = false;
+            return Page();
+        }
 
         // Validate the code matches the letter number
         if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))

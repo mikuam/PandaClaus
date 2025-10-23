@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using Microsoft.Extensions.Logging;
 using PandaClaus.Web.Core;
 using PandaClaus.Web.Core.DTOs;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
@@ -17,10 +18,12 @@ public class GoogleSheetsClient
     private readonly string _blobUrl;
     private readonly SheetsService _sheetsService;
     private readonly LetterNumerationService _letterNumerationService;
+    private readonly ILogger<GoogleSheetsClient> _logger;
 
-    public GoogleSheetsClient(IConfiguration configuration, LetterNumerationService letterNumerationService)
+    public GoogleSheetsClient(IConfiguration configuration, LetterNumerationService letterNumerationService, ILogger<GoogleSheetsClient> logger)
     {
         _letterNumerationService = letterNumerationService;
+        _logger = logger;
 
         _spreadsheetId = configuration["SpreadsheetId"]!;
         _sheetName = configuration["SheetName"]!;
@@ -46,14 +49,24 @@ public class GoogleSheetsClient
         return MapToLetters(response.Values);
     }
 
-    public async Task<Letter> FetchLetterAsync(int rowNumber)
+    public async Task<Letter?> FetchLetterAsync(int rowNumber)
     {
-        var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
-        var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
-        var response = await request.ExecuteAsync();
+        try
+        {
+            var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
+            var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
+            var response = await request.ExecuteAsync();
 
-        var letter = MapLetter(rowNumber, response.Values.First());
-        return letter;
+            var letter = MapLetter(rowNumber, response.Values.First());
+            return letter;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching letter from Google Sheets. RowNumber: {RowNumber}, SheetName: {SheetName}, SpreadsheetId: {SpreadsheetId}", 
+                rowNumber, _sheetName, _spreadsheetId);
+
+            return null;
+        }
     }
 
     public async Task<int> AddLetter(Letter letter)
