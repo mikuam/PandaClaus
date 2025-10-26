@@ -51,7 +51,6 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 ";
 
         var receiveConfirmationUrl = CreateReceiveConfirmationUrl(letter);
-        var qrCodeBase64 = GenerateQRCodeBase64(receiveConfirmationUrl);
 
         var htmlContent = $@"<h1>Drodzy PANDAstyczni Darczyńcy!</h1>
 <p>Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus.</p>
@@ -75,8 +74,8 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 <p>Z całym #pandateam życzymy wszystkiego PANDAstycznego!</p>
 <hr/>
 <h2>Potwierdzenie odbioru paczki</h2>
-<p><b>Wydrukuj i przyklej załączony kod QR na wszystkie wysłane do nas paczki!</b></p>
-<p><b>Kod QR do wydruku</b> znajduje się również w załączonym pliku PDF.</p>";
+<p><b>Wydrukuj załączony plik PDF i przyklej na wszystkie wysłane do nas paczki!</b></p>
+<p>To bardzo pomoże nam w zarządzaniu paczkami w magazynie.</p>";
 
         var email = new EmailMessage(
             EmailFrom,
@@ -91,15 +90,6 @@ Z całym #pandateam życzymy wszystkiego PANDAstycznego!
 
         // run in a background thread, don't wait for it to finish
         _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
-    }
-
-    private string GenerateQRCodeBase64(string url)
-    {
-        using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-        using var qrCode = new PngByteQRCode(qrCodeData);
-        var qrCodeBytes = qrCode.GetGraphic(20);
-        return Convert.ToBase64String(qrCodeBytes);
     }
 
     private byte[] GenerateQRCodePdf(string url, string letterNumber)
