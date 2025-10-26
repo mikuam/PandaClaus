@@ -16,6 +16,24 @@
 <div class="container-xxl bg-white p-0">
     <div class="container-xxl py-5">
         <div class="container">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="row g-5 align-items-center justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            @Model.ErrorMessage
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/" class="btn btn-primary">
+                                <i class="fa fa-home me-2"></i>Powrót do listy listów
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.Letter != null)
+            {
             <div class="row g-5 align-items-center">
                 <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge.FormatAsAge()</h1>
 
@@ -130,6 +148,7 @@
                     }
                 </div>
             </div>
+            }
         </div>
     </div>
 </div>

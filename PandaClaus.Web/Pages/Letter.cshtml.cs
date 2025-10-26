@@ -8,10 +8,12 @@ public class LetterModel : BasePageModel
     private readonly BlobClient _blobClient;
 
     [BindProperty]
-    public Letter Letter { get; set; }
+    public Letter? Letter { get; set; }
 
     [BindProperty]
     public List<IFormFile> UploadPhotos { get; set; }
+
+    public string? ErrorMessage { get; set; }
 
     public LetterModel(GoogleSheetsClient client, EmailSender emailSender, BlobClient blobClient)
     {
@@ -20,9 +22,17 @@ public class LetterModel : BasePageModel
         _blobClient = blobClient;
     }
 
-    public async Task OnGetAsync(int rowNumber)
+    public async Task<IActionResult> OnGetAsync(int rowNumber)
     {
         Letter = await _client.FetchLetterAsync(rowNumber);
+        
+        if (Letter == null)
+        {
+            ErrorMessage = "Nie znaleziono listu o podanym numerze. Sprawdź poprawność linku lub wróć do listy listów.";
+            return Page();
+        }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -30,6 +40,13 @@ public class LetterModel : BasePageModel
         var rowNumber = int.Parse(Request.Form["RowNumber"]!);
 
         var letter = await _client.FetchLetterAsync(rowNumber);
+        
+        if (letter == null)
+        {
+            ErrorMessage = "Nie znaleziono listu.";
+            return Page();
+        }
+
         if (!letter.IsAssigned)
         {
             await _client.AssignLetterAsync(new LetterAssignment
@@ -54,6 +71,11 @@ public class LetterModel : BasePageModel
         {
             Letter = await _client.FetchLetterAsync(rowNumber);
 
+            if (Letter == null)
+            {
+                return RedirectToPage("./Index");
+            }
+
             var imageUrlToRemove = Letter.ImageUrls.FirstOrDefault(i => i.Contains(imageUrl));
             if (imageUrlToRemove is not null)
             {
@@ -74,6 +96,12 @@ public class LetterModel : BasePageModel
         if (IsAdmin)
         {
             Letter = await _client.FetchLetterAsync(rowNumber);
+            
+            if (Letter == null)
+            {
+                return RedirectToPage("./Index");
+            }
+
             var photoIds = await _blobClient.UploadPhotos(UploadPhotos);
             if (photoIds.Count != 0)
             {
@@ -89,6 +117,13 @@ public class LetterModel : BasePageModel
     {
         if (IsAdmin)
         {
+            var letter = await _client.FetchLetterAsync(rowNumber);
+            
+            if (letter == null)
+            {
+                return RedirectToPage("./Index");
+            }
+
             var childName = Request.Form["ChildName"].ToString();
             var childAge = int.Parse(Request.Form["ChildAge"].ToString());
             var description = Request.Form["Description"].ToString();
