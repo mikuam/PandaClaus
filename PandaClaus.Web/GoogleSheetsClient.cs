@@ -304,10 +304,27 @@ public class GoogleSheetsClient
 
     public async Task<List<Package>> FetchPackages()
     {
-        var range = $"{_packageSheetName}!A:E";
+        var range = $"{_packageSheetName}!A:F";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
         return MapToPackages(response.Values);
+    }
+
+    public async Task UpdatePackageDateExported(int rowNumber, DateTime dateExported)
+    {
+        var range = $"{_packageSheetName}!F{rowNumber}:F{rowNumber}";
+
+        var valuesToUpdate = new List<object>
+        {
+            dateExported.ToString("yyyy-MM-dd HH:mm:ss")
+        };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
     }
 
     private List<Package> MapToPackages(IList<IList<object>> values)
@@ -326,7 +343,10 @@ public class GoogleSheetsClient
                 PackageNumber = string.IsNullOrWhiteSpace(row[1].ToString()) ? 0 : int.Parse(row[1].ToString()!),
                 TotalPackages = string.IsNullOrWhiteSpace(row[2].ToString()) ? 0 : int.Parse(row[2].ToString()!),
                 Size = string.IsNullOrWhiteSpace(row[3].ToString()) ? Gabaryt.A : Enum.Parse<Gabaryt>(row[3].ToString()!, true),
-                PackageId = string.IsNullOrWhiteSpace(row[4].ToString()) ? string.Empty : row[4].ToString()!
+                PackageId = string.IsNullOrWhiteSpace(row[4].ToString()) ? string.Empty : row[4].ToString()!,
+                DateExported = row.Count > 5 && !string.IsNullOrWhiteSpace(row[5].ToString())
+                    ? DateTime.Parse(row[5].ToString()!)
+                    : null
             };
 
             rowNumber++;

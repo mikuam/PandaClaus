@@ -8,4 +8,5 @@ public record Package
     public int TotalPackages { get; init; }
     public Gabaryt Size { get; init; }
     public string PackageId { get; init; }
+    public DateTime? DateExported { get; init; }
 }

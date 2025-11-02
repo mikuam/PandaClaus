@@ -32,6 +32,25 @@
                     @TempData["SuccessMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+                
+                @if (TempData["DownloadFileName"] != null)
+                {
+                    <div class="text-center mb-4">
+                        <a href="/Admin?handler=DownloadCsv&fileName=@TempData["DownloadFileName"]" 
+                           class="btn btn-primary btn-lg">
+                            <i class="fa fa-download me-2"></i>Pobierz plik CSV
+                        </a>
+                    </div>
+                }
+            }
+            
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"></i>
+                    @TempData["WarningMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
             
             @if (TempData["ErrorMessage"] != null)

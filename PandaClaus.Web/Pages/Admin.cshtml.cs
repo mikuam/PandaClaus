@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using PandaClaus.Web.Core;
 using PandaClaus.Web.Services;
 
@@ -113,19 +112,54 @@ public class AdminModel : BasePageModel
         var letterNumbers = letters.Select(l => l.Number).ToList();
         var packages = (await _client.FetchPackages()).Where(p => letterNumbers.Contains(p.LetterNumber));
 
-        var lettersWithPackages = letters.ToDictionary(l => l, l => packages.Where(p => p.LetterNumber == l.Number));
-        var csvExport = _csvExporter.Export(lettersWithPackages);
+        var alreadySentPackages = packages.Where(p => p.DateExported != null).ToList();
+        var packagesToExport = packages.Where(p => p.DateExported == null).ToList();
 
-        foreach (var letter in letters)
+        if (!packagesToExport.Any())
         {
-            _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, letter.Uwagi);
+            TempData["ErrorMessage"] = "Brak paczek do wyeksportowania. Wszystkie wybrane paczki zostały już wcześniej wyeksportowane.";
+            return RedirectToPage("./Admin");
         }
 
-        var byteArray = System.Text.Encoding.UTF8.GetBytes(csvExport);
-        var stream = new MemoryStream(byteArray);
-        var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+        var lettersWithPackages = letters.ToDictionary(l => l, l => packagesToExport.Where(p => p.LetterNumber == l.Number));
+        var csvExport = _csvExporter.Export(lettersWithPackages);
 
-        return File(stream, "text/csv", fileName);
+        // Update letter status
+        foreach (var letter in letters)
+        {
+            await _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, letter.Uwagi);
+        }
+
+        // Mark packages as exported
+        var exportDate = DateTime.Now;
+        foreach (var package in packagesToExport)
+        {
+            await _client.UpdatePackageDateExported(package.RowNumber, exportDate);
+        }
+
+        // Save CSV to temp file
+        var fileName = $"letters_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+        var tempPath = Path.Combine(Path.GetTempPath(), fileName);
+        await System.IO.File.WriteAllTextAsync(tempPath, csvExport);
+
+        // Inform user about already exported packages
+        if (alreadySentPackages.Any())
+        {
+            var excludedLetterNumbers = alreadySentPackages
+                .Select(p => p.LetterNumber)
+                .Distinct()
+                .OrderBy(n => n);
+            
+            TempData["WarningMessage"] = $"Uwaga: {alreadySentPackages.Count} paczek zostało pominiętych, " +
+                                         $"ponieważ były już wcześniej wyeksportowane. " +
+                                         $"Numery listów: {string.Join(", ", excludedLetterNumbers)}";
+        }
+
+        var exportedCount = packagesToExport.Count;
+        TempData["SuccessMessage"] = $"Pomyślnie wyeksportowano {exportedCount} paczek. Data eksportu: {exportDate:yyyy-MM-dd HH:mm:ss}";
+        TempData["DownloadFileName"] = fileName;
+
+        return RedirectToPage("./Admin");
     }
 
     public async Task<IActionResult> SendPackagesToInPost(IEnumerable<Letter> letters)
@@ -164,6 +198,36 @@ public class AdminModel : BasePageModel
         }
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetDownloadCsvAsync(string fileName)
+    {
+        if (!IsAdmin || string.IsNullOrWhiteSpace(fileName))
+        {
+            return RedirectToPage("./Admin");
+        }
+
+        var tempPath = Path.Combine(Path.GetTempPath(), fileName);
+        
+        if (!System.IO.File.Exists(tempPath))
+        {
+            TempData["ErrorMessage"] = "Plik CSV nie został znaleziony. Spróbuj ponownie wygenerować eksport.";
+            return RedirectToPage("./Admin");
+        }
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(tempPath);
+        
+        // Clean up temp file
+        try
+        {
+            System.IO.File.Delete(tempPath);
+        }
+        catch
+        {
+            // Ignore cleanup errors
+        }
+
+        return File(fileBytes, "text/csv", fileName);
     }
 }
 
