@@ -25,7 +25,7 @@
                             @Model.ErrorMessage
                         </div>
                         <div class="text-center mt-4">
-                            <a href="/" class="btn btn-primary">
+                            <a href="/" class="btn btn-primary btn-lg">
                                 <i class="fa fa-home me-2"></i>Powrót do listy listów
                             </a>
                         </div>
@@ -34,120 +34,180 @@
             }
             else if (Model.Letter != null)
             {
-            <div class="row g-5 align-items-center">
-                <h1 class="mb-4">@Model.Letter.ChildName<span>, </span>@Model.Letter.ChildAge.FormatAsAge()</h1>
+                <!-- Letter Header -->
+                <div class="letter-header wow fadeIn" data-wow-delay="0.1s">
+                    <h1 class="mb-0">@Model.Letter.ChildName, @Model.Letter.ChildAge.FormatAsAge()</h1>
+                    <div class="letter-number-badge">
+                        <i class="fa fa-envelope me-2"></i>List numer: <strong>@Model.Letter.Number</strong>
+                    </div>
+                    @if (Model.Letter.IsAssigned)
+                    {
+                        <div class="mt-3">
+                            <span class="reserved-badge">
+                                <i class="fa fa-check-circle"></i>
+                                List zarezerwowany
+                            </span>
+                        </div>
+                    }
+                </div>
 
-                <h2>Numer listu: @Model.Letter.Number</h2>
-                @if (Model.Letter.IsAssigned)
-                {
-                    <p id="letter-reserved"><i class="fa fa-times text-primary me-3"></i>List zarezerwowany</p>
-                }
-
-                <div class="col-lg-12 wow fadeIn d-flex flex-wrap" data-wow-delay="0.1s" style="gap: 20px;">
+                <!-- Image Gallery -->
+                <div class="image-gallery wow fadeIn" data-wow-delay="0.2s">
                     @foreach (var imageUrl in Model.Letter.ImageUrls)
-                    {   <div style="width: 340px;">
-                            <div style="height: 300px;">
+                    {
+                        <div class="image-card">
+                            <div class="image-wrapper">
                                 <a href="@imageUrl" target="_blank">
-                                    <img class="d-block letter-big-image" src="@imageUrl" alt="letter image">
+                                    <img src="@imageUrl" alt="letter image">
                                 </a>
-                                
                             </div>
                             @if (Model.IsAdmin)
                             {
-                                <form method="post">
-                                    <input type="hidden" name="imageUrl" value="@imageUrl" />
-                                    <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
-                                            asp-route-rowNumber="@Model.Letter.RowNumber" class="btn btn-primary btn-sm mt-3 float-none"
-                                            onclick="return confirmDelete();">
-                                        Usuń
-                                    </button>
-                                </form>
+                                <div class="p-3">
+                                    <form method="post" class="d-inline">
+                                        <input type="hidden" name="imageUrl" value="@imageUrl" />
+                                        <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
+                                                asp-route-rowNumber="@Model.Letter.RowNumber" 
+                                                class="btn btn-danger btn-sm w-100"
+                                                onclick="return confirmDelete();">
+                                            <i class="fa fa-trash me-2"></i>Usuń zdjęcie
+                                        </button>
+                                    </form>
+                                </div>
                             }
                         </div>
                     }
                 </div>
+
+                <!-- Admin Upload Section -->
                 @if (Model.IsAdmin)
                 {
-                    <h2>Dodaj zdjęcie</h2>
-                    <form method="post" enctype="multipart/form-data">
-                        <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
-                        <div class="mb-4">
-                            <label asp-for="UploadPhotos">Wyślij skan lub zdjęcie listu<span class="text-danger">*</span></label>
-                            <input asp-for="UploadPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
-                            <button type="submit" asp-page-handler="uploadImage" asp-route-rowNumber="@Model.Letter.RowNumber"
-                                    class="btn btn-primary btn-sm mt-3 float-end">
-                                Dodaj zdjęcie
-                            </button>
-                        </div>
-                    </form>
+                    <div class="admin-section wow fadeIn" data-wow-delay="0.3s">
+                        <h4><i class="fa fa-user-shield me-2"></i>Panel Administratora</h4>
+                        <form method="post" enctype="multipart/form-data" class="mt-3">
+                            <input type="hidden" name="RowNumber" value="@Model.Letter.RowNumber">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label class="form-label">Dodaj zdjęcia listu</label>
+                                    <input asp-for="UploadPhotos" type="file" class="form-control" 
+                                           accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" asp-page-handler="uploadImage" 
+                                            asp-route-rowNumber="@Model.Letter.RowNumber"
+                                            class="btn btn-primary w-100">
+                                        <i class="fa fa-upload me-2"></i>Dodaj zdjęcie
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 }
 
-                <div class="col-lg-12 wow fadeIn" data-wow-delay="0.5s">
+                <!-- Description and Presents Section -->
+                <div class="row g-4 wow fadeIn" data-wow-delay="0.4s">
                     @if (Model.IsAdmin)
                     {
-                        <form method="post" asp-page-handler="updateDetails" asp-route-rowNumber="@Model.Letter.RowNumber">
-                            <div class="mb-4">
-                                <label class="form-label">Imię dziecka</label>
-                                <input name="ChildName" type="text" class="form-control" value="@Model.Letter.ChildName" required>
+                        <div class="col-12">
+                            <div class="admin-section">
+                                <h4><i class="fa fa-edit me-2"></i>Edytuj szczegóły listu</h4>
+                                <form method="post" asp-page-handler="updateDetails" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Imię dziecka</label>
+                                            <input name="ChildName" type="text" class="form-control" 
+                                                   value="@Model.Letter.ChildName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Wiek dziecka</label>
+                                            <input name="ChildAge" type="number" class="form-control" 
+                                                   value="@Model.Letter.ChildAge" min="0" max="18" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Opis</label>
+                                            <textarea name="Description" rows="3" class="form-control">@Model.Letter.Description</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Prezenty, o które prosi dziecko</label>
+                                            <textarea name="Presents" rows="3" class="form-control">@Model.Letter.Presents</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fa fa-save me-2"></i>Zapisz zmiany
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label">Wiek dziecka</label>
-                                <input name="ChildAge" type="number" class="form-control" value="@Model.Letter.ChildAge" min="0" max="18" required>
-                            </div>
-                            <h3>Opis</h3>
-                            <div class="mb-4">
-                                <textarea name="Description" rows="3" class="form-control" placeholder="Opis">@Model.Letter.Description</textarea>
-                            </div>
-                            <h3>Prezenty, o które prosi dziecko</h3>
-                            <div class="mb-4">
-                                <textarea name="Presents" rows="3" class="form-control" placeholder="Prezenty">@Model.Letter.Presents</textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-sm mt-3">
-                                Zapisz zmiany
-                            </button>
-                        </form>
+                        </div>
                     }
                     else
                     {
-                        <h3>Opis</h3>
-                        <p class="mb-4" style="white-space: pre-wrap;">@Model.Letter.Description</p>
-                        <h3>Prezenty, o które prosi dziecko</h3>
-                        <p class="mb-4" style="white-space: pre-wrap;">@Model.Letter.Presents</p>
-                    }
-
-                    @if (!Model.Letter.IsAssigned)
-                    {
-                        <hr />
-                        <h3>Zarezerwuj list</h3>
-                        <form method="post">
-                            <div class="container col-lg-6 offset-lg-3">
-                                <input type="text" class="d-none" id="rowNumber" name="RowNumber" value="@Model.Letter.RowNumber">
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedTo">Imię i nazwisko <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedTo" type="text" class="form-control" id="name" name="Letter.AssignedTo" placeholder="Wpisz imię i nazwisko" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToCompanyName">Nazwa firmy</label>
-                                    <input asp-for="Letter.AssignedToCompanyName" type="text" class="form-control" id="company" name="Letter.AssignedToCompanyName" placeholder="Wpisz nazwę firmy">
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToEmail">E-mail <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedToEmail" type="email" class="form-control" id="email" name="Letter.AssignedToEmail" placeholder="Wpisz adres e-mail" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToPhone">Numer telefonu <span class="text-danger">*</span></label>
-                                    <input asp-for="Letter.AssignedToPhone" type="phone" class="form-control" id="phone" name="Letter.AssignedToPhone" placeholder="Wpisz numer telefonu" required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label asp-for="Letter.AssignedToInfo">Informacje dodatkowe</label>
-                                    <textarea asp-for="Letter.AssignedToInfo" rows="3" class="form-control" id="info" name="Letter.AssignedToInfo" placeholder="Wpisz dodatkowe informacje"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary py-3 px-5 mt-3">Zarezerwuj</button>
+                        <div class="col-md-6">
+                            <div class="content-section">
+                                <h3><i class="fa fa-info-circle me-2"></i>Opis</h3>
+                                <p style="white-space: pre-wrap;">@Model.Letter.Description</p>
                             </div>
-                        </form>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="content-section">
+                                <h3><i class="fa fa-gift me-2"></i>Prezenty, o które prosi dziecko</h3>
+                                <p style="white-space: pre-wrap;">@Model.Letter.Presents</p>
+                            </div>
+                        </div>
                     }
                 </div>
-            </div>
+
+                <!-- Reservation Form -->
+                @if (!Model.Letter.IsAssigned)
+                {
+                    <div class="row mt-5 wow fadeIn" data-wow-delay="0.5s">
+                        <div class="col-lg-8 offset-lg-2">
+                            <div class="reservation-form">
+                                <h3><i class="fa fa-heart me-2"></i>Zarezerwuj list i spełnij marzenie!</h3>
+                                <form method="post">
+                                    <input type="hidden" name="RowNumber" value="@Model.Letter.RowNumber">
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Imię i nazwisko <span class="text-danger">*</span></label>
+                                        <input asp-for="Letter.AssignedTo" type="text" class="form-control" 
+                                               placeholder="Wpisz imię i nazwisko" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Nazwa firmy</label>
+                                        <input asp-for="Letter.AssignedToCompanyName" type="text" class="form-control" 
+                                               placeholder="Opcjonalnie - wpisz nazwę firmy">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">E-mail <span class="text-danger">*</span></label>
+                                        <input asp-for="Letter.AssignedToEmail" type="email" class="form-control" 
+                                               placeholder="Wpisz adres e-mail" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Numer telefonu <span class="text-danger">*</span></label>
+                                        <input asp-for="Letter.AssignedToPhone" type="tel" class="form-control" 
+                                               placeholder="Wpisz numer telefonu" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label">Informacje dodatkowe</label>
+                                        <textarea asp-for="Letter.AssignedToInfo" rows="3" class="form-control" 
+                                                  placeholder="Wpisz dodatkowe informacje (opcjonalnie)"></textarea>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-reserve">
+                                            <i class="fa fa-heart me-2"></i>Zarezerwuj list
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>

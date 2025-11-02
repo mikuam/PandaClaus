@@ -1,0 +1,235 @@
+/* Panda Claus Custom Styles */
+
+/* Color Variables */
+:root {
+    --primary-color: #ACD3CC;
+    --primary-dark: #8DBEB5;
+    --primary-darker: #5C9489;
+    --primary-light: #E8F5F2;
+    --dark: #040515;
+    --light-gray: #f8f9fa;
+}
+
+/* Letter Header */
+.letter-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: var(--dark);
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(172, 211, 204, 0.3);
+}
+
+.letter-number-badge {
+    background: rgba(255,255,255,0.3);
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    display: inline-block;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    color: var(--dark);
+}
+
+/* Image Gallery */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.image-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(172, 211, 204, 0.3);
+}
+
+.image-wrapper {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    background: var(--light-gray);
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.image-card:hover .image-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Content Sections */
+.content-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.1);
+}
+
+.content-section h3 {
+    color: var(--primary-darker);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    border-left: 4px solid var(--primary-color);
+    padding-left: 1rem;
+}
+
+/* Reservation Form */
+.reservation-form {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #f5f7fa 100%);
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.2);
+}
+
+.reservation-form h3 {
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(172, 211, 204, 0.25);
+}
+
+/* Buttons */
+.btn-reserve {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    color: var(--dark);
+}
+
+.btn-reserve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(172, 211, 204, 0.4);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+}
+
+.btn-primary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--dark) !important;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: var(--dark) !important;
+}
+
+/* Badges */
+.reserved-badge {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5c445c 100%);
+    color: var(--dark);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.3);
+}
+
+/* Admin Section */
+.admin-section {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+/* Index Page - Letter Cards */
+.property-item {
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.property-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(172, 211, 204, 0.2);
+}
+
+.property-item .bg-primary {
+    background: var(--primary-color) !important;
+    color: var(--dark) !important;
+}
+
+/* Navigation */
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link.active {
+    color: var(--primary-darker) !important;
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--primary-darker) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+    padding: 3rem 0;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+/* Info Cards */
+.info-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(172, 211, 204, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.info-card h3 {
+    color: var(--primary-darker);
+    font-weight: 600;
+}
+
+/* Search and Filter Buttons */
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-darker);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--dark);
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, var(--primary-light) 0%, #f5f7fa 100%);
+}
+
+.footer a {
+    color: var(--primary-darker);
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: var(--primary-color);
+}
