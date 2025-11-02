@@ -7,76 +7,126 @@
 <div class="container-xxl bg-white p-0">
     <div class="container-xxl py-5">
         <div class="container">
-            <div class="row g-5 align-items-center">
-                <h1 class="mb-4">Panel admina</h1>
-                <h2 style="color: red">@Request.Query["message"]</h2>
-                
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success" role="alert">
-                        @TempData["SuccessMessage"]
-                    </div>
-                }
-                
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger" role="alert">
-                        @TempData["ErrorMessage"]
-                    </div>
-                }
-                
-                <p>Generowanie pliku eksportu do przesyłek InPost. Po wygenerwaniu pliku w formacie CSV, należy go użyć na tej stronie <a href="https://manager.paczkomaty.pl/shipments/send/import" target="_blank">https://manager.paczkomaty.pl/shipments/send/import</a> do wygenerowania etykiet.</p>
+            <!-- Page Header -->
+            <div class="letter-header wow fadeIn" data-wow-delay="0.1s">
+                <h1 class="mb-0"><i class="fa fa-user-shield me-2"></i>Panel Administratora</h1>
+                <div class="letter-number-badge">
+                    Zarządzanie eksportem listów
+                </div>
+            </div>
 
-                <form method="post">
-                    <h3>Opcja 1 - Eksport CSV</h3>
-                    
-                    <p>Generowanie listów po numerach, niezależnie od statusu. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY</p>
+            <!-- Success/Error Messages -->
+            @if (!string.IsNullOrEmpty(Request.Query["message"]))
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fa fa-info-circle me-2"></i>
+                    @Request.Query["message"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fa fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Info Card -->
+            <div class="info-card wow fadeIn" data-wow-delay="0.2s">
+                <h3><i class="fa fa-info-circle me-2"></i>Instrukcja</h3>
+                <p class="mb-0">
+                    Generowanie pliku eksportu do przesyłek InPost. Po wygenerowaniu pliku w formacie CSV, 
+                    należy go użyć na stronie 
+                    <a href="https://manager.paczkomaty.pl/shipments/send/import" target="_blank" class="text-decoration-none">
+                        <i class="fa fa-external-link-alt me-1"></i>InPost Manager
+                    </a> 
+                    do wygenerowania etykiet.
+                </p>
+            </div>
+
+            <form method="post">
+                <!-- Option 1 -->
+                <div class="content-section wow fadeIn" data-wow-delay="0.3s">
+                    <h3><i class="fa fa-list-ol me-2"></i>Opcja 1 - Eksport po numerach listów</h3>
+                    <p class="text-muted mb-4">
+                        Generowanie listów po numerach, niezależnie od statusu. Po wygenerowaniu pliku, 
+                        status zmieni się na <strong>ZAADRESOWANY</strong>.
+                    </p>
 
                     <div class="mb-4">
-                        <label asp-for="LetterNumbers">Numery listów(oddzielone przecinkiem)</label>
-                        <input asp-for="LetterNumbers" type="text" class="form-control" id="letterNumbers">
+                        <label asp-for="LetterNumbers" class="form-label">
+                            <i class="fa fa-envelope me-2"></i>Numery listów
+                        </label>
+                        <input asp-for="LetterNumbers" type="text" class="form-control" 
+                               placeholder="np. 1a, 2b, 3c (oddzielone przecinkiem)">
+                        <div class="form-text">Wpisz numery listów oddzielone przecinkami</div>
                     </div>
+
                     <button type="submit" asp-page-handler="exportFromNumbers"
-                            asp-route-letterNumbers="@Model.LetterNumbers" class="btn btn-primary btn-sm mt-3 float-none">
-                        Generuj CSV
+                            asp-route-letterNumbers="@Model.LetterNumbers" 
+                            class="btn btn-primary">
+                        <i class="fa fa-file-csv me-2"></i>Generuj CSV z wybranych numerów
                     </button>
+                </div>
 
-                    <br/>
-                    <hr/>
-                    <h3>Opcja 2 - Eksport CSV</h3>
-                    
-                    <p>Generowanie listów w statusie SPAKOWANE. Po wygenerowaniu pliku, status zmieni sie na ZAADRESOWANY.</p>
+                <!-- Option 2 -->
+                <div class="content-section wow fadeIn" data-wow-delay="0.4s">
+                    <h3><i class="fa fa-box me-2"></i>Opcja 2 - Eksport spakowanych listów</h3>
+                    <p class="text-muted mb-4">
+                        Generowanie listów w statusie <strong>SPAKOWANE</strong>. Po wygenerowaniu pliku, 
+                        status zmieni się na <strong>ZAADRESOWANY</strong>.
+                    </p>
 
                     <div class="mb-4">
-                        <label for="letterCount">Ilość listów</label>
+                        <label for="letterCount" class="form-label">
+                            <i class="fa fa-sort-numeric-down me-2"></i>Ilość listów do wygenerowania
+                        </label>
                         <select id="letterCount" name="letterCount" class="form-control" asp-for="LetterCount">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
+                            <option value="10">10 listów</option>
+                            <option value="20">20 listów</option>
+                            <option value="50">50 listów</option>
                         </select>
+                        <div class="form-text">Wybierz ilość listów do eksportu</div>
                     </div>
-                    <button type="submit" asp-page-handler="exportNext" class="btn btn-primary btn-sm mt-3 float-none">
-                        Generuj CSV
-                    </button>
-                    
-                    <hr/>
-                    <h3>Opcja 3 - Integracja InPost API</h3>
-                    
-                    <p>Automatyczne tworzenie przesyłek przez InPost ShipX API. Wybierz numery listów, które mają zostać wysłane.</p>
 
-                    <div class="mb-4">
-                        <label for="inpostLetterNumbers">Numery listów do InPost API (oddzielone przecinkiem)</label>
-                        <input type="text" name="inpostLetterNumbers" class="form-control" id="inpostLetterNumbers">
+                    <button type="submit" asp-page-handler="exportNext" class="btn btn-primary">
+                        <i class="fa fa-file-csv me-2"></i>Generuj CSV dla spakowanych listów
+                    </button>
+                </div>
+            </form>
+
+            <!-- Additional Info -->
+            <div class="row mt-4 wow fadeIn" data-wow-delay="0.5s">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="fa fa-lightbulb me-2"></i>Wskazówka</h5>
+                        <p class="mb-0 small">
+                            Plik CSV można otworzyć w programie Excel lub zaimportować bezpośrednio 
+                            do InPost Manager.
+                        </p>
                     </div>
-                    <button type="submit" asp-page-handler="sendToInPost" class="btn btn-success btn-sm mt-3 float-none">
-                        Utwórz przesyłki InPost
-                    </button>
-                    
-                    <hr/>
-                    <button type="submit" asp-page-handler="updateContentType" class="btn btn-secondary btn-sm mt-3 float-none">
-                        Update Content Type
-                    </button>
-                </form>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h5><i class="fa fa-question-circle me-2"></i>Potrzebujesz pomocy?</h5>
+                        <p class="mb-0 small">
+                            W razie problemów skontaktuj się z administratorem systemu lub 
+                            sprawdź dokumentację InPost.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
