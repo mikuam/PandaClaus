@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace PandaClaus.Web.Pages;
 public class LetterModel : BasePageModel
@@ -6,6 +7,7 @@ public class LetterModel : BasePageModel
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
     private readonly BlobClient _blobClient;
+    private readonly IConfiguration _configuration;
 
     [BindProperty]
     public Letter? Letter { get; set; }
@@ -14,12 +16,15 @@ public class LetterModel : BasePageModel
     public List<IFormFile> UploadPhotos { get; set; }
 
     public string? ErrorMessage { get; set; }
+    
+    public string BlobUrl => _configuration["BlobUrl"]!;
 
-    public LetterModel(GoogleSheetsClient client, EmailSender emailSender, BlobClient blobClient)
+    public LetterModel(GoogleSheetsClient client, EmailSender emailSender, BlobClient blobClient, IConfiguration configuration)
     {
         _emailSender = emailSender;
         _client = client;
         _blobClient = blobClient;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> OnGetAsync(int rowNumber)
@@ -79,11 +84,26 @@ public class LetterModel : BasePageModel
             var imageUrlToRemove = Letter.ImageUrls.FirstOrDefault(i => i.Contains(imageUrl));
             if (imageUrlToRemove is not null)
             {
-                var imageIdToRemove = Letter.ImageIds.FirstOrDefault(imageUrlToRemove.Contains);
-                if (imageIdToRemove is not null && Letter.ImageIds.Contains(imageIdToRemove))
+                var imageIdToRemove = Letter.ImageIds.FirstOrDefault(i => imageUrlToRemove.Contains(i)
+                                                                          || (imageUrlToRemove + "_delete").Contains(i));
+                if (imageIdToRemove is not null)
                 {
-                    Letter.ImageIds.Remove(imageIdToRemove);
-                    await _client.UpdateImageIds(Letter);
+                    var imageIndex = Letter.ImageIds.IndexOf(imageIdToRemove);
+                    if (imageIndex >= 0)
+                    {
+                        // Mark image as deleted by adding "_delete" suffix
+                        if (!imageIdToRemove.EndsWith("_delete"))
+                        {
+                            Letter.ImageIds[imageIndex] = imageIdToRemove + "_delete";
+                        }
+                        else
+                        {
+                            // If already marked as deleted, restore it by removing the suffix
+                            Letter.ImageIds[imageIndex] = imageIdToRemove.Replace("_delete", "");
+                        }
+                        
+                        await _client.UpdateImageIds(Letter);
+                    }
                 }
             }
         }

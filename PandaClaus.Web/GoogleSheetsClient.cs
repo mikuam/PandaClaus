@@ -131,6 +131,14 @@ public class GoogleSheetsClient
 
     private Letter MapLetter(int rowNumber, IList<object> row)
     {
+        var imageIdsString = row[15].ToString() ?? string.Empty;
+        var imageIds = string.IsNullOrWhiteSpace(imageIdsString)
+            ? new List<string>()
+            : imageIdsString.Split(',').ToList();
+        
+        // Filter out deleted images for thumbnails only (those ending with "_delete")
+        var activeImageIds = imageIds.Where(id => !id.EndsWith("_delete")).ToList();
+
         var letter = new Letter
         {
             RowNumber = rowNumber,
@@ -149,18 +157,12 @@ public class GoogleSheetsClient
             ChildAge = string.IsNullOrWhiteSpace(row[12].ToString()) ? 0 : int.Parse(row[12].ToString()!),
             Description = row[13].ToString() ?? string.Empty,
             Presents = row[14].ToString() ?? string.Empty,
-            ImageIds = string.IsNullOrWhiteSpace(row[15].ToString())
-                ? new List<string>()
-                : row[15].ToString()!.Split(',').ToList(),
-            ImageUrls = string.IsNullOrWhiteSpace(row[15].ToString())
-                ? new List<string>()
-                : row[15].ToString()!.Split(',').Select(url => $"{_blobUrl}/{url}").ToList(),
-            ImageThumbnailId = string.IsNullOrWhiteSpace(row[15].ToString())
-                ? string.Empty
-                : row[15].ToString()!.Split(',').First(),
-            ImageThumbnailUrl = string.IsNullOrWhiteSpace(row[15].ToString())
-                ? string.Empty
-                : $"{_blobUrl}/{row[15].ToString()!.Split(',').First()}_thumbnail.jpg",
+            ImageIds = imageIds,  // Keep all image IDs (including deleted ones)
+            ImageUrls = imageIds.Select(id => $"{_blobUrl}/{id.Replace("_delete", "")}").ToList(),  // All images (URLs without _delete suffix)
+            ImageThumbnailId = activeImageIds.Count > 0 ? activeImageIds.First() : string.Empty,
+            ImageThumbnailUrl = activeImageIds.Count > 0
+                ? $"{_blobUrl}/{activeImageIds.First()}_thumbnail.jpg"
+                : string.Empty,
             Added = DateTime.Parse(row[16].ToString() ?? string.Empty),
             IsVisible = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             IsAssigned = string.Equals(row[18].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
