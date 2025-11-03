@@ -251,7 +251,7 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateLetterDetailsWithChild(int rowNumber, string childName, int childAge, string description, string presents)
+    public async Task UpdateLetterDetailsWithChild(int rowNumber, string childName, int childAge, string description, string presents, string uwagi)
     {
         var range = $"{_sheetName}!L{rowNumber}:O{rowNumber}";
 
@@ -269,6 +269,16 @@ public class GoogleSheetsClient
         var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
         updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await updateRequest.ExecuteAsync();
+
+        // Update Uwagi separately
+        var uwagiRange = $"{_sheetName}!Y{rowNumber}:Y{rowNumber}";
+        var uwagiValueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { new List<object> { uwagi } }
+        };
+        var uwagiUpdateRequest = _sheetsService.Spreadsheets.Values.Update(uwagiValueRange, _spreadsheetId, uwagiRange);
+        uwagiUpdateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await uwagiUpdateRequest.ExecuteAsync();
     }
 
     public async Task CreatePackages(string letterNumber, IEnumerable<Gabaryt> sizes)

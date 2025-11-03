@@ -53,7 +53,7 @@
 
                 <!-- Image Gallery -->
                 <div class="image-gallery wow fadeIn" data-wow-delay="0.2s">
-                    @foreach (var imageUrl in Model.Letter.ImageUrls)
+                @foreach (var imageUrl in Model.Letter.ImageUrls)
                     {
                         <div class="image-card">
                             <div class="image-wrapper">
@@ -130,6 +130,10 @@
                                         <div class="col-12">
                                             <label class="form-label">Prezenty, o które prosi dziecko</label>
                                             <textarea name="Presents" rows="3" class="form-control">@Model.Letter.Presents</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Uwagi (widoczne tylko dla administratorów)</label>
+                                            <textarea name="Uwagi" rows="3" class="form-control" placeholder="Notatki wewnętrzne, informacje dodatkowe">@Model.Letter.Uwagi</textarea>
                                         </div>
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-success">

@@ -128,8 +128,9 @@ public class LetterModel : BasePageModel
             var childAge = int.Parse(Request.Form["ChildAge"].ToString());
             var description = Request.Form["Description"].ToString();
             var presents = Request.Form["Presents"].ToString();
-            
-            await _client.UpdateLetterDetailsWithChild(rowNumber, childName, childAge, description, presents);
+            var uwagi = Request.Form["Uwagi"].ToString();
+
+            await _client.UpdateLetterDetailsWithChild(rowNumber, childName, childAge, description, presents, uwagi);
         }
 
         return RedirectToPage("./Letter", new { rowNumber });
