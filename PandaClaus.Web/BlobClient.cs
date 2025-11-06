@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Logging;
 using PandaClaus.Web.Core;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -10,14 +11,15 @@ namespace PandaClaus.Web;
 public class BlobClient
 {
     private readonly BlobServiceClient _blobServiceClient;
-
     private readonly string _blobContainerName;
+    private readonly ILogger<BlobClient> _logger;
 
-    public BlobClient(IConfiguration configuration)
+    public BlobClient(IConfiguration configuration, ILogger<BlobClient> logger)
     {
         var blobUrl = configuration["BlobUrl"];
         var blobSasToken = configuration["BlobContainerSasToken"];
         _blobContainerName = configuration["BlobContainerName"] ?? "photos2024";
+        _logger = logger;
 
         _blobServiceClient = new BlobServiceClient(new Uri($"{blobUrl}?{blobSasToken}"));
     }
@@ -31,6 +33,9 @@ public class BlobClient
             var imageId = Guid.NewGuid() + Path.GetExtension(file.FileName);
             var thumbnailId = imageId + "_thumbnail" + ".jpg";  // Use .jpg extension for thumbnails
 
+            _logger.LogInformation("Uploading photo: FileName={FileName}, ImageId={ImageId}, ContentType={ContentType}, Length={Length}", 
+                file.FileName, imageId, file.ContentType, file.Length);
+
             await containerClient.UploadBlobAsync(imageId, file.OpenReadStream());
 
             var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(file.FileName) };
@@ -38,31 +43,49 @@ public class BlobClient
 
             imageIds.Add(imageId);
 
-            await GenerateAndUploadThumbnail(file, containerClient, thumbnailId);
+            try
+            {
+                await GenerateAndUploadThumbnail(file, containerClient, thumbnailId, imageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate thumbnail for image. FileName={FileName}, ImageId={ImageId}, ThumbnailId={ThumbnailId}, ContentType={ContentType}, Length={Length}", 
+                    file.FileName, imageId, thumbnailId, file.ContentType, file.Length);
+                throw;
+            }
         }
 
         return imageIds;
     }
 
-    private static async Task GenerateAndUploadThumbnail(IFormFile file, BlobContainerClient containerClient,
-        string thumbnailId)
+    private async Task GenerateAndUploadThumbnail(IFormFile file, BlobContainerClient containerClient,
+        string thumbnailId, string imageId)
     {
-        using var image = await Image.LoadAsync(file.OpenReadStream());
-        image.Mutate(x => x.Resize(new ResizeOptions
+        try
         {
-            Mode = ResizeMode.Max,
-            Size = new Size(600, 600)
-        }));
+            using var image = await Image.LoadAsync(file.OpenReadStream());
+            image.Mutate(x => x.Resize(new ResizeOptions
+            {
+                Mode = ResizeMode.Max,
+                Size = new Size(600, 600)
+            }));
 
-        using var memoryStream = new MemoryStream();
-        await image.SaveAsync(memoryStream, new JpegEncoder());
-        memoryStream.Position = 0;  // Reset the stream position for uploading
+            using var memoryStream = new MemoryStream();
+            await image.SaveAsync(memoryStream, new JpegEncoder());
+            memoryStream.Position = 0;  // Reset the stream position for uploading
 
-        // Upload the thumbnail with content type
-        await containerClient.UploadBlobAsync(thumbnailId, memoryStream);
+            // Upload the thumbnail with content type
+            await containerClient.UploadBlobAsync(thumbnailId, memoryStream);
 
-        var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(thumbnailId) };
-        await containerClient.GetBlobClient(thumbnailId).SetHttpHeadersAsync(blobHttpHeader);
+            var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(thumbnailId) };
+            await containerClient.GetBlobClient(thumbnailId).SetHttpHeadersAsync(blobHttpHeader);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load or process image for thumbnail generation. FileName={FileName}, ImageId={ImageId}, ThumbnailId={ThumbnailId}, ContentType={ContentType}, Length={Length}", 
+                file.FileName, imageId, thumbnailId, file.ContentType, file.Length);
+            throw;
+        }
     }
 
     internal async Task UpdateContentType(string image, string contentType)
