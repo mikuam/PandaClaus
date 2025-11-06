@@ -10,9 +10,8 @@ public class LetterNumerationService
         var letterNumbers = lettersWithNumbers.Select(GetNumber);
 
         var lastLetterWithTheSameAddress = lettersWithNumbers
-            .LastOrDefault(l => l.Street == newLetter.Street
-                                && l.HouseNumber == newLetter.HouseNumber
-                                && l.ApartmentNumber == (newLetter.ApartmentNumber ?? string.Empty)
+            .LastOrDefault(l => l.ParentName == newLetter.ParentName
+                                && l.ParentSurname == newLetter.ParentSurname
                                 && l.Email == newLetter.Email);
 
         if (lastLetterWithTheSameAddress != null)
