@@ -77,6 +77,15 @@
         *@
         <form method="post" enctype="multipart/form-data">
             <div class="container col-lg-6 offset-lg-3">
+                @if (!ModelState.IsValid)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fa fa-exclamation-triangle me-2"></i>
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                
                 <div class="row mb-4">
                     <div class="mb-6">
                         <label asp-for="ParentName">Imię rodzica/opiekuna prawnego <span class="text-danger">*</span></label>

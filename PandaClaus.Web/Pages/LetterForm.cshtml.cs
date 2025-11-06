@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using PandaClaus.Web.Core;
 using System.ComponentModel.DataAnnotations;
 
 namespace PandaClaus.Web.Pages;
@@ -36,8 +35,7 @@ public class LetterFormModel : PageModel
     public string HouseNumber { get; set; }
 
     [BindProperty]
-    [Required]
-    public string ApartmentNumber { get; set; }
+    public string? ApartmentNumber { get; set; }
 
     [BindProperty]
     [Required]
@@ -88,6 +86,24 @@ public class LetterFormModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        // Check if letter already exists
+        var existingLetters = await _sheetsClient.FetchLetters();
+        var isDuplicate = existingLetters.Any(l => 
+            string.Equals(l.Email, Email, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(l.ChildName, ChildName, StringComparison.OrdinalIgnoreCase) &&
+            l.ChildAge == ChildAge);
+
+        if (isDuplicate)
+        {
+            ModelState.AddModelError(string.Empty, "List dla tego dziecka został już dodany. Jeśli masz pytania, skontaktuj się z nami: pandaclaus@pandateam.pl");
+            return Page();
+        }
+
         var photoIds = await _blobClient.UploadPhotos(LetterPhotos);
 
         var letter = new Letter
