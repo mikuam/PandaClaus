@@ -19,7 +19,9 @@ public class LetterFormModel : PageModel
     public string ParentSurname { get; set; }
 
     [BindProperty]
-    [Required]
+    [Required(ErrorMessage = "Numer telefonu jest wymagany")]
+    [RegularExpression(@"^[4-8]\d{8}$", ErrorMessage = "Numer telefonu musi być polskim numerem telefonu składającym się z 9 cyfr (bez +48), zaczynającym się od cyfry 4-8")]
+    [StringLength(9, MinimumLength = 9, ErrorMessage = "Numer telefonu musi składać się z dokładnie 9 cyfr")]
     public string PhoneNumber { get; set; }
 
     [BindProperty]

@@ -98,8 +98,14 @@
                 </div>
 
                 <div class="mb-4">
-                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego (format: 9 cyfr) <span class="text-danger">*</span></label>
-                    <input asp-for="PhoneNumber" type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{9}" required>
+                    <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
+                    <input asp-for="PhoneNumber" type="tel" class="form-control" id="phoneNumber" 
+                           pattern="[4-8][0-9]{8}" 
+                           placeholder="np. 501234567"
+                           maxlength="9"
+                           required>
+                    <div class="form-text">Podaj 9-cyfrowy numer telefonu bez kierunkowego +48 (np. 501234567)</div>
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
                 <div class="mb-4">
                     <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
