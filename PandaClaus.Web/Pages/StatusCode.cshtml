@@ -1,0 +1,75 @@
+@page "{statusCode:int?}"
+@model StatusCodeModel
+@{
+    ViewData["Title"] = $"B??d {Model.StatusCode} - Panda Claus";
+}
+
+<div class="container-xxl bg-white p-0">
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="mb-4">
+                            @if (Model.StatusCode == 404)
+                            {
+                                <img src="~/img/panda_bear_back.png" alt="Lost Panda" style="max-width: 200px; height: auto;" />
+                            }
+                            else if (Model.StatusCode == 403)
+                            {
+                                <i class="fa fa-lock text-danger" style="font-size: 80px;"></i>
+                            }
+                            else
+                            {
+                                <img src="~/img/panda_bear_back.png" alt="Sad Panda" style="max-width: 200px; height: auto;" />
+                            }
+                        </div>
+                        
+                        <h1 class="display-4 mb-4">@Model.StatusCodeMessage</h1>
+                        <p class="lead mb-4">@Model.StatusCodeDescription</p>
+
+                        @if (!string.IsNullOrEmpty(Model.OriginalPath))
+                        {
+                            <div class="alert alert-secondary" role="alert">
+                                <p class="mb-0">
+                                    <strong>??dana ?cie?ka:</strong> <code>@Model.OriginalPath</code>
+                                </p>
+                            </div>
+                        }
+
+                        <div class="mt-4">
+                            <p>Co mo?esz zrobi??</p>
+                            <ul class="list-unstyled">
+                                @if (Model.StatusCode == 404)
+                                {
+                                    <li class="mb-2">
+                                        <i class="fa fa-search text-primary me-2"></i>
+                                        Sprawd?, czy adres URL jest poprawny
+                                    </li>
+                                }
+                                <li class="mb-2">
+                                    <i class="fa fa-arrow-left text-primary me-2"></i>
+                                    <a href="javascript:history.back()" class="text-decoration-none">Wró? do poprzedniej strony</a>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fa fa-home text-primary me-2"></i>
+                                    <a href="/" class="text-decoration-none">Przejd? do strony g?ównej</a>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fa fa-envelope text-primary me-2"></i>
+                                    <a href="mailto:pandaclaus@pandateam.pl" class="text-decoration-none">Skontaktuj si? z nami</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-5">
+                            <a href="/" class="btn btn-primary btn-lg py-3 px-5">
+                                <i class="fa fa-home me-2"></i>Powrót do strony g?ównej
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
