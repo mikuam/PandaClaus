@@ -93,6 +93,29 @@ public class LetterFormModel : PageModel
             return Page();
         }
 
+        // Validate file types
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff" };
+        var allowedMimeTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/bmp", "image/tiff", "image/x-tiff" };
+        
+        foreach (var file in LetterPhotos)
+        {
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                ModelState.AddModelError(nameof(LetterPhotos), 
+                    $"Plik '{file.FileName}' ma niedozwolone rozszerzenie. Dozwolone formaty: JPG, JPEG, PNG, BMP, TIF, TIFF");
+                return Page();
+            }
+            
+            if (!allowedMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                ModelState.AddModelError(nameof(LetterPhotos), 
+                    $"Plik '{file.FileName}' ma niedozwolony typ pliku. Proszę przesłać tylko pliki graficzne.");
+                return Page();
+            }
+        }
+
         // Check if letter already exists
         var existingLetters = await _sheetsClient.FetchLetters();
         var isDuplicate = existingLetters.Any(l => 
