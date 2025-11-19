@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
 namespace PandaClaus.Web.Pages;
-public class LetterFormModel : PageModel
+public class LetterFormModel : BasePageModel
 {
     private readonly GoogleSheetsClient _sheetsClient;
     private readonly BlobClient _blobClient;
