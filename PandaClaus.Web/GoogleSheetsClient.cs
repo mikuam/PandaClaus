@@ -2,7 +2,6 @@
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using Microsoft.Extensions.Logging;
 using PandaClaus.Web.Core;
 using PandaClaus.Web.Core.DTOs;
 using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource;
@@ -75,7 +74,7 @@ public class GoogleSheetsClient
         var firstEmptyRow = letters.Count + 2;
 
         var letterNumber = _letterNumerationService.GetNextLetterNumber(letters, letter);
-        var range = $"{_sheetName}!A{firstEmptyRow}:S{firstEmptyRow}";
+        var range = $"{_sheetName}!A{firstEmptyRow}:T{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letterNumber,
@@ -95,6 +94,7 @@ public class GoogleSheetsClient
             letter.Presents,
             string.Join(",", letter.ImageUrls),
             letter.Added.ToString("yyyy-MM-dd HH:mm:ss"),
+            letter.IsDeleted ? "tak" : "nie",
             letter.IsVisible ? "tak" : "nie",
             "nie"
         };
@@ -164,17 +164,18 @@ public class GoogleSheetsClient
                 ? $"{_blobUrl}/{activeImageIds.First()}_thumbnail.jpg"
                 : string.Empty,
             Added = DateTime.Parse(row[16].ToString() ?? string.Empty),
-            IsVisible = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[18].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsDeleted = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsVisible = string.Equals(row[18].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            IsAssigned = string.Equals(row[19].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
             
             // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 19),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 20),
-            AssignedToEmail = GetCellOrEmptyString(row, 21),
-            AssignedToPhone = GetCellOrEmptyString(row, 22),
-            AssignedToInfo = GetCellOrEmptyString(row, 23),
-            Uwagi = GetCellOrEmptyString(row, 24),
-            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 25)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 25), true)
+            AssignedTo = GetCellOrEmptyString(row, 20),
+            AssignedToCompanyName = GetCellOrEmptyString(row, 21),
+            AssignedToEmail = GetCellOrEmptyString(row, 22),
+            AssignedToPhone = GetCellOrEmptyString(row, 23),
+            AssignedToInfo = GetCellOrEmptyString(row, 24),
+            Uwagi = GetCellOrEmptyString(row, 25),
+            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 26)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 26), true)
         };
 
         return letter;
@@ -200,7 +201,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!S{assignment.RowNumber}:X{assignment.RowNumber}";
+        var range = $"{_sheetName}!T{assignment.RowNumber}:Y{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -237,7 +238,7 @@ public class GoogleSheetsClient
 
     public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi)
     {
-        var range = $"{_sheetName}!Y{rowNumber}:Z{rowNumber}";
+        var range = $"{_sheetName}!Z{rowNumber}:AA{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -273,7 +274,7 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
 
         // Update Uwagi separately
-        var uwagiRange = $"{_sheetName}!Y{rowNumber}:Y{rowNumber}";
+        var uwagiRange = $"{_sheetName}!Z{rowNumber}:Z{rowNumber}";
         var uwagiValueRange = new ValueRange
         {
             Values = new List<IList<object>> { new List<object> { uwagi } }
@@ -281,6 +282,23 @@ public class GoogleSheetsClient
         var uwagiUpdateRequest = _sheetsService.Spreadsheets.Values.Update(uwagiValueRange, _spreadsheetId, uwagiRange);
         uwagiUpdateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await uwagiUpdateRequest.ExecuteAsync();
+    }
+
+    public async Task UpdateIsDeleted(int rowNumber, bool isDeleted)
+    {
+        var range = $"{_sheetName}!R{rowNumber}:R{rowNumber}";
+
+        var valuesToUpdate = new List<object>
+        {
+            isDeleted ? "tak" : "nie"
+        };
+        var valueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { valuesToUpdate }
+        };
+        var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
+        updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await updateRequest.ExecuteAsync();
     }
 
     public async Task CreatePackages(string letterNumber, IEnumerable<Gabaryt> sizes)

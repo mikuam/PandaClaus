@@ -152,6 +152,7 @@ public class LetterFormModel : BasePageModel
             ImageIds = [],
             ImageUrls = photoIds,
             Added = DateTime.Now,
+            IsDeleted = false,
             IsVisible = false,
             IsAssigned = false
         };

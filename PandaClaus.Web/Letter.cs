@@ -26,6 +26,7 @@ public class Letter
     public string ImageThumbnailUrl { get; set; } = string.Empty;
 
     public required DateTime Added { get; set; }
+    public required bool IsDeleted { get; set; }
     public required bool IsVisible { get; set; }
     public required bool IsAssigned { get; set; }
     public string AssignedTo { get; set; } = string.Empty;

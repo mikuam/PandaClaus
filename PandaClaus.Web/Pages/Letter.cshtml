@@ -171,6 +171,32 @@
                                 </form>
                             </div>
                         </div>
+                        
+                        <div class="col-12">
+                            <div class="admin-section">
+                                <h4><i class="fa fa-trash-alt me-2"></i>Zarządzanie listem</h4>
+                                <form method="post" asp-page-handler="deleteLetter" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                    @if (Model.Letter.IsDeleted)
+                                    {
+                                        <div class="alert alert-warning mb-3">
+                                            <i class="fa fa-exclamation-triangle me-2"></i>
+                                            <strong>Ten list jest oznaczony jako usunięty.</strong> Nie będzie widoczny dla użytkowników.
+                                        </div>
+                                        <button type="submit" class="btn btn-success" 
+                                                onclick="return confirm('Czy na pewno chcesz przywrócić ten list?');">
+                                            <i class="fa fa-undo me-2"></i>Przywróć list
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-danger" 
+                                                onclick="return confirm('Czy na pewno chcesz usunąć ten list? List zostanie ukryty dla użytkowników.');">
+                                            <i class="fa fa-trash me-2"></i>Usuń list
+                                        </button>
+                                    }
+                                </form>
+                            </div>
+                        </div>
                     }
                     else
                     {

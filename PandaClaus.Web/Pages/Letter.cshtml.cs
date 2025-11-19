@@ -155,5 +155,23 @@ public class LetterModel : BasePageModel
 
         return RedirectToPage("./Letter", new { rowNumber });
     }
+
+    public async Task<IActionResult> OnPostDeleteLetterAsync(int rowNumber)
+    {
+        if (IsAdmin)
+        {
+            var letter = await _client.FetchLetterAsync(rowNumber);
+            
+            if (letter == null)
+            {
+                return RedirectToPage("./Index");
+            }
+
+            // Toggle the IsDeleted status
+            await _client.UpdateIsDeleted(rowNumber, !letter.IsDeleted);
+        }
+
+        return RedirectToPage("./Letter", new { rowNumber });
+    }
 }
 

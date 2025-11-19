@@ -35,7 +35,7 @@ public class IndexModel : BasePageModel
         var isEarlyAccess = IsEarlyAccess();
         Request.HttpContext.Session.SetString("IsEarlyAccess", isEarlyAccess ? "true" : "false");
 
-        var result = (await _client.FetchLetters()).ToList();
+        var result = (await _client.FetchLetters()).Where(l => !l.IsDeleted).ToList();
         var filter = Request.Query["filter"].ToString();
         switch (filter)
         {

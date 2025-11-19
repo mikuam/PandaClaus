@@ -242,6 +242,7 @@ public class LetterNumerationServiceTests
             ImageIds = new List<string>(),
             ImageUrls = new List<string>(),
             Added = DateTime.Now,
+            IsDeleted = false,
             IsVisible = true,
             IsAssigned = false
         };

@@ -17,7 +17,7 @@ namespace PandaClaus.Web.Pages
 
         public async Task OnGet()
         {
-            var letters = await _client.FetchLetters();
+            var letters = (await _client.FetchLetters()).Where(l => !l.IsDeleted).ToList();
             var packages = await _client.FetchPackages();
 
             Statistics = new Statistics
