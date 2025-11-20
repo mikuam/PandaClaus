@@ -78,10 +78,10 @@ Fundacja Panda Team
     <li>Prosimy Was także o <b style=""color: red;"">wydrukowanie (z załącznika) kodu QR</b> i przyklejenie go na paczce - ułatwi to naszym Magazynowym Elfom pracę i dzięki temu dostaniesz od nas <b>POTWIERDZENIE ODBIORU PACZKI!</b></li>
     <li><b>Prosimy o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek.</b> Prosimy nie zamawiać zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.</li>
     <li>Prosimy nie pakować paczek w ozdobny papier - podczas finału akcji nasi wolontariusze sprawdzają każdą z nich i szykują prezenty do wysyłki :).</li>
-    <li>Zapraszamy do skorzystania z zasobów naszego Partnera - Biblioart - zachęcamy do sprawdzenia strony www - może to właśnie tam znajdziecie wymarzony prezent naszych podopiecznych: <a href=""https://bibliopunkt.pl/"" target=""_blank"">https://bibliopunkt.pl/</a></li>
-    <li>Jeżeli realizujesz kilka listów, paczkę dla każdego dziecka spakuj osobno i umieść wszystkie możliwie w jednym kartonie - opisując paczkę każdym z numerów listów, które realizujesz!</li>
-    <li>Do listu możesz dołączyć upominek dla rodziców dziecka, list lub kartkę oraz słodycze itd.</li>
 </ul>
+<p>Zapraszamy do skorzystania z zasobów naszego Partnera - <b>Biblioart</b> - zachęcamy do sprawdzenia strony www - może to właśnie tam znajdziecie wymarzony prezent naszych podopiecznych: <a href=""https://bibliopunkt.pl/"" target=""_blank"">https://bibliopunkt.pl/</a></p>
+<p>Jeżeli realizujesz kilka listów, paczkę dla każdego dziecka spakuj osobno i umieść wszystkie możliwie w jednym kartonie - opisując paczkę każdym z numerów listów, które realizujesz!</p>
+<p>Do listu możesz dołączyć upominek dla rodziców dziecka, list lub kartkę oraz słodycze itd.</p>
 <p>Jak co roku naszym Partnerem jest <b>InPost</b>, dlatego paczki muszą mieć rozmiary zgodne z wymaganiami <b>Paczkomatów InPost</b> - Elfowie Kurierzy będą pracować w pocie czoła - pomóżmy im i trzymajmy się wymiarów paczkomatowych - mała ściąga tutaj:</p>
 <ul>
     <li>Gabaryt A – maksymalne wymiary 8 × 38 × 64 cm, maksymalna waga: 25 kg</li>
