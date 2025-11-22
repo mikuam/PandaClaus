@@ -120,10 +120,18 @@ public class GoogleSheetsClient
             if (row.Count < 14)
                 continue;
 
-            var letter = MapLetter(rowNumber, row);
+            try
+            {
+                var letter = MapLetter(rowNumber, row);
+                letters.Add(letter);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error mapping letter at row {RowNumber}. Row has {ColumnCount} columns. Skipping this row.", 
+                    rowNumber, row.Count);
+            }
 
             rowNumber++;
-            letters.Add(letter);
         }
 
         return letters;
@@ -131,54 +139,63 @@ public class GoogleSheetsClient
 
     private Letter MapLetter(int rowNumber, IList<object> row)
     {
-        var imageIdsString = row[15].ToString() ?? string.Empty;
-        var imageIds = string.IsNullOrWhiteSpace(imageIdsString)
-            ? new List<string>()
-            : imageIdsString.Split(',').ToList();
-        
-        // Filter out deleted images for thumbnails only (those ending with "_delete")
-        var activeImageIds = imageIds.Where(id => !id.EndsWith("_delete")).ToList();
-
-        var letter = new Letter
+        try
         {
-            RowNumber = rowNumber,
-            Number = row[0].ToString() ?? string.Empty,
-            ParentName = row[1].ToString() ?? string.Empty,
-            ParentSurname = row[2].ToString() ?? string.Empty,
-            PhoneNumber = row[3].ToString() ?? string.Empty,
-            Email = row[4].ToString() ?? string.Empty,
-            Street = row[5].ToString() ?? string.Empty,
-            HouseNumber = row[6].ToString() ?? string.Empty,
-            ApartmentNumber = row[7].ToString() ?? string.Empty,
-            City = row[8].ToString() ?? string.Empty,
-            PostalCode = row[9].ToString() ?? string.Empty,
-            PaczkomatCode = row[10].ToString() ?? string.Empty,
-            ChildName = row[11].ToString() ?? string.Empty,
-            ChildAge = string.IsNullOrWhiteSpace(row[12].ToString()) ? 0 : int.Parse(row[12].ToString()!),
-            Description = row[13].ToString() ?? string.Empty,
-            Presents = row[14].ToString() ?? string.Empty,
-            ImageIds = imageIds,  // Keep all image IDs (including deleted ones)
-            ImageUrls = imageIds.Select(id => $"{_blobUrl}/{id.Replace("_delete", "")}").ToList(),  // All images (URLs without _delete suffix)
-            ImageThumbnailId = activeImageIds.Count > 0 ? activeImageIds.First() : string.Empty,
-            ImageThumbnailUrl = activeImageIds.Count > 0
-                ? $"{_blobUrl}/{activeImageIds.First()}_thumbnail.jpg"
-                : string.Empty,
-            Added = DateTime.Parse(row[16].ToString() ?? string.Empty),
-            IsDeleted = string.Equals(row[17].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsVisible = string.Equals(row[18].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-            IsAssigned = string.Equals(row[19].ToString() ?? string.Empty, "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+            var imageIdsString = GetCellOrEmptyString(row, 15);
+            var imageIds = string.IsNullOrWhiteSpace(imageIdsString)
+                ? new List<string>()
+                : imageIdsString.Split(',').ToList();
             
-            // optional cells
-            AssignedTo = GetCellOrEmptyString(row, 20),
-            AssignedToCompanyName = GetCellOrEmptyString(row, 21),
-            AssignedToEmail = GetCellOrEmptyString(row, 22),
-            AssignedToPhone = GetCellOrEmptyString(row, 23),
-            AssignedToInfo = GetCellOrEmptyString(row, 24),
-            Uwagi = GetCellOrEmptyString(row, 25),
-            Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 26)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 26), true)
-        };
+            // Filter out deleted images for thumbnails only (those ending with "_delete")
+            var activeImageIds = imageIds.Where(id => !id.EndsWith("_delete")).ToList();
 
-        return letter;
+            var letter = new Letter
+            {
+                RowNumber = rowNumber,
+                Number = GetCellOrEmptyString(row, 0),
+                ParentName = GetCellOrEmptyString(row, 1),
+                ParentSurname = GetCellOrEmptyString(row, 2),
+                PhoneNumber = GetCellOrEmptyString(row, 3),
+                Email = GetCellOrEmptyString(row, 4),
+                Street = GetCellOrEmptyString(row, 5),
+                HouseNumber = GetCellOrEmptyString(row, 6),
+                ApartmentNumber = GetCellOrEmptyString(row, 7),
+                City = GetCellOrEmptyString(row, 8),
+                PostalCode = GetCellOrEmptyString(row, 9),
+                PaczkomatCode = GetCellOrEmptyString(row, 10),
+                ChildName = GetCellOrEmptyString(row, 11),
+                ChildAge = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 12)) ? 0 : int.Parse(GetCellOrEmptyString(row, 12)),
+                Description = GetCellOrEmptyString(row, 13),
+                Presents = GetCellOrEmptyString(row, 14),
+                ImageIds = imageIds,  // Keep all image IDs (including deleted ones)
+                ImageUrls = imageIds.Select(id => $"{_blobUrl}/{id.Replace("_delete", "")}").ToList(),  // All images (URLs without _delete suffix)
+                ImageThumbnailId = activeImageIds.Count > 0 ? activeImageIds.First() : string.Empty,
+                ImageThumbnailUrl = activeImageIds.Count > 0
+                    ? $"{_blobUrl}/{activeImageIds.First()}_thumbnail.jpg"
+                    : string.Empty,
+                Added = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 16)) ? DateTime.MinValue : DateTime.Parse(GetCellOrEmptyString(row, 16)),
+                IsDeleted = string.Equals(GetCellOrEmptyString(row, 17), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                IsVisible = string.Equals(GetCellOrEmptyString(row, 18), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                IsAssigned = string.Equals(GetCellOrEmptyString(row, 19), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                
+                // optional cells
+                AssignedTo = GetCellOrEmptyString(row, 20),
+                AssignedToCompanyName = GetCellOrEmptyString(row, 21),
+                AssignedToEmail = GetCellOrEmptyString(row, 22),
+                AssignedToPhone = GetCellOrEmptyString(row, 23),
+                AssignedToInfo = GetCellOrEmptyString(row, 24),
+                Uwagi = GetCellOrEmptyString(row, 25),
+                Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 26)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 26), true)
+            };
+
+            return letter;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in MapLetter for row {RowNumber}. Row has {ColumnCount} columns.", 
+                rowNumber, row.Count);
+            throw;
+        }
     }
 
     private static string GetCellOrEmptyString(IList<object> row, int index)
