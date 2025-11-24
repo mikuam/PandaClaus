@@ -16,6 +16,7 @@ public class LetterModel : BasePageModel
     public List<IFormFile> UploadPhotos { get; set; }
 
     public string? ErrorMessage { get; set; }
+    public string? SuccessMessage { get; set; }
     
     public string BlobUrl => _configuration["BlobUrl"]!;
 
@@ -35,6 +36,16 @@ public class LetterModel : BasePageModel
         {
             ErrorMessage = "Nie znaleziono listu o podanym numerze. Sprawdź poprawność linku lub wróć do listy listów.";
             return Page();
+        }
+
+        // Get messages from TempData
+        if (TempData.ContainsKey("SuccessMessage"))
+        {
+            SuccessMessage = TempData["SuccessMessage"]?.ToString();
+        }
+        if (TempData.ContainsKey("ErrorMessage"))
+        {
+            ErrorMessage = TempData["ErrorMessage"]?.ToString();
         }
 
         return Page();
@@ -169,6 +180,31 @@ public class LetterModel : BasePageModel
 
             // Toggle the IsDeleted status
             await _client.UpdateIsDeleted(rowNumber, !letter.IsDeleted);
+        }
+
+        return RedirectToPage("./Letter", new { rowNumber });
+    }
+
+    public async Task<IActionResult> OnPostSendConfirmationEmailAsync(int rowNumber)
+    {
+        if (IsAdmin)
+        {
+            var letter = await _client.FetchLetterAsync(rowNumber);
+            
+            if (letter == null)
+            {
+                return RedirectToPage("./Index");
+            }
+
+            if (letter.IsAssigned && !string.IsNullOrEmpty(letter.AssignedToEmail))
+            {
+                await _emailSender.SendConfirmationEmail(rowNumber);
+                TempData["SuccessMessage"] = "E-mail potwierdzający został wysłany!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "List nie jest zarezerwowany lub brak adresu e-mail.";
+            }
         }
 
         return RedirectToPage("./Letter", new { rowNumber });
