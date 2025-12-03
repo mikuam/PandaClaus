@@ -41,7 +41,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:Z";
+        var range = $"{_sheetName}!A:AA";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -52,7 +52,7 @@ public class GoogleSheetsClient
     {
         try
         {
-            var range = $"{_sheetName}!A{rowNumber}:Z{rowNumber}";
+            var range = $"{_sheetName}!A{rowNumber}:AA{rowNumber}";
             var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
             var response = await request.ExecuteAsync();
 
