@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
 public class LetterModel : BasePageModel
@@ -14,6 +15,9 @@ public class LetterModel : BasePageModel
 
     [BindProperty]
     public List<IFormFile> UploadPhotos { get; set; }
+
+    [BindProperty]
+    public int NumberOfBoxes { get; set; } = 1;
 
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
@@ -205,6 +209,43 @@ public class LetterModel : BasePageModel
             {
                 TempData["ErrorMessage"] = "List nie jest zarezerwowany lub brak adresu e-mail.";
             }
+        }
+
+        return RedirectToPage("./Letter", new { rowNumber });
+    }
+
+    public async Task<IActionResult> OnPostConfirmDeliveryAsync(int rowNumber, int numberOfBoxes)
+    {
+        if (IsAdmin)
+        {
+            var letter = await _client.FetchLetterAsync(rowNumber);
+            
+            if (letter == null)
+            {
+                TempData["ErrorMessage"] = "Nie znaleziono listu.";
+                return RedirectToPage("./Index");
+            }
+
+            if (!letter.IsAssigned)
+            {
+                TempData["ErrorMessage"] = "List nie jest zarezerwowany.";
+                return RedirectToPage("./Letter", new { rowNumber });
+            }
+
+            // Update status to DOSTARCZONE and add note about number of boxes
+            var uwagi = letter.Uwagi ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(uwagi))
+            {
+                uwagi += $"\n";
+            }
+            uwagi += $"Potwierdzone dostarczenie {numberOfBoxes} paczek - {DateTime.Now:yyyy-MM-dd HH:mm}";
+
+            await _client.UpdateStatus(rowNumber, LetterStatus.DOSTARCZONE, uwagi);
+
+            // Send confirmation email
+            await _emailSender.SendPackageReceived(rowNumber);
+
+            TempData["SuccessMessage"] = $"Potwierdzono dostarczenie {numberOfBoxes} paczek dla listu {letter.Number}. E-mail potwierdzający został wysłany do darczyńcy.";
         }
 
         return RedirectToPage("./Letter", new { rowNumber });

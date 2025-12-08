@@ -34,7 +34,7 @@ Bardzo dziękujemy za Wasze zaangażowanie w akcję Panda Claus 2025.
 Gratulujemy {letter.AssignedTo}! Potwierdzamy realizowanie wybranego przez Ciebie listu nr {letter.Number}. List znajdziesz pod tym adresem: {GetLetterUrl(letter)}
 Mamy absolutny rekord - jak wiecie, w tym roku - trafiło do nas ponad 300 listów! To trzysta dziecięcych marzeń, trzysta historii, trzysta prezentów czekających na spełnienie.
 Akcja z roku na rok rośnie i jest coraz większym wyzwaniem logistycznym. W związku z tym przypominamy najważniejsze zasady i dziękujemy Wam za wyrozumiałość:
-- Na paczki czekamy do 8 grudnia!
+- Na paczki czekamy do 6 grudnia!
 - Paczki muszą być oznaczone numerami listów — to BARDZO ważne i pozwoli nam uniknąć pomyłek. 
 - Prosimy Was także o wydrukowanie (z załącznika) kodu QR i przyklejenie go na paczce - ułatwi to naszym Magazynowym Elfom pracę i dzięki temu dostaniesz od nas POTWIERDZENIE ODBIORU PACZKI!
 - Prosimy o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek. Prosimy nie zamawiać zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.
@@ -55,7 +55,7 @@ ul. Opłotki 23,
 Nadając przesyłkę, podaj e-mail: pandaclaus@pandateam.pl oraz numer telefonu: +48 537 925 335.
 
 Jeżeli chcesz dostarczyć paczkę osobiście:
-Poinformuj nas o tym do 8 grudnia!
+Poinformuj nas o tym do 6 grudnia!
 Przywieź paczkę do naszego magazynu w Poznaniu Hala numer 10 MTP (wejście od ulicy Śniadeckich) w dniu:
 11 grudnia 2025 od godziny 16:00 do 20:30
 
@@ -73,7 +73,7 @@ Fundacja Panda Team
 <p><b>Mamy absolutny rekord</b> - jak wiecie, w tym roku - trafiło do nas ponad 300 listów! To trzysta dziecięcych marzeń, trzysta historii, trzysta prezentów czekających na spełnienie.</p>
 <p>Akcja z roku na rok rośnie i jest coraz większym wyzwaniem logistycznym. W związku z tym przypominamy najważniejsze zasady i dziękujemy Wam za wyrozumiałość:</p>
 <ul>
-    <li><b>Na paczki czekamy do 8 grudnia!</b></li>
+    <li><b>Na paczki czekamy do 6 grudnia!</b></li>
     <li><b style=""color: red;"">Paczki muszą być oznaczone numerami listów</b> — to <b>BARDZO</b> ważne i pozwoli nam uniknąć pomyłek.</li>
     <li>Prosimy Was także o <b style=""color: red;"">wydrukowanie (z załącznika) kodu QR</b> i przyklejenie go na paczce - ułatwi to naszym Magazynowym Elfom pracę i dzięki temu dostaniesz od nas <b>POTWIERDZENIE ODBIORU PACZKI!</b></li>
     <li><b>Prosimy o wysyłanie skompletowanych paczek. Tylko w taki sposób jesteśmy w stanie uniknąć pomyłek.</b> Prosimy nie zamawiać zabawek bezpośrednio ze sklepu do nas i dosyłanie osobno innych upominków. To prowadzi do błędów i innych trudności organizacyjnych. Takie paczki nie będą niestety przyjmowane.</li>
@@ -94,7 +94,7 @@ Fundacja Panda Team
 <b>60-012 Poznań</b></p>
 <p>Nadając przesyłkę, podaj e-mail: <a href=""mailto:pandaclaus@pandateam.pl"">pandaclaus@pandateam.pl</a> oraz numer telefonu: +48 537 925 335.</p>
 <h2>Jeżeli chcesz dostarczyć paczkę osobiście:</h2>
-<p><b style=""color: red;"">Poinformuj nas o tym do 8 grudnia!</b></p>
+<p><b style=""color: red;"">Poinformuj nas o tym do 6 grudnia!</b></p>
 <p>Przywieź paczkę do naszego magazynu w Poznaniu Hala numer 10 MTP (wejście od ulicy Śniadeckich) w dniu:</p>
 <ul>
     <li>11 grudnia 2025 od godziny 16:00 do 20:30</li>
