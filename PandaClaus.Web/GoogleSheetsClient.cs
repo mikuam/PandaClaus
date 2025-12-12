@@ -321,21 +321,40 @@ public class GoogleSheetsClient
     public async Task CreatePackages(string letterNumber, IEnumerable<Gabaryt> sizes)
     {
         var packages = await FetchPackages();
-        var firstEmptyRow = packages.Count + 2;
+        
+        // Find existing packages for this letter
+        var existingPackages = packages.Where(p => p.LetterNumber == letterNumber).OrderBy(p => p.PackageNumber).ToList();
+        
+        var sizesList = sizes.ToList();
+        var packageIndex = 0;
 
-        var rowNumber = firstEmptyRow;
-        foreach (var size in sizes)
+        foreach (var size in sizesList)
         {
-            var range = $"{_packageSheetName}!A{rowNumber}:E{rowNumber}";
+            packageIndex++;
+            int rowNumber;
+            
+            // Check if we're updating an existing package or creating a new one
+            if (packageIndex <= existingPackages.Count)
+            {
+                // Update existing package
+                rowNumber = existingPackages[packageIndex - 1].RowNumber;
+            }
+            else
+            {
+                // Create new package at the end
+                rowNumber = packages.Count + 2 + (packageIndex - existingPackages.Count - 1);
+            }
 
-            var packageNumber = rowNumber - firstEmptyRow + 1;
+            var range = $"{_packageSheetName}!A{rowNumber}:F{rowNumber}";
+
             var valuesToUpdate = new List<object>
             {
                 letterNumber,
-                packageNumber,
-                sizes.Count(),
+                packageIndex,
+                sizesList.Count,
                 size.ToString(),
-                $"PandaClaus2025-{letterNumber}-{packageNumber}"
+                $"PandaClaus2025-{letterNumber}-{packageIndex}",
+                string.Empty  // Clear DateExported when updating
             };
             var valueRange = new ValueRange
             {
@@ -344,8 +363,6 @@ public class GoogleSheetsClient
             var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, _spreadsheetId, range);
             updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
             await updateRequest.ExecuteAsync();
-
-            rowNumber++;
         }
     }
 

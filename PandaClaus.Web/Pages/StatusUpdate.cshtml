@@ -107,10 +107,13 @@
                             case LetterStatus.SPAKOWANE:
                                 <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="ZAADRESOWANE">Zmień status na: Paczki zaadresowane</button>
                                 break;
+                            case LetterStatus.ZAADRESOWANE:
+                                <button type="submit" class="btn btn-danger" asp-page-handler="setStatus" asp-route-status="SPRAWDZONE">Cofnij status na: Paczki sprawdzone</button>
+                                break;
                         }
 
                         <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="@Model.Letter.Status">Zapisz bez zmiany statusu</button>
+                            <button type="submit" class="btn btn-secondary" asp-page-handler="setStatus" asp-route-status="@Model.Letter.Status">Zapisz bez zmiany statusu</button>
                         </div>
                     </form>
                 }
