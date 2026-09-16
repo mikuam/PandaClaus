@@ -67,7 +67,7 @@
                         <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                             <div class="property-item rounded overflow-hidden">
                                 <div class="position-relative overflow-hidden letter-small-image">
-                                    <a asp-area="" asp-page="/Letter" asp-route-rowNumber="@letter.RowNumber">
+                                    <a asp-area="" asp-page="/Letter" asp-route-hash="@letter.Hash">
                                         <img class="img-fluid" src="@letter.ImageThumbnailUrl" alt="letter image">
                                     </a>
                                     @if (letter.IsAssigned)
@@ -77,7 +77,7 @@
                                     <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-3 py-1 px-3 number">@letter.Number</div>
                                 </div>
                                 <div class="p-4 pb-0">
-                                    <a class="d-block h5 mb-2" asp-area="" asp-page="/Letter" asp-route-rowNumber="@letter.RowNumber">@letter.ChildName<span>, </span><span>@letter.ChildAge.FormatAsAge()</span></a>
+                                    <a class="d-block h5 mb-2" asp-area="" asp-page="/Letter" asp-route-hash="@letter.Hash">@letter.ChildName<span>, </span><span>@letter.ChildAge.FormatAsAge()</span></a>
                                     <p>@letter.Description</p>
                                 </div>
                             </div>

@@ -173,7 +173,7 @@ Fundacja Panda Team
 
     private string GetLetterUrl(Letter letter)
     {
-        return PageUrl + $"Letter?rowNumber={letter.RowNumber}";
+        return PageUrl + $"Letters/{letter.Hash}";
     }
 
     public async Task SendLetterAdded(int rowNumber)
@@ -228,6 +228,6 @@ Fundacja Panda Team
 
     private string CreateReceiveConfirmationUrl(Letter letter)
     {
-        return PageUrl + $"ReceiveConfirmation?rowNumber={letter.RowNumber}&code={letter.Number}";
+        return PageUrl + $"ReceiveConfirmation?hash={letter.Hash}&code={letter.Number}";
     }
 }

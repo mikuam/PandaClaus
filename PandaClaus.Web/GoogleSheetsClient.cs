@@ -41,7 +41,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:AA";
+        var range = $"{_sheetName}!A:AB";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -52,7 +52,7 @@ public class GoogleSheetsClient
     {
         try
         {
-            var range = $"{_sheetName}!A{rowNumber}:AA{rowNumber}";
+            var range = $"{_sheetName}!A{rowNumber}:AB{rowNumber}";
             var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
             var response = await request.ExecuteAsync();
 
@@ -68,13 +68,20 @@ public class GoogleSheetsClient
         }
     }
 
-    public async Task<int> AddLetter(Letter letter)
+    public async Task<Letter?> FetchLetterByHashAsync(string hash)
+    {
+        var letters = await FetchLetters();
+        return letters.FirstOrDefault(l => string.Equals(l.Hash, hash, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public async Task<(int RowNumber, string Hash)> AddLetter(Letter letter)
     {
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
         var letterNumber = _letterNumerationService.GetNextLetterNumber(letters, letter);
-        var range = $"{_sheetName}!A{firstEmptyRow}:T{firstEmptyRow}";
+        var hash = HashGenerator.GenerateHash();
+        var range = $"{_sheetName}!B{firstEmptyRow}:U{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letterNumber,
@@ -107,7 +114,16 @@ public class GoogleSheetsClient
         updateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await updateRequest.ExecuteAsync();
 
-        return firstEmptyRow;
+        var hashRange = $"{_sheetName}!A{firstEmptyRow}:A{firstEmptyRow}";
+        var hashValueRange = new ValueRange
+        {
+            Values = new List<IList<object>> { new List<object> { hash } }
+        };
+        var hashUpdateRequest = _sheetsService.Spreadsheets.Values.Update(hashValueRange, _spreadsheetId, hashRange);
+        hashUpdateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
+        await hashUpdateRequest.ExecuteAsync();
+
+        return (firstEmptyRow, hash);
     }
 
     private List<Letter> MapToLetters(IList<IList<object>> values)
@@ -141,51 +157,52 @@ public class GoogleSheetsClient
     {
         try
         {
-            var imageIdsString = GetCellOrEmptyString(row, 15);
+            var imageIdsString = GetCellOrEmptyString(row, 16);
             var imageIds = string.IsNullOrWhiteSpace(imageIdsString)
                 ? new List<string>()
                 : imageIdsString.Split(',').ToList();
-            
+
             // Filter out deleted images for thumbnails only (those ending with "_delete")
             var activeImageIds = imageIds.Where(id => !id.EndsWith("_delete")).ToList();
 
             var letter = new Letter
             {
                 RowNumber = rowNumber,
-                Number = GetCellOrEmptyString(row, 0),
-                ParentName = GetCellOrEmptyString(row, 1),
-                ParentSurname = GetCellOrEmptyString(row, 2),
-                PhoneNumber = GetCellOrEmptyString(row, 3),
-                Email = GetCellOrEmptyString(row, 4),
-                Street = GetCellOrEmptyString(row, 5),
-                HouseNumber = GetCellOrEmptyString(row, 6),
-                ApartmentNumber = GetCellOrEmptyString(row, 7),
-                City = GetCellOrEmptyString(row, 8),
-                PostalCode = GetCellOrEmptyString(row, 9),
-                PaczkomatCode = GetCellOrEmptyString(row, 10),
-                ChildName = GetCellOrEmptyString(row, 11),
-                ChildAge = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 12)) ? 0 : int.Parse(GetCellOrEmptyString(row, 12)),
-                Description = GetCellOrEmptyString(row, 13),
-                Presents = GetCellOrEmptyString(row, 14),
+                Hash = GetCellOrEmptyString(row, 0),
+                Number = GetCellOrEmptyString(row, 1),
+                ParentName = GetCellOrEmptyString(row, 2),
+                ParentSurname = GetCellOrEmptyString(row, 3),
+                PhoneNumber = GetCellOrEmptyString(row, 4),
+                Email = GetCellOrEmptyString(row, 5),
+                Street = GetCellOrEmptyString(row, 6),
+                HouseNumber = GetCellOrEmptyString(row, 7),
+                ApartmentNumber = GetCellOrEmptyString(row, 8),
+                City = GetCellOrEmptyString(row, 9),
+                PostalCode = GetCellOrEmptyString(row, 10),
+                PaczkomatCode = GetCellOrEmptyString(row, 11),
+                ChildName = GetCellOrEmptyString(row, 12),
+                ChildAge = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 13)) ? 0 : int.Parse(GetCellOrEmptyString(row, 13)),
+                Description = GetCellOrEmptyString(row, 14),
+                Presents = GetCellOrEmptyString(row, 15),
                 ImageIds = imageIds,  // Keep all image IDs (including deleted ones)
                 ImageUrls = imageIds.Select(id => $"{_blobUrl}/{id.Replace("_delete", "")}").ToList(),  // All images (URLs without _delete suffix)
                 ImageThumbnailId = activeImageIds.Count > 0 ? activeImageIds.First() : string.Empty,
                 ImageThumbnailUrl = activeImageIds.Count > 0
                     ? $"{_blobUrl}/{activeImageIds.First()}_thumbnail.jpg"
                     : string.Empty,
-                Added = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 16)) ? DateTime.MinValue : DateTime.Parse(GetCellOrEmptyString(row, 16)),
-                IsDeleted = string.Equals(GetCellOrEmptyString(row, 17), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-                IsVisible = string.Equals(GetCellOrEmptyString(row, 18), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-                IsAssigned = string.Equals(GetCellOrEmptyString(row, 19), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
-                
+                Added = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 17)) ? DateTime.MinValue : DateTime.Parse(GetCellOrEmptyString(row, 17)),
+                IsDeleted = string.Equals(GetCellOrEmptyString(row, 18), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                IsVisible = string.Equals(GetCellOrEmptyString(row, 19), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+                IsAssigned = string.Equals(GetCellOrEmptyString(row, 20), "tak", StringComparison.OrdinalIgnoreCase), // "tak" or "nie"
+
                 // optional cells
-                AssignedTo = GetCellOrEmptyString(row, 20),
-                AssignedToCompanyName = GetCellOrEmptyString(row, 21),
-                AssignedToEmail = GetCellOrEmptyString(row, 22),
-                AssignedToPhone = GetCellOrEmptyString(row, 23),
-                AssignedToInfo = GetCellOrEmptyString(row, 24),
-                Uwagi = GetCellOrEmptyString(row, 25),
-                Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 26)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 26), true)
+                AssignedTo = GetCellOrEmptyString(row, 21),
+                AssignedToCompanyName = GetCellOrEmptyString(row, 22),
+                AssignedToEmail = GetCellOrEmptyString(row, 23),
+                AssignedToPhone = GetCellOrEmptyString(row, 24),
+                AssignedToInfo = GetCellOrEmptyString(row, 25),
+                Uwagi = GetCellOrEmptyString(row, 26),
+                Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 27)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 27), true)
             };
 
             return letter;
@@ -218,7 +235,7 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!T{assignment.RowNumber}:Y{assignment.RowNumber}";
+        var range = $"{_sheetName}!U{assignment.RowNumber}:Z{assignment.RowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -240,7 +257,7 @@ public class GoogleSheetsClient
 
     internal async Task UpdateImageIds(Letter letter)
     {
-        var range = $"{_sheetName}!P{letter.RowNumber}:P{letter.RowNumber}";
+        var range = $"{_sheetName}!Q{letter.RowNumber}:Q{letter.RowNumber}";
 
         var valuesToUpdate = new List<object> { string.Join(",", letter.ImageIds) };
 
@@ -255,7 +272,7 @@ public class GoogleSheetsClient
 
     public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi)
     {
-        var range = $"{_sheetName}!Z{rowNumber}:AA{rowNumber}";
+        var range = $"{_sheetName}!AA{rowNumber}:AB{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -273,7 +290,7 @@ public class GoogleSheetsClient
 
     public async Task UpdateLetterDetailsWithChild(int rowNumber, string childName, int childAge, string description, string presents, string uwagi)
     {
-        var range = $"{_sheetName}!L{rowNumber}:O{rowNumber}";
+        var range = $"{_sheetName}!M{rowNumber}:P{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -291,7 +308,7 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
 
         // Update Uwagi separately
-        var uwagiRange = $"{_sheetName}!Z{rowNumber}:Z{rowNumber}";
+        var uwagiRange = $"{_sheetName}!AA{rowNumber}:AA{rowNumber}";
         var uwagiValueRange = new ValueRange
         {
             Values = new List<IList<object>> { new List<object> { uwagi } }
@@ -303,7 +320,7 @@ public class GoogleSheetsClient
 
     public async Task UpdateIsDeleted(int rowNumber, bool isDeleted)
     {
-        var range = $"{_sheetName}!R{rowNumber}:R{rowNumber}";
+        var range = $"{_sheetName}!S{rowNumber}:S{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {

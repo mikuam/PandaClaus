@@ -32,9 +32,9 @@ public class ReceiveConfirmationModel : PageModel
         _configuration = configuration;
     }
 
-    public async Task<IActionResult> OnGetAsync(int rowNumber, string code)
+    public async Task<IActionResult> OnGetAsync(string hash, string code)
     {
-        Letter = await _client.FetchLetterAsync(rowNumber);
+        Letter = await _client.FetchLetterByHashAsync(hash);
         if (Letter == null)
         {
             Message = "Nie znaleziono listu.";

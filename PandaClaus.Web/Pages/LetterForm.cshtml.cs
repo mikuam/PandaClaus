@@ -157,11 +157,11 @@ public class LetterFormModel : BasePageModel
             IsAssigned = false
         };
 
-        var rowNumber = await _sheetsClient.AddLetter(letter);
+        var (rowNumber, hash) = await _sheetsClient.AddLetter(letter);
 
         await _emailSender.SendLetterAdded(rowNumber);
 
-        return RedirectToPage("./LetterAddedConfirmation", new { rowNumber });
+        return RedirectToPage("./LetterAddedConfirmation", new { hash });
     }
 }
 

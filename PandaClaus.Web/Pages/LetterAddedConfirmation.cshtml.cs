@@ -12,9 +12,9 @@ public class LetterAddedConfirmationModel : PageModel
         _client = client;
     }
 
-    public async Task OnGetAsync(int rowNumber)
+    public async Task OnGetAsync(string hash)
     {
-        Letter = await _client.FetchLetterAsync(rowNumber);
+        Letter = await _client.FetchLetterByHashAsync(hash);
     }
 }
 

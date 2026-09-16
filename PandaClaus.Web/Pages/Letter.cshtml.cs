@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
@@ -32,9 +31,11 @@ public class LetterModel : BasePageModel
         _configuration = configuration;
     }
 
-    public async Task<IActionResult> OnGetAsync(int rowNumber)
+    public async Task<IActionResult> OnGetAsync(string? hash)
     {
-        Letter = await _client.FetchLetterAsync(rowNumber);
+        Letter = !string.IsNullOrEmpty(hash)
+            ? await _client.FetchLetterByHashAsync(hash)
+            : null;
         
         if (Letter == null)
         {
