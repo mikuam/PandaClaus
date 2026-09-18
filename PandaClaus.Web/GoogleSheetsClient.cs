@@ -370,7 +370,7 @@ public class GoogleSheetsClient
                 packageIndex,
                 sizesList.Count,
                 size.ToString(),
-                $"PandaClaus2025-{letterNumber}-{packageIndex}",
+                $"PandaClaus{DateTime.Now.Year}-{letterNumber}-{packageIndex}",
                 string.Empty  // Clear DateExported when updating
             };
             var valueRange = new ValueRange
