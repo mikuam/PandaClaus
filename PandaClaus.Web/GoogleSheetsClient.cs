@@ -370,7 +370,7 @@ public class GoogleSheetsClient
                 packageIndex,
                 sizesList.Count,
                 size.ToString(),
-                $"PandaClaus{DateTime.Now.Year}-{letterNumber}-{packageIndex}",
+                $"Panda{DateTime.Now.Year}-{letterNumber}-{packageIndex}",
                 string.Empty  // Clear DateExported when updating
             };
             var valueRange = new ValueRange
