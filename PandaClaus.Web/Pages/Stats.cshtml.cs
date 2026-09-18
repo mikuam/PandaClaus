@@ -20,24 +20,35 @@ namespace PandaClaus.Web.Pages
             var letters = (await _client.FetchLetters()).Where(l => !l.IsDeleted).ToList();
             var packages = await _client.FetchPackages();
 
+            var lettersCount = letters.Count;
+            var nieWiadomo = letters.Count(l => l.Status == LetterStatus.NIE_WIADOMO);
+            var wiadomosc = letters.Count(l => l.Status > LetterStatus.NIE_WIADOMO);
+            var dostarczone = letters.Count(l => l.Status >= LetterStatus.DOSTARCZONE);
+            var wTrakcieSprawdzania = letters.Count(l => l.Status >= LetterStatus.W_TRAKCIE_SPRAWDZANIA);
+            var odlozone = letters.Count(l => l.Status == LetterStatus.ODLOZONE);
+            var sprawdzone = letters.Count(l => l.Status >= LetterStatus.SPRAWDZONE);
+            var doSprawdzenia = letters.Count(l => l.Status < LetterStatus.SPRAWDZONE);
+            var spakowane = letters.Count(l => l.Status >= LetterStatus.SPAKOWANE);
+            var zaadresowane = letters.Count(l => l.Status >= LetterStatus.ZAADRESOWANE);
+
             Statistics = new Statistics
             {
-                Letters = letters.Count,
-                NieWiadomo = letters.Count(l => l.Status == LetterStatus.NIE_WIADOMO),
-                Wiadomo = letters.Count(l => l.Status > LetterStatus.NIE_WIADOMO),
-                WiadomoPercentage = letters.Count(l => l.Status > LetterStatus.NIE_WIADOMO) * 100 / letters.Count,
-                Dostarczone = letters.Count(l => l.Status >= LetterStatus.DOSTARCZONE),
-                DostarczonePercentage = letters.Count(l => l.Status >= LetterStatus.DOSTARCZONE) * 100 / letters.Count,
-                WTrakcieSprawdzania = letters.Count(l => l.Status >= LetterStatus.W_TRAKCIE_SPRAWDZANIA),
-                WTrakcieSprawdzaniaPercentage = letters.Count(l => l.Status >= LetterStatus.W_TRAKCIE_SPRAWDZANIA) * 100 / letters.Count,
-                Odlozone = letters.Count(l => l.Status == LetterStatus.ODLOZONE),
-                Sprawdzone = letters.Count(l => l.Status >= LetterStatus.SPRAWDZONE),
-                SprawdzonePercentage = letters.Count(l => l.Status >= LetterStatus.SPRAWDZONE) * 100 / letters.Count,
-                DoSprawdzenia = letters.Count(l => l.Status < LetterStatus.SPRAWDZONE),
-                Spakowane = letters.Count(l => l.Status >= LetterStatus.SPAKOWANE),
-                SpakowanePercentage = letters.Count(l => l.Status >= LetterStatus.SPAKOWANE) * 100 / letters.Count,
-                Zaadresowane = letters.Count(l => l.Status >= LetterStatus.ZAADRESOWANE),
-                ZaadresowanePercentage = letters.Count(l => l.Status >= LetterStatus.ZAADRESOWANE) * 100 / letters.Count,
+                Letters = lettersCount,
+                NieWiadomo = nieWiadomo,
+                Wiadomo = wiadomosc,
+                WiadomoPercentage = lettersCount == 0 ? 0 : wiadomosc * 100 / lettersCount,
+                Dostarczone = dostarczone,
+                DostarczonePercentage = lettersCount == 0 ? 0 : dostarczone * 100 / lettersCount,
+                WTrakcieSprawdzania = wTrakcieSprawdzania,
+                WTrakcieSprawdzaniaPercentage = lettersCount == 0 ? 0 : wTrakcieSprawdzania * 100 / lettersCount,
+                Odlozone = odlozone,
+                Sprawdzone = sprawdzone,
+                SprawdzonePercentage = lettersCount == 0 ? 0 : sprawdzone * 100 / lettersCount,
+                DoSprawdzenia = doSprawdzenia,
+                Spakowane = spakowane,
+                SpakowanePercentage = lettersCount == 0 ? 0 : spakowane * 100 / lettersCount,
+                Zaadresowane = zaadresowane,
+                ZaadresowanePercentage = lettersCount == 0 ? 0 : zaadresowane * 100 / lettersCount,
                 ZaadresowanePaczki = packages.Count
             };
         }
