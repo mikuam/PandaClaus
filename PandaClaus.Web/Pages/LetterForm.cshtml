@@ -24,6 +24,7 @@
             max-width: 90%;
             width: 900px;
         }
+
         #geowidgetModal inpost-geowidget {
             height: 600px;
             display: block;
@@ -83,7 +84,7 @@
         {
             @* Form visible only for admins *@
             <form method="post" enctype="multipart/form-data">
-                <div class="container col-lg-6 offset-lg-3">
+                <div class="container col-lg-6 offset-lg-3 clearfix">
                     @if (!ModelState.IsValid)
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -92,7 +93,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
-                    
+
                     <div class="row mb-4">
                         <div class="mb-6">
                             <label asp-for="ParentName">Imię rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
@@ -106,8 +107,8 @@
 
                     <div class="mb-4">
                         <label asp-for="PhoneNumber">Numer telefonu rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                        <input asp-for="PhoneNumber" type="tel" class="form-control" id="phoneNumber" 
-                               pattern="[4-8][0-9]{8}" 
+                        <input asp-for="PhoneNumber" type="tel" class="form-control" id="phoneNumber"
+                               pattern="[4-8][0-9]{8}"
                                placeholder="np. 501234567"
                                maxlength="9"
                                required>
@@ -173,24 +174,75 @@
                         <input asp-for="LetterPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
                     </div>
 
+                    <p class="mt-4 mb-2"><b>Pola obowiązkowe</b></p>
+
                     <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="privacy" required>
-                        <label class="form-check-label" for="privacy">
-                            <span class="text-danger">*</span> Akceptuję politykę prywatności Fundacji Panda Team im. Michałka Tarachowicza dostępną na stronie <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">https://pandateam.pl/polityka-prywatnosci/</a>
+                        <input asp-for="ConfirmParentStatement" class="form-check-input" type="checkbox" id="confirmParentStatement" required>
+                        <label class="form-check-label" asp-for="ConfirmParentStatement">
+                            <span class="text-danger">*</span> Oświadczam, że jestem rodzicem lub opiekunem prawnym zgłaszanego dziecka, a informacje podane w formularzu są zgodne z moją najlepszą wiedzą ze stanem faktycznym.
                         </label>
+                        <span asp-validation-for="ConfirmParentStatement" class="text-danger"></span>
                     </div>
 
                     <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="rules" required>
-                        <label class="form-check-label" for="rules">
-                            <span class="text-danger">*</span> Wyrażam zgodę na udział w akcji Panda Claus 2024 i akceptuję zasady akcji dostępne na stronie <a href="https://pandaclaus.pl/Privacy" target="_blank">https://pandaclaus.pl/Privacy</a>
+                        <input asp-for="AcceptRegulamin" class="form-check-input" type="checkbox" id="acceptRegulamin" required>
+                        <label class="form-check-label" asp-for="AcceptRegulamin">
+                            <span class="text-danger">*</span> Zapoznałam/em się z <a href="https://pandaclaus.pl/Privacy" target="_blank">Regulaminem Akcji Panda Claus 2026</a> i akceptuję jego postanowienia.
                         </label>
+                        <span asp-validation-for="AcceptRegulamin" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="AcceptRodoClause" class="form-check-input" type="checkbox" id="acceptRodoClause" required>
+                        <label class="form-check-label" asp-for="AcceptRodoClause">
+                            <span class="text-danger">*</span> Zapoznałam/em się z <a href="#rodo-clause">Klauzulą informacyjną RODO</a> dotyczącą Akcji Panda Claus 2026.
+                        </label>
+                        <span asp-validation-for="AcceptRodoClause" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="ConsentToPublication" class="form-check-input" type="checkbox" id="consentToPublication" required>
+                        <label class="form-check-label" asp-for="ConsentToPublication">
+                            <span class="text-danger">*</span> Wyrażam zgodę na publikację imienia i wieku dziecka, zdjęcia lub skanu jego listu oraz przygotowanego do publikacji opisu jego historii na stronie Akcji Panda Claus oraz w oficjalnych kanałach Fundacji Panda Team w celu przeprowadzenia i informowania o Akcji. Wyrażam również zgodę na niezbędne wykorzystanie i opracowanie listu, w szczególności jego kadrowanie, zmianę rozmiaru, poprawę jakości, zasłanianie danych oraz umieszczanie w oprawie graficznej Akcji.
+                        </label>
+                        <span asp-validation-for="ConsentToPublication" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="ConsentToContact" class="form-check-input" type="checkbox" id="consentToContact" required>
+                        <label class="form-check-label" asp-for="ConsentToContact">
+                            <span class="text-danger">*</span> Przyjmuję do wiadomości, że Fundacja Panda Team będzie kontaktować się ze mną na podany w formularzu adres e-mail i/lub numer telefonu w sprawach związanych z Akcją Panda Claus 2026, w szczególności dotyczących statusu zgłoszenia, jego weryfikacji, realizacji listu, wysyłki prezentu oraz ewentualnych problemów wymagających kontaktu.
+                        </label>
+                        <span asp-validation-for="ConsentToContact" class="text-danger"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-end">Wyślij</button>
                 </div>
             </form>
+
         }
+        
+    <br />
+    <br />
+        <br />
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h4 id="rodo-clause">Klauzula informacyjna RODO – Panda Claus 2026</h4>
+                    <p>Administratorem danych osobowych jest Fundacja Panda Team im. Michałka Tarachowicza z siedzibą w Poznaniu. W sprawach dotyczących danych osobowych można kontaktować się pod adresem <a href="mailto:rodo@pandateam.pl">rodo@pandateam.pl</a>, a z Inspektorem Ochrony Danych pod adresem <a href="mailto:iod@pandateam.pl">iod@pandateam.pl</a>.</p>
+                    <p>Dane rodzica lub opiekuna oraz zgłaszanego dziecka przetwarzamy w celu przyjęcia i weryfikacji zgłoszenia, kontaktu, organizacji Akcji Panda Claus, realizacji listu, przygotowania i doręczenia prezentu oraz zapewnienia prawidłowego i bezpiecznego przebiegu Akcji. Podstawą przetwarzania jest prawnie uzasadniony interes Fundacji związany z organizacją Akcji (art. 6 ust. 1 lit. f RODO), a w zakresie publikacji imienia, wieku, listu i historii dziecka – udzielona zgoda (art. 6 ust. 1 lit. a RODO).</p>
+                    <p>Dane mogą być przekazywane podmiotom wspierającym Fundację w organizacji Akcji, w szczególności dostawcom usług informatycznych, hostingowych i formularzy oraz operatorom pocztowym lub kurierskim – wyłącznie w zakresie niezbędnym do wykonania danego zadania. Dane kontaktowe i adresowe rodziny nie są publikowane ani co do zasady przekazywane Darczyńcom.</p>
+                    <p>Dostęp do niepublicznych danych mają wyłącznie osoby, które potrzebują ich do realizacji powierzonych zadań. Wolontariuszom udostępniamy tylko taki zakres informacji, jaki jest niezbędny do wykonania ich zadania.</p>
+                    <p>Dane będą przechowywane przez okres niezbędny do przeprowadzenia i rozliczenia Akcji oraz – w odpowiednim zakresie – przez czas potrzebny do ustalenia, dochodzenia lub obrony ewentualnych roszczeń. Dane przetwarzane wyłącznie na podstawie zgody przetwarzamy do czasu jej wycofania lub upływu okresu wskazanego w treści zgody.</p>
+                    <p>Masz prawo do dostępu do danych, ich sprostowania, usunięcia lub ograniczenia przetwarzania oraz – w przypadkach przewidzianych prawem – wniesienia sprzeciwu. Zgodę możesz wycofać w dowolnym momencie; nie wpływa to na zgodność z prawem wcześniejszego przetwarzania. Masz również prawo złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.</p>
+                    <p>Podanie danych jest dobrowolne, ale brak danych wymaganych do obsługi zgłoszenia uniemożliwi udział w Akcji. Publikacja listu i podstawowych informacji o dziecku jest elementem Akcji Panda Claus – bez niej nie możemy przedstawić listu Darczyńcom.</p>
+                    <p>Dane nie są wykorzystywane do zautomatyzowanego podejmowania decyzji ani profilowania.</p>
+                    <p>Więcej informacji o zasadach ochrony danych znajduje się w <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">Polityce prywatności</a> oraz Polityce Ochrony Danych Fundacji Panda Team.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

@@ -71,6 +71,26 @@ public class LetterFormModel : BasePageModel
     [Required]
     public List<IFormFile> LetterPhotos { get; set; }
 
+    [BindProperty]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "To oświadczenie jest wymagane")]
+    public bool ConfirmParentStatement { get; set; }
+
+    [BindProperty]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Akceptacja Regulaminu jest wymagana")]
+    public bool AcceptRegulamin { get; set; }
+
+    [BindProperty]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Zapoznanie się z Klauzulą informacyjną RODO jest wymagane")]
+    public bool AcceptRodoClause { get; set; }
+
+    [BindProperty]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Zgoda na publikację jest wymagana")]
+    public bool ConsentToPublication { get; set; }
+
+    [BindProperty]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Zgoda na kontakt jest wymagana")]
+    public bool ConsentToContact { get; set; }
+
     public string InPostGeoWidgetToken => _configuration["InPostGeoWidgetToken"] ?? string.Empty;
 
     public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender, IConfiguration configuration)
