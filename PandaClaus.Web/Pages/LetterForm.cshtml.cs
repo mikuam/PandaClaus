@@ -57,6 +57,7 @@ public class LetterFormModel : BasePageModel
 
     [BindProperty]
     [Required]
+    [Range(0, 18, ErrorMessage = "Wiek dziecka musi być liczbą dodatnią z zakresu 0-18")]
     public int ChildAge { get; set; }
 
     [BindProperty]

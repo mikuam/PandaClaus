@@ -83,7 +83,7 @@
         else
         {
             @* Form visible only for admins *@
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" novalidate>
                 <div class="container col-lg-6 offset-lg-3 clearfix">
                     @if (!ModelState.IsValid)
                     {
@@ -117,7 +117,7 @@
                     </div>
                     <div class="mb-4">
                         <label asp-for="Email">Adres e-mail rodzica/opiekuna prawnego <span class="text-danger">*</span></label>
-                        <input asp-for="Email" type="text" class="form-control" id="email" required>
+                        <input asp-for="Email" type="email" class="form-control" id="email" required>
                     </div>
 
                     <div class="row mb-4">
@@ -159,7 +159,7 @@
                     </div>
                     <div class="mb-4">
                         <label asp-for="ChildAge">Wiek dziecka zgłaszanego do akcji <span class="text-danger">*</span></label>
-                        <input asp-for="ChildAge" type="number" class="form-control" id="childAge" required>
+                        <input asp-for="ChildAge" type="number" class="form-control" id="childAge" min="0" max="18" required>
                     </div>
                     <div class="mb-4">
                         <label asp-for="Description">Opiszcie krótko swoją historię i z jakiego powodu bierzecie udział w akcji. Ta treść będzie widoczna na stronie z listem i będzie zachęcała Darczyńców do jego realizacji. <span class="text-danger">*</span></label>
@@ -185,7 +185,14 @@
                     </div>
 
                     <div class="form-check mb-4">
-                        <input asp-for="AcceptRegulamin" class="form-check-input" type="checkbox" id="acceptRegulamin" required>
+                        <input type="checkbox" class="form-check-input" id="selectAllConsents">
+                        <label class="form-check-label" for="selectAllConsents">
+                            <b>Zaznacz wszystkie zgody</b>
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="AcceptRegulamin" class="form-check-input consent-checkbox" type="checkbox" id="acceptRegulamin" required>
                         <label class="form-check-label" asp-for="AcceptRegulamin">
                             <span class="text-danger">*</span> Zapoznałam/em się z <a href="https://pandaclaus.pl/Privacy" target="_blank">Regulaminem Akcji Panda Claus 2026</a> i akceptuję jego postanowienia.
                         </label>
@@ -193,7 +200,7 @@
                     </div>
 
                     <div class="form-check mb-4">
-                        <input asp-for="AcceptRodoClause" class="form-check-input" type="checkbox" id="acceptRodoClause" required>
+                        <input asp-for="AcceptRodoClause" class="form-check-input consent-checkbox" type="checkbox" id="acceptRodoClause" required>
                         <label class="form-check-label" asp-for="AcceptRodoClause">
                             <span class="text-danger">*</span> Zapoznałam/em się z <a href="#rodo-clause">Klauzulą informacyjną RODO</a> dotyczącą Akcji Panda Claus 2026.
                         </label>
@@ -201,7 +208,7 @@
                     </div>
 
                     <div class="form-check mb-4">
-                        <input asp-for="ConsentToPublication" class="form-check-input" type="checkbox" id="consentToPublication" required>
+                        <input asp-for="ConsentToPublication" class="form-check-input consent-checkbox" type="checkbox" id="consentToPublication" required>
                         <label class="form-check-label" asp-for="ConsentToPublication">
                             <span class="text-danger">*</span> Wyrażam zgodę na publikację imienia i wieku dziecka, zdjęcia lub skanu jego listu oraz przygotowanego do publikacji opisu jego historii na stronie Akcji Panda Claus oraz w oficjalnych kanałach Fundacji Panda Team w celu przeprowadzenia i informowania o Akcji. Wyrażam również zgodę na niezbędne wykorzystanie i opracowanie listu, w szczególności jego kadrowanie, zmianę rozmiaru, poprawę jakości, zasłanianie danych oraz umieszczanie w oprawie graficznej Akcji.
                         </label>
@@ -209,7 +216,7 @@
                     </div>
 
                     <div class="form-check mb-4">
-                        <input asp-for="ConsentToContact" class="form-check-input" type="checkbox" id="consentToContact" required>
+                        <input asp-for="ConsentToContact" class="form-check-input consent-checkbox" type="checkbox" id="consentToContact" required>
                         <label class="form-check-label" asp-for="ConsentToContact">
                             <span class="text-danger">*</span> Przyjmuję do wiadomości, że Fundacja Panda Team będzie kontaktować się ze mną na podany w formularzu adres e-mail i/lub numer telefonu w sprawach związanych z Akcją Panda Claus 2026, w szczególności dotyczących statusu zgłoszenia, jego weryfikacji, realizacji listu, wysyłki prezentu oraz ewentualnych problemów wymagających kontaktu.
                         </label>
@@ -220,8 +227,93 @@
                 </div>
             </form>
 
+            <script>
+                (function () {
+                    var form = document.querySelector('form[method="post"][enctype="multipart/form-data"]');
+                    if (!form) return;
+
+                    function getMessage(field) {
+                        var validity = field.validity;
+                        if (validity.valueMissing) return 'To pole jest wymagane.';
+                        if (validity.typeMismatch) return 'Wprowadzona wartość ma nieprawidłowy format.';
+                        if (validity.patternMismatch) return 'Wprowadzona wartość ma nieprawidłowy format.';
+                        if (validity.tooShort) return 'Wprowadzona wartość jest za krótka.';
+                        if (validity.tooLong) return 'Wprowadzona wartość jest za długa.';
+                        if (validity.rangeUnderflow || validity.rangeOverflow) return 'Wprowadzona wartość jest poza dozwolonym zakresem.';
+                        return 'Wprowadzona wartość jest nieprawidłowa.';
+                    }
+
+                    function clearError(field) {
+                        field.classList.remove('is-invalid');
+                        var feedback = field.parentElement.querySelector('.invalid-feedback-pl');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+
+                    function showError(field, message) {
+                        field.classList.add('is-invalid');
+                        var feedback = field.parentElement.querySelector('.invalid-feedback-pl');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback-pl text-danger small mt-1';
+                            field.insertAdjacentElement('afterend', feedback);
+                        }
+                        feedback.textContent = message;
+                    }
+
+                    var fields = form.querySelectorAll('input, textarea, select');
+
+                    fields.forEach(function (field) {
+                        field.addEventListener('input', function () { clearError(field); });
+                        field.addEventListener('change', function () { clearError(field); });
+                    });
+
+                    form.addEventListener('submit', function (e) {
+                        var firstInvalid = null;
+
+                        fields.forEach(function (field) {
+                            clearError(field);
+                            if (!field.checkValidity()) {
+                                showError(field, getMessage(field));
+                                if (!firstInvalid) {
+                                    firstInvalid = field;
+                                }
+                            }
+                        });
+
+                        if (firstInvalid) {
+                            e.preventDefault();
+                            firstInvalid.focus();
+                        }
+                    });
+
+                    var selectAll = document.getElementById('selectAllConsents');
+                    var consentCheckboxes = form.querySelectorAll('.consent-checkbox');
+
+                    if (selectAll) {
+                        selectAll.addEventListener('change', function () {
+                            consentCheckboxes.forEach(function (checkbox) {
+                                checkbox.checked = selectAll.checked;
+                                clearError(checkbox);
+                            });
+                        });
+
+                        function syncSelectAll() {
+                            var allChecked = Array.prototype.every.call(consentCheckboxes, function (checkbox) {
+                                return checkbox.checked;
+                            });
+                            selectAll.checked = allChecked;
+                        }
+
+                        consentCheckboxes.forEach(function (checkbox) {
+                            checkbox.addEventListener('change', syncSelectAll);
+                        });
+                    }
+                })();
+            </script>
         }
-        
+
     <br />
     <br />
         <br />
