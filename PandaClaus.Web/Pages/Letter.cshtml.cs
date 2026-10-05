@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PandaClaus.Web.Core;
+using PandaClaus.Web.Services;
 
 namespace PandaClaus.Web.Pages;
 public class LetterModel : BasePageModel
@@ -8,6 +9,7 @@ public class LetterModel : BasePageModel
     private readonly EmailSender _emailSender;
     private readonly BlobClient _blobClient;
     private readonly IConfiguration _configuration;
+    private readonly GetResponseClient _getResponseClient;
 
     [BindProperty]
     public Letter? Letter { get; set; }
@@ -18,13 +20,18 @@ public class LetterModel : BasePageModel
     [BindProperty]
     public int NumberOfBoxes { get; set; } = 1;
 
+    [BindProperty]
+    public bool ConsentToNewsletter { get; set; }
+
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
     
     public string BlobUrl => _configuration["BlobUrl"]!;
 
-    public LetterModel(GoogleSheetsClient client, EmailSender emailSender, BlobClient blobClient, IConfiguration configuration)
+    public LetterModel(GoogleSheetsClient client, EmailSender emailSender,
+        BlobClient blobClient, IConfiguration configuration, GetResponseClient getResponseClient)
     {
+        _getResponseClient = getResponseClient;
         _emailSender = emailSender;
         _client = client;
         _blobClient = blobClient;
@@ -79,6 +86,11 @@ public class LetterModel : BasePageModel
                 PhoneNumber = Letter.AssignedToPhone,
                 Info = Letter.AssignedToInfo
             });
+
+            if (ConsentToNewsletter && !string.IsNullOrWhiteSpace(Letter.AssignedToEmail))
+            {
+                await _getResponseClient.SubscribeAsync(Letter.AssignedToEmail.Trim(), Letter.AssignedTo?.Trim() ?? string.Empty);
+            }
         }
 
         await _emailSender.SendConfirmationEmail(rowNumber);
