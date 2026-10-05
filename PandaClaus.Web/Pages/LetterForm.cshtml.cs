@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using PandaClaus.Web.Services;
 
 namespace PandaClaus.Web.Pages;
 public class LetterFormModel : BasePageModel
@@ -9,6 +10,7 @@ public class LetterFormModel : BasePageModel
     private readonly BlobClient _blobClient;
     private readonly EmailSender _emailSender;
     private readonly IConfiguration _configuration;
+    private readonly GetResponseClient _getResponseClient;
 
     [BindProperty]
     [Required]
@@ -92,10 +94,15 @@ public class LetterFormModel : BasePageModel
     [Range(typeof(bool), "true", "true", ErrorMessage = "Zgoda na kontakt jest wymagana")]
     public bool ConsentToContact { get; set; }
 
+    [BindProperty]
+    public bool ConsentToNewsletter { get; set; }
+
     public string InPostGeoWidgetToken => _configuration["InPostGeoWidgetToken"] ?? string.Empty;
 
-    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender, IConfiguration configuration)
+    public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender,
+        IConfiguration configuration, GetResponseClient getResponseClient)
     {
+        _getResponseClient = getResponseClient;
         _sheetsClient = sheetsClient;
         _blobClient = blobClient;
         _emailSender = emailSender;
@@ -181,6 +188,11 @@ public class LetterFormModel : BasePageModel
         var (rowNumber, hash) = await _sheetsClient.AddLetter(letter);
 
         await _emailSender.SendLetterAdded(rowNumber);
+
+        if (ConsentToNewsletter)
+        {
+            await _getResponseClient.SubscribeAsync(Email.Trim(), $"{ParentName.Trim()} {ParentSurname.Trim()}");
+        }
 
         return RedirectToPage("./LetterAddedConfirmation", new { hash });
     }

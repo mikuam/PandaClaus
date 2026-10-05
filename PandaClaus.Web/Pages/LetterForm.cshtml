@@ -223,6 +223,13 @@
                         <span asp-validation-for="ConsentToContact" class="text-danger"></span>
                     </div>
 
+                    <div class="form-check mb-4">
+                        <input asp-for="ConsentToNewsletter" class="form-check-input consent-checkbox" type="checkbox" id="consentToNewsletter">
+                        <label class="form-check-label" asp-for="ConsentToNewsletter">
+                            Chcę zapisać się do newslettera Fundacji Panda Team (opcjonalnie).
+                        </label>
+                    </div>
+
                     <button type="submit" class="btn btn-primary py-3 px-5 mt-3 float-end">Wyślij</button>
                 </div>
             </form>

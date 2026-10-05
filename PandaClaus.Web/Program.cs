@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Http.Features;
 using PandaClaus.Web;
 using PandaClaus.Web.Core;
-using PandaClaus.Web.Pages;
 using PandaClaus.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<GoogleSheetsClient>();
 builder.Services.AddScoped<BlobClient>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddHttpClient<GetResponseClient>();
 
 // Add HttpClient for InPost API
 builder.Services.AddHttpClient<InPostApiClient>();
