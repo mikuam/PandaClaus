@@ -75,6 +75,14 @@
                 </p>
             </div>
 
+            <form method="post" class="content-section mb-4">
+                <h3><i class="fa fa-toggle-on me-2"></i>Widoczność linku "Dodaj list"</h3>
+                <p class="text-muted">Aktualnie: <strong>@(Model.AddLetterLinkVisible ? "widoczny dla wszystkich" : "tylko dla administratora")</strong></p>
+                <button type="submit" asp-page-handler="ToggleAddLetterLink" asp-route-enabled="@(!Model.AddLetterLinkVisible)" class="btn btn-primary">
+                    @(Model.AddLetterLinkVisible ? "Ukryj link" : "Pokaż link")
+                </button>
+            </form>
+
             <form method="post">
                 <!-- Option 1 -->
                 <div class="content-section wow fadeIn" data-wow-delay="0.3s">

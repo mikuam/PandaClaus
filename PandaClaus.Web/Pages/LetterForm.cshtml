@@ -1,5 +1,6 @@
 ﻿@page
 @model LetterFormModel
+@inject PandaClaus.Web.Services.FeatureFlags FeatureFlags
 @{
     ViewData["Title"] = "Dodaj List";
 }
@@ -71,7 +72,7 @@
         </div>
         <hr class="mb-4" />
 
-        @if (!Model.IsAdmin)
+        @if (!Model.IsAdmin && !FeatureFlags.AddLetterLinkVisible)
         {
             <div class="container col-lg-6 offset-lg-3">
                 <div class="alert alert-info text-center" role="alert">

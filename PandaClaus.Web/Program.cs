@@ -6,6 +6,7 @@ using PandaClaus.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+builder.Services.AddSingleton<FeatureFlags>();
 builder.Services.AddScoped<GoogleSheetsClient>();
 builder.Services.AddScoped<BlobClient>();
 builder.Services.AddScoped<EmailSender>();

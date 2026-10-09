@@ -18,9 +18,28 @@ public class AdminModel : BasePageModel
     [BindProperty]
     public int LetterCount { get; set; }
 
-    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient, 
-        InPostApiClient inPostApiClient, InPostShipmentRequestBuilder shipmentRequestBuilder)
+    private readonly FeatureFlags _featureFlags;
+
+    public bool AddLetterLinkVisible => _featureFlags.AddLetterLinkVisible;
+
+    public IActionResult OnPostToggleAddLetterLink(bool enabled)
     {
+        if (!IsAdmin)
+        {
+            return RedirectToPage("./Index");
+        }
+
+        _featureFlags.AddLetterLinkVisible = enabled;
+        TempData["SuccessMessage"] = enabled
+            ? "Link \"Dodaj list\" jest teraz widoczny dla wszystkich."
+            : "Link \"Dodaj list\" jest teraz widoczny tylko dla administratora.";
+        return RedirectToPage("./Admin");
+    }
+
+    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient, 
+        InPostApiClient inPostApiClient, InPostShipmentRequestBuilder shipmentRequestBuilder, FeatureFlags featureFlags)
+    {
+        _featureFlags = featureFlags;
         _client = client;
         _csvExporter = csvExporter;
         _blobClient = blobClient;

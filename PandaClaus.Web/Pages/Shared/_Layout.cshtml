@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject PandaClaus.Web.Services.FeatureFlags FeatureFlags
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
@@ -48,6 +49,10 @@
                             <a class="nav-item nav-link" asp-area="" asp-page="/LetterForm">Dodaj list</a>
                             <a class="nav-item nav-link" asp-area="" asp-page="/Admin">Admin panel</a>
                             <a class="nav-item nav-link" asp-area="" asp-page="/StatusUpdate">Status Listu</a>
+                        }
+                        @if (baseModel?.IsAdmin != true && FeatureFlags.AddLetterLinkVisible)
+                        {
+                            <a class="nav-item nav-link" asp-area="" asp-page="/LetterForm">Dodaj list</a>
                         }
                         <a href="https://pandateam.pl/" class="nav-item nav-link" target="_blank">Panda Team</a>
                         <a class="nav-item nav-link" asp-area="" asp-page="/Index">Listy</a>
