@@ -202,7 +202,7 @@
                     <div class="form-check mb-4">
                         <input asp-for="AcceptRodoClause" class="form-check-input consent-checkbox" type="checkbox" id="acceptRodoClause" required>
                         <label class="form-check-label" asp-for="AcceptRodoClause">
-                            <span class="text-danger">*</span> Zapoznałam/em się z <a href="#rodo-clause">Klauzulą informacyjną RODO</a> dotyczącą Akcji Panda Claus 2026.
+                            <span class="text-danger">*</span> Zapoznałam/em się z <a asp-page="/KlauzulaRodo" target="_blank" rel="noopener noreferrer">Klauzulą informacyjną RODO</a> dotyczącą Akcji Panda Claus 2026.
                         </label>
                         <span asp-validation-for="AcceptRodoClause" class="text-danger"></span>
                     </div>
@@ -320,27 +320,6 @@
                 })();
             </script>
         }
-
-    <br />
-    <br />
-        <br />
-
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h4 id="rodo-clause">Klauzula informacyjna RODO – Panda Claus 2026</h4>
-                    <p>Administratorem danych osobowych jest Fundacja Panda Team im. Michałka Tarachowicza z siedzibą w Poznaniu. W sprawach dotyczących danych osobowych można kontaktować się pod adresem <a href="mailto:rodo@pandateam.pl">rodo@pandateam.pl</a>, a z Inspektorem Ochrony Danych pod adresem <a href="mailto:iod@pandateam.pl">iod@pandateam.pl</a>.</p>
-                    <p>Dane rodzica lub opiekuna oraz zgłaszanego dziecka przetwarzamy w celu przyjęcia i weryfikacji zgłoszenia, kontaktu, organizacji Akcji Panda Claus, realizacji listu, przygotowania i doręczenia prezentu oraz zapewnienia prawidłowego i bezpiecznego przebiegu Akcji. Podstawą przetwarzania jest prawnie uzasadniony interes Fundacji związany z organizacją Akcji (art. 6 ust. 1 lit. f RODO), a w zakresie publikacji imienia, wieku, listu i historii dziecka – udzielona zgoda (art. 6 ust. 1 lit. a RODO).</p>
-                    <p>Dane mogą być przekazywane podmiotom wspierającym Fundację w organizacji Akcji, w szczególności dostawcom usług informatycznych, hostingowych i formularzy oraz operatorom pocztowym lub kurierskim – wyłącznie w zakresie niezbędnym do wykonania danego zadania. Dane kontaktowe i adresowe rodziny nie są publikowane ani co do zasady przekazywane Darczyńcom.</p>
-                    <p>Dostęp do niepublicznych danych mają wyłącznie osoby, które potrzebują ich do realizacji powierzonych zadań. Wolontariuszom udostępniamy tylko taki zakres informacji, jaki jest niezbędny do wykonania ich zadania.</p>
-                    <p>Dane będą przechowywane przez okres niezbędny do przeprowadzenia i rozliczenia Akcji oraz – w odpowiednim zakresie – przez czas potrzebny do ustalenia, dochodzenia lub obrony ewentualnych roszczeń. Dane przetwarzane wyłącznie na podstawie zgody przetwarzamy do czasu jej wycofania lub upływu okresu wskazanego w treści zgody.</p>
-                    <p>Masz prawo do dostępu do danych, ich sprostowania, usunięcia lub ograniczenia przetwarzania oraz – w przypadkach przewidzianych prawem – wniesienia sprzeciwu. Zgodę możesz wycofać w dowolnym momencie; nie wpływa to na zgodność z prawem wcześniejszego przetwarzania. Masz również prawo złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.</p>
-                    <p>Podanie danych jest dobrowolne, ale brak danych wymaganych do obsługi zgłoszenia uniemożliwi udział w Akcji. Publikacja listu i podstawowych informacji o dziecku jest elementem Akcji Panda Claus – bez niej nie możemy przedstawić listu Darczyńcom.</p>
-                    <p>Dane nie są wykorzystywane do zautomatyzowanego podejmowania decyzji ani profilowania.</p>
-                    <p>Więcej informacji o zasadach ochrony danych znajduje się w <a href="https://pandateam.pl/polityka-prywatnosci/" target="_blank">Polityce prywatności</a> oraz Polityce Ochrony Danych Fundacji Panda Team.</p>
-                </div>
-            </div>
-        </div>
 
     </div>
 </div>
