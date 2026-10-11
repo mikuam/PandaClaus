@@ -59,13 +59,6 @@
                     <p>Listy napisane przez dzieci, zostaną udostępnione na naszych kanałach w mediach społecznościowych oraz na stronie akcji. Darczyńcy akcji będą mogli wybrać listy od dzieci, dla których przygotują podarunki. Wiemy, że dzięki temu prezenty będą trafione! </p>
 
                     <p>Wszystkie pytania prosimy kierować na adres: <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a></p>
-                    <p><b>Partnerzy akcji:</b></p>
-                </div>
-                <div style="text-align: center;">
-                    <img src="~/img/inpost_logo.png" class="m-3 m-lg-5" alt="InPost logo" />
-                    <img src="~/img/dudacars_logo.svg" class="m-3 m-lg-5" alt="Duda Cars logo" height="100" />
-                    <img src="~/img/top_party_box_logo.png" class="m-3 m-lg-5" alt="Top Party Box" height="100" />
-                    <img src="~/img/bibliopunkt_logo.jpg" class="m-3 m-lg-5" alt="Bibliopunkt logo" height="100" />
                 </div>
             </div>
         </div>
@@ -83,6 +76,9 @@
         else
         {
             @* Form visible only for admins *@
+            <div class="container col-lg-6 offset-lg-3">
+                <h2 class="h4 mb-4">Formularz zgłoszeniowy</h2>
+            </div>
             <form method="post" enctype="multipart/form-data" novalidate>
                 <div class="container col-lg-6 offset-lg-3 clearfix">
                     @if (!ModelState.IsValid)
@@ -321,6 +317,20 @@
             </script>
         }
 
+        <hr class="mt-5 mb-4" />
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <p><b>Partnerzy akcji:</b></p>
+                    <div style="text-align: center;">
+                        <img src="~/img/inpost_logo.png" class="m-3 m-lg-5" alt="InPost logo" />
+                        <img src="~/img/dudacars_logo.svg" class="m-3 m-lg-5" alt="Duda Cars logo" height="100" />
+                        <img src="~/img/top_party_box_logo.png" class="m-3 m-lg-5" alt="Top Party Box" height="100" />
+                        <img src="~/img/bibliopunkt_logo.jpg" class="m-3 m-lg-5" alt="Bibliopunkt logo" height="100" style="max-width: calc(100% - 2rem); object-fit: contain;" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
