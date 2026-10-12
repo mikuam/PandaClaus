@@ -10,10 +10,6 @@
     --pc-light-text: #fffdfd;
 }
 
-#nav-h1 {
-    color: var(--pc-red) !important;
-}
-
 .bg-primary {
     background-color: var(--primary) !important;
 }
@@ -198,7 +194,7 @@
 }
 
 .navbar-light .navbar-brand {
-    height: 75px;
+    height: auto;
 }
 
 .navbar-light .navbar-nav .nav-link {
