@@ -43,7 +43,8 @@
                     <p><b>Rodzicu, zanim wypełnisz formularz, przeczytaj poniższe informacje.</b></p>
                     <p>Pandowy Święty Mikołaj i jego elfy chcą spełnić świąteczne marzenia dzieci, które przeżywają stratę mamy, taty, brata, siostry lub opiekuna prawnego. Chcemy, by magia świąt dotarła również do nich.</p>
                     <p><b>Jak wziąć udział w akcji?</b></p>
-                    <p>Rodzic lub opiekun prawny może zgłosić dziecko, które w dniu zgłoszenia nie ukończyło 18 lat, jeśli od śmierci mamy, taty, brata, siostry lub opiekuna prawnego nie upłynęły więcej niż 2 lata. Dla każdego dziecka należy wypełnić osobny <a href="https://pandaclaus.pl/LetterForm">formularz zgłoszeniowy</a>. Sama choroba, również onkologiczna, nie jest podstawą do udziału w tej edycji.</p>
+                    <p>Rodzic lub opiekun prawny może zgłosić dziecko, które w dniu zgłoszenia nie ukończyło 18 lat, jeśli od śmierci mamy, taty, brata, siostry lub opiekuna prawnego nie upłynęły więcej niż 2 lata. Dla każdego dziecka należy wypełnić osobny <a href="https://pandaclaus.pl/LetterForm">formularz zgłoszeniowy</a>.</p>
+                    <p class="text-danger"><strong>Uwaga:</strong> Sama choroba, również onkologiczna, nie jest podstawą do udziału w tej edycji.</p>
                     <p><b>Rodzicu, to ważne informacje dla Ciebie!</b> Każde dziecko prosimy o napisanie listu do Panda Clausa (Pandowego Świętego Mikołaja), w którym opowie o swoim wymarzonym prezencie (wartość do 300 zł). List musi być napisany ręcznie, a jeśli dziecko nie potrafi jeszcze pisać lub ma z tym trudności, możesz mu w tym pomóc. Dekorowanie listu zostaw dziecku — na pewno świetnie sobie poradzi.  Listy pisane na komputerze nie będą przyjmowane. </p>
                     <p>Gotowy list zeskanuj i prześlij za pomocą formularza zgłoszeniowego na stronie akcji <a href="https://pandaclaus.pl/LetterForm">https://pandaclaus.pl/LetterForm</a></p>
                     <p><b>Kilka ważnych zasad:</b></p>
@@ -53,10 +54,10 @@
                         <li>Listy <b>nie mogą zawierać innych danych osobowych</b> dziecka poza imieniem i wiekiem.</li>
                         <li>Prezentem nie mogą być żywe zwierzęta.</li>
                     </ol>
-
+                    <p>Pozostałe zasady udziału znajdziesz w <a href="/Privacy">regulaminie akcji</a>.</p>
                     <p><b>Kiedy wysyłać zgłoszenia?</b></p>
                     <p>Zgłoszenia przyjmujemy do 25 października 2026 r. do godziny 23:59. W razie potrzeby termin może ulec zmianie. Panda Claus dołoży wszelkich starań, aby prezenty trafiły do dzieci jeszcze przed Świętami – do 24 grudnia 2026 r.</p>
-                    <p>Listy napisane przez dzieci, zostaną udostępnione na naszych kanałach w mediach społecznościowych oraz na stronie akcji. Darczyńcy akcji będą mogli wybrać listy od dzieci, dla których przygotują podarunki. Wiemy, że dzięki temu prezenty będą trafione! </p>
+                    <p>Listy napisane przez dzieci, zostaną udostępnione na naszych kanałach w mediach społecznościowych oraz na stronie akcji. Darczyńcy akcji będą mogli wybrać listy od dzieci, dla których przygotują podarunki.</p>
 
                     <p>Wszystkie pytania prosimy kierować na adres: <a href="mailto:pandaclaus@pandateam.pl">pandaclaus@pandateam.pl</a></p>
                 </div>
@@ -170,21 +171,21 @@
                         <input asp-for="LetterPhotos" type="file" class="form-control" id="file" accept=".jpg, .png, .jpeg, .bmp, .tif, .tiff" required multiple>
                     </div>
 
-                    <p class="mt-4 mb-2"><b>Pola obowiązkowe</b></p>
-
-                    <div class="form-check mb-4">
-                        <input asp-for="ConfirmParentStatement" class="form-check-input" type="checkbox" id="confirmParentStatement" required>
-                        <label class="form-check-label" asp-for="ConfirmParentStatement">
-                            <span class="text-danger">*</span> Oświadczam, że jestem rodzicem lub opiekunem prawnym zgłaszanego dziecka, a informacje podane w formularzu są zgodne z moją najlepszą wiedzą ze stanem faktycznym.
-                        </label>
-                        <span asp-validation-for="ConfirmParentStatement" class="text-danger"></span>
-                    </div>
+                    <p class="mt-4 mb-2"><span class="text-danger">*</span> oznacza pole obowiązkowe</p>
 
                     <div class="form-check mb-4">
                         <input type="checkbox" class="form-check-input" id="selectAllConsents">
                         <label class="form-check-label" for="selectAllConsents">
                             <b>Zaznacz wszystkie zgody</b>
                         </label>
+                    </div>
+                    
+                    <div class="form-check mb-4">
+                        <input asp-for="ConfirmParentStatement" class="form-check-input consent-checkbox" type="checkbox" id="confirmParentStatement" required>
+                        <label class="form-check-label" asp-for="ConfirmParentStatement">
+                            <span class="text-danger">*</span> Oświadczam, że jestem rodzicem lub opiekunem prawnym zgłaszanego dziecka, a informacje podane w formularzu są zgodne z moją najlepszą wiedzą ze stanem faktycznym.
+                        </label>
+                        <span asp-validation-for="ConfirmParentStatement" class="text-danger"></span>
                     </div>
 
                     <div class="form-check mb-4">
