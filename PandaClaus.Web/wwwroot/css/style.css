@@ -10,10 +10,6 @@
     --pc-light-text: #fffdfd;
 }
 
-#nav-h1 {
-    color: var(--pc-red) !important;
-}
-
 .bg-primary {
     background-color: var(--primary) !important;
 }
