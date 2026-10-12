@@ -194,7 +194,7 @@
 }
 
 .navbar-light .navbar-brand {
-    height: 75px;
+    height: auto;
 }
 
 .navbar-light .navbar-nav .nav-link {
