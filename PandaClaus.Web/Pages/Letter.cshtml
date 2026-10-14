@@ -70,6 +70,8 @@
                     }
                 </div>
 
+                @if (Model.IsAdmin)
+                {
                 <!-- Image Gallery -->
                 <div class="image-gallery wow fadeIn" data-wow-delay="0.2s">
                 @for (int i = 0; i < Model.Letter.ImageIds.Count; i++)
@@ -124,6 +126,7 @@
                     </div>
                 }
                 </div>
+                }
 
                 <!-- Admin Upload Section -->
                 @if (Model.IsAdmin)

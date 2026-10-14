@@ -4,7 +4,7 @@ using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
 
-public class ReceiveConfirmationModel : PageModel
+public class ReceiveConfirmationModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
@@ -34,6 +34,18 @@ public class ReceiveConfirmationModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(string hash, string code)
     {
+        if (!IsAdmin)
+        {
+            HttpContext.Session.Remove("PendingReceiptHash");
+            HttpContext.Session.Remove("PendingReceiptCode");
+            if (!string.IsNullOrWhiteSpace(hash) && hash.Length <= 64 &&
+                !string.IsNullOrWhiteSpace(code) && code.Length <= 32)
+            {
+                HttpContext.Session.SetString("PendingReceiptHash", hash);
+                HttpContext.Session.SetString("PendingReceiptCode", code);
+            }
+            return RedirectToPage("./Index");
+        }
         Letter = await _client.FetchLetterByHashAsync(hash);
         if (Letter == null)
         {
@@ -45,6 +57,7 @@ public class ReceiveConfirmationModel : PageModel
         // Validate the code matches the letter number
         if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))
         {
+            Letter = null;
             Message = "Nieprawidłowy kod potwierdzenia.";
             ShowForm = false;
             return Page();
@@ -63,11 +76,14 @@ public class ReceiveConfirmationModel : PageModel
 
     public async Task<IActionResult> OnPostConfirmAsync(int rowNumber, string code)
     {
-        Letter = await _client.FetchLetterAsync(rowNumber);
+        if (!IsAdmin) return RedirectToPage("./Index");
+        Letter = rowNumber >= 2 ? await _client.FetchLetterAsync(rowNumber) : null;
+        if (Letter == null) return NotFound();
 
         // Validate the code
         if (!string.Equals(Letter.Number, code, StringComparison.OrdinalIgnoreCase))
         {
+            Letter = null;
             Message = "Nieprawidłowy kod potwierdzenia.";
             ShowForm = false;
             return Page();

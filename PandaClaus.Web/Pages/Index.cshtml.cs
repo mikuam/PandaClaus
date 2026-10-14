@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PandaClaus.Web.Pages;
 public class IndexModel : BasePageModel
 {
     private const string AdminParameter = "adminCode";
-    private const string EarlyAccessParameter = "earlyAccess";
     private const string ActiveButton = "btn-primary";
     private const string InActiveButton = "btn-outline-primary";
 
@@ -22,18 +22,23 @@ public class IndexModel : BasePageModel
         _adminCode = configuration["AdminCode"]!;
     }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        var isAdminFromQuery = Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode;
+        Response.Headers.CacheControl = "private, no-store";
+        var isAdminFromQuery = !string.IsNullOrWhiteSpace(_adminCode) &&
+            Request.Query.ContainsKey(AdminParameter) && Request.Query[AdminParameter] == _adminCode;
         if (isAdminFromQuery)
         {
             Request.HttpContext.Session.SetString("IsAdmin", "true");
+            var pendingHash = HttpContext.Session.GetString("PendingReceiptHash");
+            var pendingCode = HttpContext.Session.GetString("PendingReceiptCode");
+            HttpContext.Session.Remove("PendingReceiptHash");
+            HttpContext.Session.Remove("PendingReceiptCode");
+            if (!string.IsNullOrEmpty(pendingHash) && !string.IsNullOrEmpty(pendingCode))
+                return RedirectToPage("./ReceiveConfirmation", new { hash = pendingHash, code = pendingCode });
         }
 
         Request.HttpContext.Session.SetString("IsAdmin", IsAdmin ? "true" : "false");
-
-        var isEarlyAccess = IsEarlyAccess();
-        Request.HttpContext.Session.SetString("IsEarlyAccess", isEarlyAccess ? "true" : "false");
 
         var result = (await _client.FetchLetters()).Where(l => !l.IsDeleted).ToList();
         var filter = Request.Query["filter"].ToString();
@@ -63,9 +68,9 @@ public class IndexModel : BasePageModel
                 break;
         }
 
-        if (!IsAdmin && !isEarlyAccess)
+        if (!IsAdmin)
         {
-            result = result.Where(l => l.IsVisible).ToList();
+            result = result.Where(l => LetterAccessPolicy.CanReadPublicly(l.IsVisible, l.IsDeleted)).ToList();
         }
 
         var search = Request.Query["search"].ToString();
@@ -79,15 +84,7 @@ public class IndexModel : BasePageModel
 
         result.ForEach(l => l.Description = TrimLength(l.Description));
         Letters = result.OrderBy(l => l.Number, new CustomComparer()).ToList();
-    }
-
-    private bool IsEarlyAccess()
-    {
-        var isEarlAccessValue = Request.HttpContext.Session.GetString("IsEarlyAccess");
-        var isEarlyAccessFromSession = isEarlAccessValue is not null && isEarlAccessValue == "true";
-
-        return isEarlyAccessFromSession ||
-               (Request.Query.ContainsKey(EarlyAccessParameter) && Request.Query[EarlyAccessParameter] == "true");
+        return Page();
     }
 
     private string TrimLength(string text)
