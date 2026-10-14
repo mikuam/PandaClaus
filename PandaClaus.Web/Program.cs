@@ -46,6 +46,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 var app = builder.Build();
@@ -65,6 +67,25 @@ else
 
 // Handle status code pages (404, 403, etc.)
 app.UseStatusCodePagesWithReExecute("/StatusCode/{0}");
+
+// The legacy adminCode query still exists in this branch: never leak it via Referer.
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    var path = context.Request.Path;
+    if (path == "/" || path.StartsWithSegments("/Index", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/StatusUpdate", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/Letters", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/Confirmation", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/LetterAddedConfirmation", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWithSegments("/ReceiveConfirmation", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.Headers.CacheControl = "private, no-store";
+        context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+    }
+    await next();
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

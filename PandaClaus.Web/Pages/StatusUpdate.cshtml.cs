@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PandaClaus.Web.Core;
 
 namespace PandaClaus.Web.Pages;
-public class StatusUpdateModel : PageModel
+public class StatusUpdateModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
@@ -26,16 +26,20 @@ public class StatusUpdateModel : PageModel
         _client = client;
     }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        if (int.TryParse(Request.Query["number"].ToString(), out var number))
+        Response.Headers.CacheControl = "private, no-store";
+        if (!IsAdmin) return RedirectToPage("./Index");
+        if (int.TryParse(Request.Query["number"].ToString(), out var number) && number >= 2)
         {
             Letter = await _client.FetchLetterAsync(number);
         }
+        return Page();
     }
 
     public async Task<IActionResult> OnPostSetLetterNumberAsync()
     {
+        if (!IsAdmin) return RedirectToPage("./Index");
         var letterNumber = Request.Form["letterNumber"].ToString();
         var allLetters = await _client.FetchLetters();
         var letter = allLetters.FirstOrDefault(l => l.Number.Equals(letterNumber, StringComparison.CurrentCultureIgnoreCase));
@@ -52,11 +56,14 @@ public class StatusUpdateModel : PageModel
 
     public async Task<IActionResult> OnPostSetStatusAsync()
     {
-        if (int.TryParse(Request.Form["number"].ToString(), out var rowNumber))
+        if (!IsAdmin) return RedirectToPage("./Index");
+        if (int.TryParse(Request.Form["number"].ToString(), out var rowNumber) && rowNumber >= 2 &&
+            Enum.TryParse<LetterStatus>(Request.Query["status"].ToString(), out var status) &&
+            Enum.IsDefined(status))
         {
-            var status = Enum.Parse<LetterStatus>(Request.Query["status"].ToString());
+            Letter = await _client.FetchLetterAsync(rowNumber);
+            if (Letter == null) return NotFound();
             var uwagi = Request.Form["uwagi"].ToString();
-
             await _client.UpdateStatus(rowNumber, status, uwagi);
             if (status == LetterStatus.DOSTARCZONE)
             {

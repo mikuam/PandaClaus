@@ -11,6 +11,7 @@ public class LetterFormModel : BasePageModel
     private readonly EmailSender _emailSender;
     private readonly IConfiguration _configuration;
     private readonly GetResponseClient _getResponseClient;
+    private readonly FeatureFlags _featureFlags;
 
     [BindProperty]
     [Required]
@@ -100,8 +101,9 @@ public class LetterFormModel : BasePageModel
     public string InPostGeoWidgetToken => _configuration["InPostGeoWidgetToken"] ?? string.Empty;
 
     public LetterFormModel(GoogleSheetsClient sheetsClient, BlobClient blobClient, EmailSender emailSender,
-        IConfiguration configuration, GetResponseClient getResponseClient)
+        IConfiguration configuration, GetResponseClient getResponseClient, FeatureFlags featureFlags)
     {
+        _featureFlags = featureFlags;
         _getResponseClient = getResponseClient;
         _sheetsClient = sheetsClient;
         _blobClient = blobClient;
@@ -116,6 +118,8 @@ public class LetterFormModel : BasePageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!IsAdmin && !_featureFlags.AddLetterLinkVisible)
+            return NotFound();
         if (!ModelState.IsValid)
         {
             return Page();
@@ -194,6 +198,7 @@ public class LetterFormModel : BasePageModel
             await _getResponseClient.SubscribeAsync(Email.Trim(), $"{ParentName.Trim()} {ParentSurname.Trim()}");
         }
 
+        HttpContext.Session.SetString("SubmittedLetterHash", hash);
         return RedirectToPage("./LetterAddedConfirmation", new { hash });
     }
 }

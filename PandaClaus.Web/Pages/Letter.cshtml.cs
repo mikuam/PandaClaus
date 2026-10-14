@@ -40,14 +40,15 @@ public class LetterModel : BasePageModel
 
     public async Task<IActionResult> OnGetAsync(string? hash)
     {
+        if (IsAdmin) Response.Headers.CacheControl = "private, no-store";
         Letter = !string.IsNullOrEmpty(hash)
             ? await _client.FetchLetterByHashAsync(hash)
             : null;
-        
-        if (Letter == null)
+
+        if (Letter == null || (!IsAdmin && !LetterAccessPolicy.CanReadPublicly(Letter.IsVisible, Letter.IsDeleted)))
         {
-            ErrorMessage = "Nie znaleziono listu o podanym numerze. Sprawdź poprawność linku lub wróć do listy listów.";
-            return Page();
+            Letter = null;
+            return NotFound();
         }
 
         // Get messages from TempData
@@ -65,15 +66,14 @@ public class LetterModel : BasePageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var rowNumber = int.Parse(Request.Form["RowNumber"]!);
+        if (!int.TryParse(Request.Form["RowNumber"], out var rowNumber) || rowNumber < 2)
+            return BadRequest();
 
         var letter = await _client.FetchLetterAsync(rowNumber);
-        
-        if (letter == null)
-        {
-            ErrorMessage = "Nie znaleziono listu.";
-            return Page();
-        }
+        if (letter == null ||
+            !LetterAccessPolicy.CanReserve(letter.IsVisible, letter.IsDeleted, letter.IsAssigned) ||
+            !string.Equals(letter.Hash, RouteData.Values["hash"]?.ToString(), StringComparison.OrdinalIgnoreCase))
+            return NotFound();
 
         if (!letter.IsAssigned)
         {
@@ -95,6 +95,7 @@ public class LetterModel : BasePageModel
 
         await _emailSender.SendConfirmationEmail(rowNumber);
         
+        HttpContext.Session.SetInt32("ReservedRowNumber", rowNumber);
         return RedirectToPage("./Confirmation", new { rowNumber});
     }
 
