@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using PandaClaus.Web.Services;
+using PandaClaus.Web.Validation;
 
 namespace PandaClaus.Web.Pages;
 public class LetterFormModel : BasePageModel
@@ -61,6 +62,17 @@ public class LetterFormModel : BasePageModel
     [Required]
     [Range(0, 18, ErrorMessage = "Wiek dziecka musi być liczbą dodatnią z zakresu 0-18")]
     public int ChildAge { get; set; }
+
+    [BindProperty]
+    [Required(ErrorMessage = "Wybierz, kogo straciło dziecko")]
+    [RegularExpression(@"^(Mama|Tata|Brat|Siostra|Opiekun prawny)$", ErrorMessage = "Wybierz jedną z relacji wymienionych w regulaminie")]
+    public string DeceasedRelation { get; set; } = string.Empty;
+
+    [BindProperty]
+    [Required(ErrorMessage = "Podaj rok śmierci tej osoby")]
+    [RegularExpression(@"^((0[1-9]|1[0-2])\.)?[0-9]{4}$", ErrorMessage = "Podaj rok (np. 2025) albo miesiąc i rok (np. 05.2025)")]
+    [LossWithinTwoYears(ErrorMessage = "Podaj bieżący rok lub jeden z dwóch poprzednich lat. Miesiąc nie może być w przyszłości")]
+    public string LossTime { get; set; } = string.Empty;
 
     [BindProperty]
     [Required]
@@ -144,6 +156,17 @@ public class LetterFormModel : BasePageModel
             }
         }
 
+        // Check the sheet schema before any photo upload or letter write.
+        try
+        {
+            await _sheetsClient.EnsureEligibilityColumnsAvailableAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            ModelState.AddModelError(string.Empty, "Zgłoszenie nie może teraz zostać zapisane. Skontaktuj się z organizatorem.");
+            return Page();
+        }
+
         // Check if letter already exists
         var existingLetters = await _sheetsClient.FetchLetters();
         var isDuplicate = existingLetters.Any(l => 
@@ -175,6 +198,8 @@ public class LetterFormModel : BasePageModel
             PaczkomatCode = PaczkomatCode.Trim(),
             ChildName = ChildName.Trim(),
             ChildAge = ChildAge,
+            DeceasedRelation = DeceasedRelation,
+            LossTime = LossTime,
             Description = Description,
             Presents = Presents,
             ImageIds = [],

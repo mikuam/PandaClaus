@@ -41,7 +41,7 @@ public class GoogleSheetsClient
 
     public async Task<List<Letter>> FetchLetters()
     {
-        var range = $"{_sheetName}!A:AB";
+        var range = $"{_sheetName}!A:{(await HasEligibilityColumnsAsync() ? "AD" : "AB")}";
         var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
         var response = await request.ExecuteAsync();
 
@@ -52,7 +52,8 @@ public class GoogleSheetsClient
     {
         try
         {
-            var range = $"{_sheetName}!A{rowNumber}:AB{rowNumber}";
+            var lastColumn = await HasEligibilityColumnsAsync() ? "AD" : "AB";
+            var range = $"{_sheetName}!A{rowNumber}:{lastColumn}{rowNumber}";
             var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
             var response = await request.ExecuteAsync();
 
@@ -76,12 +77,13 @@ public class GoogleSheetsClient
 
     public async Task<(int RowNumber, string Hash)> AddLetter(Letter letter)
     {
+        await EnsureEligibilityColumnsAvailableAsync();
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
 
         var letterNumber = _letterNumerationService.GetNextLetterNumber(letters, letter);
         var hash = HashGenerator.GenerateHash();
-        var range = $"{_sheetName}!B{firstEmptyRow}:U{firstEmptyRow}";
+        var range = $"{_sheetName}!B{firstEmptyRow}:AD{firstEmptyRow}";
         var valuesToAdd = new List<object>
         {
             letterNumber,
@@ -105,6 +107,7 @@ public class GoogleSheetsClient
             letter.IsVisible ? "tak" : "nie",
             "nie"
         };
+        LetterSheetWritePlan.Extend(valuesToAdd, letter); // V:AB, AC, AD
         var valueRange = new ValueRange
         {
             Values = new List<IList<object>> { valuesToAdd }
@@ -124,6 +127,28 @@ public class GoogleSheetsClient
         await hashUpdateRequest.ExecuteAsync();
 
         return (firstEmptyRow, hash);
+    }
+
+    private async Task<bool> HasEligibilityColumnsAsync()
+    {
+        var metadataRequest = _sheetsService.Spreadsheets.Get(_spreadsheetId);
+        metadataRequest.Fields = "sheets(properties(title,gridProperties(columnCount)))";
+        var spreadsheet = await metadataRequest.ExecuteAsync();
+        var count = spreadsheet.Sheets?.FirstOrDefault(s => s.Properties?.Title == _sheetName)
+            ?.Properties?.GridProperties?.ColumnCount ?? 0;
+        if (count < 30)
+            return false;
+
+        var headerRequest = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, $"{_sheetName}!AC1:AD1");
+        var headers = (await headerRequest.ExecuteAsync()).Values?.FirstOrDefault();
+        return SheetEligibilityColumns.AreReady(count, headers?.ElementAtOrDefault(0)?.ToString(),
+            headers?.ElementAtOrDefault(1)?.ToString());
+    }
+
+    public async Task EnsureEligibilityColumnsAvailableAsync()
+    {
+        if (!await HasEligibilityColumnsAsync())
+            throw new InvalidOperationException("Brak zatwierdzonych kolumn AC/AD w arkuszu zgłoszeń. Nie zapisano zgłoszenia.");
     }
 
     private List<Letter> MapToLetters(IList<IList<object>> values)
@@ -202,7 +227,9 @@ public class GoogleSheetsClient
                 AssignedToPhone = GetCellOrEmptyString(row, 24),
                 AssignedToInfo = GetCellOrEmptyString(row, 25),
                 Uwagi = GetCellOrEmptyString(row, 26),
-                Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 27)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 27), true)
+                Status = string.IsNullOrWhiteSpace(GetCellOrEmptyString(row, 27)) ? LetterStatus.NIE_WIADOMO : Enum.Parse<LetterStatus>(GetCellOrEmptyString(row, 27), true),
+                DeceasedRelation = GetCellOrEmptyString(row, 28),
+                LossTime = GetCellOrEmptyString(row, 29)
             };
 
             return letter;

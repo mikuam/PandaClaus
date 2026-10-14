@@ -157,6 +157,9 @@
                         <div class="col-12">
                             <div class="admin-section">
                                 <h4><i class="fa fa-edit me-2"></i>Edytuj szczegóły listu</h4>
+                                <p class="mb-2"><strong>Dane do weryfikacji zgłoszenia (nie są publikowane):</strong></p>
+                                <p>Kogo straciło dziecko: @(string.IsNullOrEmpty(Model.Letter.DeceasedRelation) ? "Brak danych" : Model.Letter.DeceasedRelation)<br />
+                                   Kiedy: @(string.IsNullOrEmpty(Model.Letter.LossTime) ? "Brak danych" : Model.Letter.LossTime)</p>
                                 <form method="post" asp-page-handler="updateDetails" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
                                     <div class="row g-3">
                                         <div class="col-md-6">

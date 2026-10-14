@@ -19,6 +19,8 @@ public class Letter
     public string PaczkomatCode { get; set; } = string.Empty;
     public required string ChildName { get; set; }
     public required int ChildAge { get; set; }
+    public string DeceasedRelation { get; set; } = string.Empty;
+    public string LossTime { get; set; } = string.Empty;
     public required string Description { get; set; }
     public required string Presents { get; set; }
     public required List<string> ImageIds { get; set; }
