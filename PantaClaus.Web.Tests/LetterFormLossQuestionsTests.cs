@@ -9,7 +9,7 @@ public class LetterFormLossQuestionsTests
 {
     private static bool IsValid(string propertyName, string? value)
     {
-        var model = new LetterFormModel(null!, null!, null!, null!, null!);
+        var model = new LetterFormModel(null!, null!, null!, null!, null!, null!);
         var property = typeof(LetterFormModel).GetProperty(propertyName);
         Assert.IsNotNull(property, $"Form is missing {propertyName}");
         property.SetValue(model, value);
