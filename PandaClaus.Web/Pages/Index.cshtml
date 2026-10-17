@@ -80,14 +80,7 @@
                             <div class="property-item rounded overflow-hidden">
                                 <div class="position-relative overflow-hidden letter-small-image">
                                     <a asp-area="" asp-page="/Letter" asp-route-hash="@letter.Hash">
-                                        @if (Model.IsAdmin)
-                                        {
-                                            <img class="img-fluid" src="@letter.ImageThumbnailUrl" alt="letter image">
-                                        }
-                                        else
-                                        {
-                                            <span class="d-block p-5">Zdjęcie dostępne tylko dla uprawnionych</span>
-                                        }
+                                        <img class="img-fluid" src="@letter.ImageThumbnailUrl" alt="letter image">
                                     </a>
                                     @if (letter.IsAssigned)
                                     {

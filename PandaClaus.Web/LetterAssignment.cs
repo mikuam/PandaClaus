@@ -2,7 +2,7 @@ namespace PandaClaus.Web;
 
 public class LetterAssignment
 {
-    public int RowNumber { get; set; }
+    public string Hash { get; set; } = string.Empty;
     public string Name { get; set; }
     public string CompanyName { get; set; }
     public string Email { get; set; }

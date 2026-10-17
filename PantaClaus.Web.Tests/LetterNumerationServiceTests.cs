@@ -224,7 +224,6 @@ public class LetterNumerationServiceTests
     {
         var letter = new Letter
         {
-            RowNumber = 1,
             Number = "X",
             ParentName = "Test Parent",
             ParentSurname = "Test Surname",

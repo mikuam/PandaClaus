@@ -48,33 +48,34 @@ public class GoogleSheetsClient
         return MapToLetters(response.Values);
     }
 
-    public async Task<Letter?> FetchLetterAsync(int rowNumber)
-    {
-        try
-        {
-            var range = $"{_sheetName}!A{rowNumber}:AD{rowNumber}";
-            var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, range);
-            var response = await request.ExecuteAsync();
-
-            var letter = MapLetter(rowNumber, response.Values.First());
-            return letter;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching letter from Google Sheets. RowNumber: {RowNumber}, SheetName: {SheetName}, SpreadsheetId: {SpreadsheetId}", 
-                rowNumber, _sheetName, _spreadsheetId);
-
-            return null;
-        }
-    }
-
     public async Task<Letter?> FetchLetterByHashAsync(string hash)
     {
         var letters = await FetchLetters();
         return letters.FirstOrDefault(l => string.Equals(l.Hash, hash, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task<(int RowNumber, string Hash)> AddLetter(Letter letter)
+    private async Task<int> FindRowNumberAsync(string hash)
+    {
+        if (string.IsNullOrWhiteSpace(hash))
+            throw new ArgumentException("Letter hash is required.", nameof(hash));
+
+        var request = _sheetsService.Spreadsheets.Values.Get(_spreadsheetId, $"{_sheetName}!A:A");
+        var response = await request.ExecuteAsync();
+        var values = response.Values ?? new List<IList<object>>();
+
+        for (var i = 1; i < values.Count; i++)
+        {
+            var row = values[i];
+            if (row.Count > 0 && string.Equals(row[0]?.ToString(), hash, StringComparison.OrdinalIgnoreCase))
+            {
+                return i + 1;
+            }
+        }
+
+        throw new KeyNotFoundException($"Letter with hash '{hash}' was not found.");
+    }
+
+    public async Task<string> AddLetter(Letter letter)
     {
         var letters = await FetchLetters();
         var firstEmptyRow = letters.Count + 2;
@@ -126,16 +127,18 @@ public class GoogleSheetsClient
         hashUpdateRequest.ValueInputOption = UpdateRequest.ValueInputOptionEnum.USERENTERED;
         await hashUpdateRequest.ExecuteAsync();
 
-        return (firstEmptyRow, hash);
+        return hash;
     }
 
     private List<Letter> MapToLetters(IList<IList<object>> values)
     {
         var letters = new List<Letter>();
-        var rowNumber = 2;
+        var rowNumber = 1;
 
         foreach (var row in values.Skip(1))
         {
+            rowNumber++;
+
             if (row.Count < 14)
                 continue;
 
@@ -150,7 +153,6 @@ public class GoogleSheetsClient
                     rowNumber, row.Count);
             }
 
-            rowNumber++;
         }
 
         return letters;
@@ -170,7 +172,6 @@ public class GoogleSheetsClient
 
             var letter = new Letter
             {
-                RowNumber = rowNumber,
                 Hash = GetCellOrEmptyString(row, 0),
                 Number = GetCellOrEmptyString(row, 1),
                 ParentName = GetCellOrEmptyString(row, 2),
@@ -240,7 +241,8 @@ public class GoogleSheetsClient
 
     public async Task AssignLetterAsync(LetterAssignment assignment)
     {
-        var range = $"{_sheetName}!U{assignment.RowNumber}:Z{assignment.RowNumber}";
+        var rowNumber = await FindRowNumberAsync(assignment.Hash);
+        var range = $"{_sheetName}!U{rowNumber}:Z{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
@@ -260,11 +262,12 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    internal async Task UpdateImageIds(Letter letter)
+    internal async Task UpdateImageIds(string hash, IEnumerable<string> imageIds)
     {
-        var range = $"{_sheetName}!Q{letter.RowNumber}:Q{letter.RowNumber}";
+        var rowNumber = await FindRowNumberAsync(hash);
+        var range = $"{_sheetName}!Q{rowNumber}:Q{rowNumber}";
 
-        var valuesToUpdate = new List<object> { string.Join(",", letter.ImageIds) };
+        var valuesToUpdate = new List<object> { string.Join(",", imageIds) };
 
         var valueRange = new ValueRange
         {
@@ -275,8 +278,9 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateStatus(int rowNumber, LetterStatus status, string uwagi)
+    public async Task UpdateStatus(string hash, LetterStatus status, string uwagi)
     {
+        var rowNumber = await FindRowNumberAsync(hash);
         var range = $"{_sheetName}!AA{rowNumber}:AB{rowNumber}";
 
         var valuesToUpdate = new List<object>
@@ -293,8 +297,9 @@ public class GoogleSheetsClient
         await updateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateLetterDetailsWithChild(int rowNumber, string childName, int childAge, string description, string presents, string uwagi)
+    public async Task UpdateLetterDetailsWithChild(string hash, string childName, int childAge, string description, string presents, string uwagi)
     {
+        var rowNumber = await FindRowNumberAsync(hash);
         var range = $"{_sheetName}!M{rowNumber}:P{rowNumber}";
 
         var valuesToUpdate = new List<object>
@@ -323,13 +328,14 @@ public class GoogleSheetsClient
         await uwagiUpdateRequest.ExecuteAsync();
     }
 
-    public async Task UpdateIsDeleted(int rowNumber, bool isDeleted)
+    public async Task UpdateIsDeleted(string hash, bool isDeleted)
     {
+        var rowNumber = await FindRowNumberAsync(hash);
         var range = $"{_sheetName}!S{rowNumber}:S{rowNumber}";
 
         var valuesToUpdate = new List<object>
         {
-            isDeleted ? "tak" : "nie"
+            isDeleted
         };
         var valueRange = new ValueRange
         {
