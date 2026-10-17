@@ -160,17 +160,6 @@ public class LetterFormModel : BasePageModel
             }
         }
 
-        // Check the sheet schema before any photo upload or letter write.
-        try
-        {
-            await _sheetsClient.EnsureEligibilityColumnsAvailableAsync();
-        }
-        catch (InvalidOperationException)
-        {
-            ModelState.AddModelError(string.Empty, "Zgłoszenie nie może teraz zostać zapisane. Skontaktuj się z organizatorem.");
-            return Page();
-        }
-
         // Check if letter already exists
         var existingLetters = await _sheetsClient.FetchLetters();
         var isDuplicate = existingLetters.Any(l => 
