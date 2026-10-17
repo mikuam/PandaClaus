@@ -74,10 +74,10 @@ public class ReceiveConfirmationModel : BasePageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostConfirmAsync(int rowNumber, string code)
+    public async Task<IActionResult> OnPostConfirmAsync(string hash, string code)
     {
         if (!IsAdmin) return RedirectToPage("./Index");
-        Letter = rowNumber >= 2 ? await _client.FetchLetterAsync(rowNumber) : null;
+        Letter = !string.IsNullOrWhiteSpace(hash) ? await _client.FetchLetterByHashAsync(hash) : null;
         if (Letter == null) return NotFound();
 
         // Validate the code
@@ -107,10 +107,10 @@ public class ReceiveConfirmationModel : BasePageModel
         }
         uwagi += $"Potwierdzone dostarczenie {NumberOfBoxes} paczek - {DateTime.Now:yyyy-MM-dd HH:mm}";
 
-        await _client.UpdateStatus(rowNumber, LetterStatus.DOSTARCZONE, uwagi);
+        await _client.UpdateStatus(Letter.Hash, LetterStatus.DOSTARCZONE, uwagi);
 
         // Send confirmation email
-        await _emailSender.SendPackageReceived(rowNumber);
+        await _emailSender.SendPackageReceived(Letter.Hash);
 
         Message = $"Dziękujemy! Potwierdzono dostarczenie {NumberOfBoxes} paczek dla listu numer {Letter.Number}.";
         ShowForm = false;

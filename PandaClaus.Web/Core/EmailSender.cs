@@ -24,9 +24,9 @@ public class EmailSender
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
-    public async Task SendConfirmationEmail(int rowNumber)
+    public async Task SendConfirmationEmail(string hash)
     {
-        var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
+        var letter = (await _googleSheetsClient.FetchLetterByHashAsync(hash))!;
 
         var subject = "Potwierdzenie rezerwacji listu oraz ważne informacje";
         var plainTextContent = $@"Drodzy PANDAstyczni Darczyńcy!
@@ -176,9 +176,9 @@ Fundacja Panda Team
         return PageUrl + $"Letters/{letter.Hash}";
     }
 
-    public async Task SendLetterAdded(int rowNumber)
+    public async Task SendLetterAdded(string hash)
     {
-        var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
+        var letter = await _googleSheetsClient.FetchLetterByHashAsync(hash);
 
         var subject = "Panda Claus - potwierdzenie dodania listu";
 
@@ -198,9 +198,9 @@ Fundacja Panda Team
         _ = Task.Run(() => _emailClient.Send(WaitUntil.Completed, email));
     }
 
-    public async Task SendPackageReceived(int rowNumber)
+    public async Task SendPackageReceived(string hash)
     {
-        var letter = await _googleSheetsClient.FetchLetterAsync(rowNumber);
+        var letter = await _googleSheetsClient.FetchLetterByHashAsync(hash);
 
         var subject = "Panda Claus - potwierdzenie dostarczenia paczek dla listu";
 

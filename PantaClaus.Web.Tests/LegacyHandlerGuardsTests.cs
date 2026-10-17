@@ -64,7 +64,7 @@ public class LegacyHandlerGuardsTests
         var page = Admin(Context());
         IActionResult result = handler switch
         {
-            "index" => await page.OnGetAsync(2),
+            "index" => await page.OnGetAsync(),
             "exportNext" => await page.OnPostExportNextAsync(1),
             "exportFromNumbers" => await page.OnPostExportFromNumbersAsync("FAKE"),
             "sendToInpost" => await page.OnPostSendToInPostAsync("FAKE"),
@@ -88,26 +88,22 @@ public class LegacyHandlerGuardsTests
         var page = Letter(Context());
         IActionResult result = handler switch
         {
-            "deleteImage" => await page.OnPostDeleteImageAsync(2, "synthetic-image"),
-            "uploadImage" => await page.OnPostUploadImageAsync(2),
-            "updateDetails" => await page.OnPostUpdateDetailsAsync(2),
-            "deleteLetter" => await page.OnPostDeleteLetterAsync(2),
-            "sendConfirmationEmail" => await page.OnPostSendConfirmationEmailAsync(2),
-            "confirmDelivery" => await page.OnPostConfirmDeliveryAsync(2, 1),
+            "deleteImage" => await page.OnPostDeleteImageAsync("fakehash", "synthetic-image"),
+            "uploadImage" => await page.OnPostUploadImageAsync("fakehash"),
+            "updateDetails" => await page.OnPostUpdateDetailsAsync("fakehash"),
+            "deleteLetter" => await page.OnPostDeleteLetterAsync("fakehash"),
+            "sendConfirmationEmail" => await page.OnPostSendConfirmationEmailAsync("fakehash"),
+            "confirmDelivery" => await page.OnPostConfirmDeliveryAsync("fakehash", 1),
             _ => throw new ArgumentOutOfRangeException(nameof(handler))
         };
         Assert.IsInstanceOfType<RedirectToPageResult>(result);
     }
 
     [TestMethod]
-    public async Task ForgedReservationWithInvalidRowIsRejectedBeforeSheetsAccess()
+    public async Task ReservationWithEmptyHashIsRejectedBeforeSheetsAccess()
     {
         var context = Context();
-        context.Request.Form = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
-        {
-            ["RowNumber"] = "0"
-        });
-        Assert.IsInstanceOfType<BadRequestResult>(await Letter(context).OnPostAsync());
+        Assert.IsInstanceOfType<BadRequestResult>(await Letter(context).OnPostAsync(string.Empty));
     }
 
     [TestMethod]
@@ -115,7 +111,7 @@ public class LegacyHandlerGuardsTests
     {
         var page = Setup(new ReceiveConfirmationModel(Unreachable<GoogleSheetsClient>(), null!,
             new ConfigurationBuilder().Build()), Context());
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync(2, "FAKE"));
+        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync("fakehash", "FAKE"));
     }
 
     [TestMethod]

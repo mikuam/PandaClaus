@@ -47,7 +47,7 @@ public class AdminModel : BasePageModel
         _shipmentRequestBuilder = shipmentRequestBuilder;
     }
 
-    public async Task<IActionResult> OnGetAsync(int rowNumber)
+    public async Task<IActionResult> OnGetAsync()
     {
         if (!IsAdmin)
         {
@@ -146,7 +146,7 @@ public class AdminModel : BasePageModel
         // Update letter status
         foreach (var letter in letters)
         {
-            await _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, letter.Uwagi);
+            await _client.UpdateStatus(letter.Hash, LetterStatus.ZAADRESOWANE, letter.Uwagi);
         }
 
         // Mark packages as exported
@@ -204,7 +204,7 @@ public class AdminModel : BasePageModel
             // Update letter status to indicate shipments were created
             foreach (var letter in letters)
             {
-                await _client.UpdateStatus(letter.RowNumber, LetterStatus.ZAADRESOWANE, 
+                await _client.UpdateStatus(letter.Hash, LetterStatus.ZAADRESOWANE, 
                     $"Utworzono przesyłki InPost: {shipmentResponses.Count} z {shipmentRequests.Count}");
             }
 

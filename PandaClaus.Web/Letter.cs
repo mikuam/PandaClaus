@@ -4,7 +4,6 @@ namespace PandaClaus.Web;
 
 public class Letter
 {
-    public required int RowNumber { get; set; }
     public required string Number { get; set; }
     public string Hash { get; set; } = string.Empty;
     public required string ParentName { get; set; }

@@ -101,7 +101,7 @@ public class LegacySecurityTests
         {
             PageContext = new PageContext { HttpContext = Context() }
         };
-        Assert.IsInstanceOfType<NotFoundResult>(await confirmation.OnGetAsync(3));
+        Assert.IsInstanceOfType<NotFoundResult>(await confirmation.OnGetAsync("fakehash"));
         var added = new LetterAddedConfirmationModel(UnreachableSheets())
         {
             PageContext = new PageContext { HttpContext = Context() }
@@ -117,6 +117,6 @@ public class LegacySecurityTests
             PageContext = new PageContext { HttpContext = Context() }
         };
         Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnGetAsync("FAKE", "1"));
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync(2, "1"));
+        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync("fakehash", "1"));
     }
 }

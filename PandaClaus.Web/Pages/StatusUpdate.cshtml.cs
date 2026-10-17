@@ -30,9 +30,10 @@ public class StatusUpdateModel : BasePageModel
     {
         Response.Headers.CacheControl = "private, no-store";
         if (!IsAdmin) return RedirectToPage("./Index");
-        if (int.TryParse(Request.Query["number"].ToString(), out var number) && number >= 2)
+        var hash = Request.Query["hash"].ToString();
+        if (!string.IsNullOrWhiteSpace(hash))
         {
-            Letter = await _client.FetchLetterAsync(number);
+            Letter = await _client.FetchLetterByHashAsync(hash);
         }
         return Page();
     }
@@ -51,28 +52,29 @@ public class StatusUpdateModel : BasePageModel
 
         Letter = letter;
 
-        return RedirectToPage("./StatusUpdate", new { number = letter.RowNumber });
+        return RedirectToPage("./StatusUpdate", new { hash = letter.Hash });
     }
 
     public async Task<IActionResult> OnPostSetStatusAsync()
     {
         if (!IsAdmin) return RedirectToPage("./Index");
-        if (int.TryParse(Request.Form["number"].ToString(), out var rowNumber) && rowNumber >= 2 &&
+        var hash = Request.Form["hash"].ToString();
+        if (!string.IsNullOrWhiteSpace(hash) &&
             Enum.TryParse<LetterStatus>(Request.Query["status"].ToString(), out var status) &&
             Enum.IsDefined(status))
         {
-            Letter = await _client.FetchLetterAsync(rowNumber);
+            Letter = await _client.FetchLetterByHashAsync(hash);
             if (Letter == null) return NotFound();
             var uwagi = Request.Form["uwagi"].ToString();
-            await _client.UpdateStatus(rowNumber, status, uwagi);
+            await _client.UpdateStatus(hash, status, uwagi);
             if (status == LetterStatus.DOSTARCZONE)
             {
-                await _emailSender.SendPackageReceived(rowNumber);
+                await _emailSender.SendPackageReceived(hash);
             }
 
             if (status == LetterStatus.SPAKOWANE)
             {
-                Letter = await _client.FetchLetterAsync(rowNumber);
+                Letter = await _client.FetchLetterByHashAsync(hash);
 
                 var package1Size = GetPackageSize("package1Size");
                 var package2Size = GetPackageSize("package2Size");

@@ -70,8 +70,6 @@
                     }
                 </div>
 
-                @if (Model.IsAdmin)
-                {
                 <!-- Image Gallery -->
                 <div class="image-gallery wow fadeIn" data-wow-delay="0.2s">
                 @for (int i = 0; i < Model.Letter.ImageIds.Count; i++)
@@ -106,7 +104,7 @@
                                     @if (isDeleted)
                                     {
                                         <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
-                                                asp-route-rowNumber="@Model.Letter.RowNumber" 
+                                                asp-route-hash="@Model.Letter.Hash" 
                                                 class="btn btn-success btn-sm w-100">
                                             <i class="fa fa-undo me-2"></i>Przywróć zdjęcie
                                         </button>
@@ -114,7 +112,7 @@
                                     else
                                     {
                                         <button type="submit" asp-page-handler="deleteImage" asp-route-imageUrl="@imageUrl"
-                                                asp-route-rowNumber="@Model.Letter.RowNumber" 
+                                                asp-route-hash="@Model.Letter.Hash" 
                                                 class="btn btn-danger btn-sm w-100"
                                                 onclick="return confirmDelete();">
                                             <i class="fa fa-trash me-2"></i>Usuń zdjęcie
@@ -126,7 +124,6 @@
                     </div>
                 }
                 </div>
-                }
 
                 <!-- Admin Upload Section -->
                 @if (Model.IsAdmin)
@@ -134,7 +131,6 @@
                     <div class="admin-section wow fadeIn" data-wow-delay="0.3s">
                         <h4><i class="fa fa-user-shield me-2"></i>Panel Administratora</h4>
                         <form method="post" enctype="multipart/form-data" class="mt-3">
-                            <input type="hidden" name="RowNumber" value="@Model.Letter.RowNumber">
                             <div class="row">
                                 <div class="col-md-8">
                                     <label class="form-label">Dodaj zdjęcia listu</label>
@@ -143,7 +139,7 @@
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end">
                                     <button type="submit" asp-page-handler="uploadImage" 
-                                            asp-route-rowNumber="@Model.Letter.RowNumber"
+                                            asp-route-hash="@Model.Letter.Hash"
                                             class="btn btn-primary w-100">
                                         <i class="fa fa-upload me-2"></i>Dodaj zdjęcie
                                     </button>
@@ -163,7 +159,7 @@
                                 <p class="mb-2"><strong>Dane do weryfikacji zgłoszenia (nie są publikowane):</strong></p>
                                 <p>Kogo straciło dziecko: @(string.IsNullOrEmpty(Model.Letter.DeceasedRelation) ? "Brak danych" : Model.Letter.DeceasedRelation)<br />
                                    Kiedy: @(string.IsNullOrEmpty(Model.Letter.LossTime) ? "Brak danych" : Model.Letter.LossTime)</p>
-                                <form method="post" asp-page-handler="updateDetails" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                <form method="post" asp-page-handler="updateDetails" asp-route-hash="@Model.Letter.Hash" class="mt-3">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label">Imię dziecka</label>
@@ -200,7 +196,7 @@
                         <div class="col-12">
                             <div class="admin-section">
                                 <h4><i class="fa fa-trash-alt me-2"></i>Zarządzanie listem</h4>
-                                <form method="post" asp-page-handler="deleteLetter" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                <form method="post" asp-page-handler="deleteLetter" asp-route-hash="@Model.Letter.Hash" class="mt-3">
                                     @if (Model.Letter.IsDeleted)
                                     {
                                         <div class="alert alert-warning mb-3">
@@ -232,7 +228,7 @@
                                         <strong>Darczyńca:</strong> @Model.Letter.AssignedTo<br/>
                                         <strong>E-mail darczyńcy:</strong> @Model.Letter.AssignedToEmail<br/>
                                     </p>
-                                    <form method="post" asp-page-handler="sendConfirmationEmail" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                    <form method="post" asp-page-handler="sendConfirmationEmail" asp-route-hash="@Model.Letter.Hash" class="mt-3">
                                         <button type="submit" class="btn btn-primary" 
                                                 onclick="return confirm('Czy na pewno chcesz wysłać e-mail potwierdzający do @Model.Letter.AssignedToEmail?');">
                                             <i class="fa fa-paper-plane me-2"></i>Wyślij e-mail potwierdzający
@@ -259,7 +255,7 @@
                                             </span>
                                         }
                                     </p>
-                                    <form method="post" asp-page-handler="confirmDelivery" asp-route-rowNumber="@Model.Letter.RowNumber" class="mt-3">
+                                    <form method="post" asp-page-handler="confirmDelivery" asp-route-hash="@Model.Letter.Hash" class="mt-3">
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label">Liczba paczek</label>
@@ -303,8 +299,7 @@
                             <div class="reservation-form">
                                 <h3><i class="fa fa-heart me-2"></i>Zarezerwuj list i spełnij marzenie!</h3>
                                 <form method="post">
-                                    <input type="hidden" name="RowNumber" value="@Model.Letter.RowNumber">
-                                    
+
                                     <div class="mb-4">
                                         <label class="form-label">Imię i nazwisko <span class="text-danger">*</span></label>
                                         <input asp-for="Letter.AssignedTo" type="text" class="form-control" 

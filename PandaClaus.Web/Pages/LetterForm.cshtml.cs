@@ -177,8 +177,7 @@ public class LetterFormModel : BasePageModel
 
         var letter = new Letter
         {
-            RowNumber = 0, // Will be set by Google Sheets
-            Number = "X", // Temporary, will be updated by the service
+            Number = "X",
             ParentName = ParentName.Trim(),
             ParentSurname = ParentSurname.Trim(),
             PhoneNumber = PhoneNumber.Trim(),
@@ -203,9 +202,9 @@ public class LetterFormModel : BasePageModel
             IsAssigned = false
         };
 
-        var (rowNumber, hash) = await _sheetsClient.AddLetter(letter);
+        var hash = await _sheetsClient.AddLetter(letter);
 
-        await _emailSender.SendLetterAdded(rowNumber);
+        await _emailSender.SendLetterAdded(hash);
 
         if (ConsentToNewsletter)
         {

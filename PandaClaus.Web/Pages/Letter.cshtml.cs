@@ -64,22 +64,21 @@ public class LetterModel : BasePageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string hash)
     {
-        if (!int.TryParse(Request.Form["RowNumber"], out var rowNumber) || rowNumber < 2)
+        if (string.IsNullOrWhiteSpace(hash))
             return BadRequest();
 
-        var letter = await _client.FetchLetterAsync(rowNumber);
+        var letter = await _client.FetchLetterByHashAsync(hash);
         if (letter == null ||
-            !LetterAccessPolicy.CanReserve(letter.IsVisible, letter.IsDeleted, letter.IsAssigned) ||
-            !string.Equals(letter.Hash, RouteData.Values["hash"]?.ToString(), StringComparison.OrdinalIgnoreCase))
+            !LetterAccessPolicy.CanReserve(letter.IsVisible, letter.IsDeleted, letter.IsAssigned))
             return NotFound();
 
         if (!letter.IsAssigned)
         {
             await _client.AssignLetterAsync(new LetterAssignment
             {
-                RowNumber = rowNumber,
+                Hash = letter.Hash,
                 Name = Letter.AssignedTo,
                 CompanyName = Letter.AssignedToCompanyName,
                 Email = Letter.AssignedToEmail,
@@ -93,17 +92,17 @@ public class LetterModel : BasePageModel
             }
         }
 
-        await _emailSender.SendConfirmationEmail(rowNumber);
-        
-        HttpContext.Session.SetInt32("ReservedRowNumber", rowNumber);
-        return RedirectToPage("./Confirmation", new { rowNumber});
+        await _emailSender.SendConfirmationEmail(letter.Hash);
+
+        HttpContext.Session.SetString("ReservedLetterHash", letter.Hash);
+        return RedirectToPage("./Confirmation", new { hash = letter.Hash });
     }
 
-    public async Task<IActionResult> OnPostDeleteImageAsync(int rowNumber, string imageUrl)
+    public async Task<IActionResult> OnPostDeleteImageAsync(string hash, string imageUrl)
     {
         if (IsAdmin)
         {
-            Letter = await _client.FetchLetterAsync(rowNumber);
+            Letter = await _client.FetchLetterByHashAsync(hash);
 
             if (Letter == null)
             {
@@ -131,20 +130,20 @@ public class LetterModel : BasePageModel
                             Letter.ImageIds[imageIndex] = imageIdToRemove.Replace("_delete", "");
                         }
                         
-                        await _client.UpdateImageIds(Letter);
+                        await _client.UpdateImageIds(Letter.Hash, Letter.ImageIds);
                     }
                 }
             }
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 
-    public async Task<IActionResult> OnPostUploadImageAsync(int rowNumber)
+    public async Task<IActionResult> OnPostUploadImageAsync(string hash)
     {
         if (IsAdmin)
         {
-            Letter = await _client.FetchLetterAsync(rowNumber);
+            Letter = await _client.FetchLetterByHashAsync(hash);
             
             if (Letter == null)
             {
@@ -155,18 +154,18 @@ public class LetterModel : BasePageModel
             if (photoIds.Count != 0)
             {
                 Letter.ImageIds.AddRange(photoIds);
-                await _client.UpdateImageIds(Letter);
+                await _client.UpdateImageIds(Letter.Hash, Letter.ImageIds);
             }
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 
-    public async Task<IActionResult> OnPostUpdateDetailsAsync(int rowNumber)
+    public async Task<IActionResult> OnPostUpdateDetailsAsync(string hash)
     {
         if (IsAdmin)
         {
-            var letter = await _client.FetchLetterAsync(rowNumber);
+            var letter = await _client.FetchLetterByHashAsync(hash);
             
             if (letter == null)
             {
@@ -179,17 +178,17 @@ public class LetterModel : BasePageModel
             var presents = Request.Form["Presents"].ToString();
             var uwagi = Request.Form["Uwagi"].ToString();
 
-            await _client.UpdateLetterDetailsWithChild(rowNumber, childName, childAge, description, presents, uwagi);
+            await _client.UpdateLetterDetailsWithChild(letter.Hash, childName, childAge, description, presents, uwagi);
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 
-    public async Task<IActionResult> OnPostDeleteLetterAsync(int rowNumber)
+    public async Task<IActionResult> OnPostDeleteLetterAsync(string hash)
     {
         if (IsAdmin)
         {
-            var letter = await _client.FetchLetterAsync(rowNumber);
+            var letter = await _client.FetchLetterByHashAsync(hash);
             
             if (letter == null)
             {
@@ -197,17 +196,17 @@ public class LetterModel : BasePageModel
             }
 
             // Toggle the IsDeleted status
-            await _client.UpdateIsDeleted(rowNumber, !letter.IsDeleted);
+            await _client.UpdateIsDeleted(letter.Hash, !letter.IsDeleted);
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 
-    public async Task<IActionResult> OnPostSendConfirmationEmailAsync(int rowNumber)
+    public async Task<IActionResult> OnPostSendConfirmationEmailAsync(string hash)
     {
         if (IsAdmin)
         {
-            var letter = await _client.FetchLetterAsync(rowNumber);
+            var letter = await _client.FetchLetterByHashAsync(hash);
             
             if (letter == null)
             {
@@ -216,7 +215,7 @@ public class LetterModel : BasePageModel
 
             if (letter.IsAssigned && !string.IsNullOrEmpty(letter.AssignedToEmail))
             {
-                await _emailSender.SendConfirmationEmail(rowNumber);
+                await _emailSender.SendConfirmationEmail(letter.Hash);
                 TempData["SuccessMessage"] = "E-mail potwierdzający został wysłany!";
             }
             else
@@ -225,14 +224,14 @@ public class LetterModel : BasePageModel
             }
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 
-    public async Task<IActionResult> OnPostConfirmDeliveryAsync(int rowNumber, int numberOfBoxes)
+    public async Task<IActionResult> OnPostConfirmDeliveryAsync(string hash, int numberOfBoxes)
     {
         if (IsAdmin)
         {
-            var letter = await _client.FetchLetterAsync(rowNumber);
+            var letter = await _client.FetchLetterByHashAsync(hash);
             
             if (letter == null)
             {
@@ -243,7 +242,7 @@ public class LetterModel : BasePageModel
             if (!letter.IsAssigned)
             {
                 TempData["ErrorMessage"] = "List nie jest zarezerwowany.";
-                return RedirectToPage("./Letter", new { rowNumber });
+                return RedirectToPage("./Letter", new { hash });
             }
 
             // Update status to DOSTARCZONE and add note about number of boxes
@@ -254,15 +253,15 @@ public class LetterModel : BasePageModel
             }
             uwagi += $"Potwierdzone dostarczenie {numberOfBoxes} paczek - {DateTime.Now:yyyy-MM-dd HH:mm}";
 
-            await _client.UpdateStatus(rowNumber, LetterStatus.DOSTARCZONE, uwagi);
+            await _client.UpdateStatus(letter.Hash, LetterStatus.DOSTARCZONE, uwagi);
 
             // Send confirmation email
-            await _emailSender.SendPackageReceived(rowNumber);
+            await _emailSender.SendPackageReceived(letter.Hash);
 
             TempData["SuccessMessage"] = $"Potwierdzono dostarczenie {numberOfBoxes} paczek dla listu {letter.Number}. E-mail potwierdzający został wysłany do darczyńcy.";
         }
 
-        return RedirectToPage("./Letter", new { rowNumber });
+        return RedirectToPage("./Letter", new { hash });
     }
 }
 
