@@ -8,11 +8,27 @@ public class FeatureFlags
     private readonly object _lock = new();
     private bool _addLetterLinkVisible;
 
-    public FeatureFlags(IWebHostEnvironment env)
+    public FeatureFlags(IWebHostEnvironment env, IConfiguration configuration)
     {
-        var dir = Path.Combine(env.ContentRootPath, "App_Data");
-        Directory.CreateDirectory(dir);
-        _filePath = Path.Combine(dir, "featureflags.json");
+        var storagePath = configuration["FeatureFlags:StoragePath"];
+        if (string.IsNullOrWhiteSpace(storagePath))
+        {
+            if (!env.IsDevelopment())
+                throw new InvalidOperationException("FeatureFlags:StoragePath must point to persistent storage outside the deployment directory.");
+            storagePath = Path.Combine(env.ContentRootPath, "App_Data", "featureflags.json");
+        }
+        else
+        {
+            if (!Path.IsPathFullyQualified(storagePath))
+                throw new InvalidOperationException("FeatureFlags:StoragePath must be an absolute path.");
+            var relativeToRelease = Path.GetRelativePath(env.ContentRootPath, storagePath);
+            if (relativeToRelease != ".." && !relativeToRelease.StartsWith(".." + Path.DirectorySeparatorChar) &&
+                !Path.IsPathFullyQualified(relativeToRelease))
+                throw new InvalidOperationException("FeatureFlags:StoragePath must be outside the deployment directory.");
+        }
+
+        _filePath = storagePath;
+        Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
 
         if (File.Exists(_filePath))
         {
