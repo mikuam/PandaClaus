@@ -201,6 +201,7 @@ Fundacja Panda Team
     public async Task SendPackageReceived(string hash)
     {
         var letter = await _googleSheetsClient.FetchLetterByHashAsync(hash);
+        if (letter == null || !letter.IsAssigned) return;
 
         var subject = "Panda Claus - potwierdzenie dostarczenia paczek dla listu";
 

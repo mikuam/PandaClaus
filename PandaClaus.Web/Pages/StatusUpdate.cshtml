@@ -48,11 +48,12 @@
                             <textarea rows="3" class="form-control" id="uwagi" name="uwagi">@Model.Letter.Uwagi</textarea>
                         </div>
 
-                        <div class="@(Model.Letter.Status == LetterStatus.SPRAWDZONE ? "" : "d-none")">
+                        <div class="mb-3">
+                                                    <p class="text-muted">Gabaryty paczek - używane tylko przy zmianie statusu na: Paczki spakowane</p>
                             <div class="mb-3">
                                 <label for="package1Size" class="form-label">Paczka 1 - gabaryt</label>
-                                <select id="package1Size" name="package1Size" class="form-select" asp-for="@Model.Package1Size" required>
-                                    <option value="None" disabled selected>Wybierz gabaryt</option>
+                                <select id="package1Size" name="package1Size" class="form-select" asp-for="@Model.Package1Size">
+                                    <option value="None" selected>Wybierz gabaryt</option>
                                     <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
                                     <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
                                     <option value="C">C (41 × 38 × 64 cm, max 25kg)</option>
@@ -62,7 +63,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="package2Size" class="form-label">Paczka 2 - gabaryt (opcjonalnie)</label>
-                                <select id="package2Size" name="package2Size" class="form-select" asp-for="@Model.Package2Size" required>
+                                <select id="package2Size" name="package2Size" class="form-select" asp-for="@Model.Package2Size">
                                     <option value="None">Wybierz gabaryt</option>
                                     <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
                                     <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
@@ -73,7 +74,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="package3Size" class="form-label">Paczka 3 - gabaryt (opcjonalnie)</label>
-                                <select id="package3Size" name="package3Size" class="form-select" asp-for="@Model.Package3Size" required>
+                                <select id="package3Size" name="package3Size" class="form-select" asp-for="@Model.Package3Size">
                                     <option value="None">Wybierz gabaryt</option>
                                     <option value="A">A (8 × 38 × 64 cm, max 25kg)</option>
                                     <option value="B">B (19 × 38 × 64 cm, max 25 kg)</option>
@@ -84,14 +85,19 @@
                             </div>
                         </div>
 
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var status in Enum.GetValues<LetterStatus>())
+                            {
+                                var isCurrent = status == Model.Letter.Status;
+                                <button type="submit" class="btn @(isCurrent ? "btn-success" : "btn-outline-primary")" asp-page-handler="setStatus" asp-route-status="@status">@(isCurrent ? "Zapisz status" : "Zmień status na"): @StatusHelper.GetStatusDescription(status)</button>
+                            }
+                        </div>
+                        @*OLD
                         @switch (Model.Letter.Status)
                         {
-                            case LetterStatus.NIE_WIADOMO:
-                                <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="DOSTARCZONE">Zmień status na: Dostarczono paczki</button>
-                                break;
                             case LetterStatus.DOSTARCZONE:
                                 <button type="submit" class="btn btn-primary" asp-page-handler="setStatus" asp-route-status="W_TRAKCIE_SPRAWDZANIA">Zmień status na: Paczki w trakcie sprawdzania</button>
-                                break;
+
                             case LetterStatus.W_TRAKCIE_SPRAWDZANIA:
                                 <div class="d-flex justify-content-between">
                                     <button type="submit" class="btn btn-primary me-2" asp-page-handler="setStatus" asp-route-status="SPRAWDZONE">Zmień status na: Paczki sprawdzone</button>
@@ -111,10 +117,7 @@
                                 <button type="submit" class="btn btn-danger" asp-page-handler="setStatus" asp-route-status="SPRAWDZONE">Cofnij status na: Paczki sprawdzone</button>
                                 break;
                         }
-
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-secondary" asp-page-handler="setStatus" asp-route-status="@Model.Letter.Status">Zapisz bez zmiany statusu</button>
-                        </div>
+                        OLD*@
                     </form>
                 }
             </div>
