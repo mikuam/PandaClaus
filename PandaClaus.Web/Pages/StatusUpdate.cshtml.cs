@@ -66,6 +66,10 @@ public class StatusUpdateModel : BasePageModel
             Letter = await _client.FetchLetterByHashAsync(hash);
             if (Letter == null) return NotFound();
             var uwagi = Request.Form["uwagi"].ToString();
+            if (status == LetterStatus.SPAKOWANE && GetPackageSize("package1Size") == Gabaryt.None)
+            {
+                return RedirectToPage("./StatusUpdate", new { hash, message = "Podaj gabaryt co najmniej pierwszej paczki" });
+            }
             await _client.UpdateStatus(hash, status, uwagi);
             if (status == LetterStatus.DOSTARCZONE)
             {
@@ -80,16 +84,12 @@ public class StatusUpdateModel : BasePageModel
                 var package2Size = GetPackageSize("package2Size");
                 var package3Size = GetPackageSize("package3Size");
 
-                if (package1Size == Gabaryt.None)
-                {
-                    package1Size = Gabaryt.A;
-                }
                 var packages = new List<Gabaryt> { package1Size, package2Size, package3Size }.Where(p => p != Gabaryt.None);
                 await _client.CreatePackages(Letter.Number, packages);
             }
         }
 
-        return RedirectToPage("./StatusUpdate", new { message = "Status zaktualizowany pomyślnie" });
+        return RedirectToPage("./StatusUpdate", new { hash, message = "Status zaktualizowany pomyślnie" });
     }
 
     private Gabaryt GetPackageSize(string parameterName)
