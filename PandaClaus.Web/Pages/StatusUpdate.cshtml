@@ -34,7 +34,10 @@
                             <li class="list-group-item @(Model.Letter.Status == LetterStatus.DOSTARCZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.DOSTARCZONE)</li>
                             <li class="list-group-item @(Model.Letter.Status == LetterStatus.W_TRAKCIE_SPRAWDZANIA ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.W_TRAKCIE_SPRAWDZANIA)</li>
                             <li class="list-group-item @(Model.Letter.Status == LetterStatus.ODLOZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.ODLOZONE)</li>
-                            <li class="list-group-item @(Model.Letter.Status == LetterStatus.SPRAWDZONE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.SPRAWDZONE)</li>
+                            @if (Model.Letter.Status == LetterStatus.SPRAWDZONE)
+                            {
+                                <li class="list-group-item list-group-item-success">@StatusHelper.GetStatusDescription(LetterStatus.SPRAWDZONE)</li>
+                            }
                             <li class="list-group-item @(Model.Letter.Status == LetterStatus.SPAKOWANE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.SPAKOWANE)</li>
                             <li class="list-group-item @(Model.Letter.Status == LetterStatus.ZAADRESOWANE ? "list-group-item-success" : "list-group-item-light")">@StatusHelper.GetStatusDescription(LetterStatus.ZAADRESOWANE)</li>
                         </ul>
@@ -49,7 +52,7 @@
                         </div>
 
                         <div class="mb-3">
-                                                    <p class="text-muted">Gabaryty paczek - używane tylko przy zmianie statusu na: Paczki spakowane</p>
+                            <p class="text-muted">Gabaryty paczek - wymagane przy zmianie statusu na: Paczki sprawdzone i spakowane</p>
                             <div class="mb-3">
                                 <label for="package1Size" class="form-label">Paczka 1 - gabaryt</label>
                                 <select id="package1Size" name="package1Size" class="form-select" asp-for="@Model.Package1Size">
@@ -86,7 +89,7 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            @foreach (var status in Enum.GetValues<LetterStatus>())
+                            @foreach (var status in Enum.GetValues<LetterStatus>().Where(StatusHelper.IsSelectableStatus))
                             {
                                 var isCurrent = status == Model.Letter.Status;
                                 <button type="submit" class="btn @(isCurrent ? "btn-success" : "btn-outline-primary")" asp-page-handler="setStatus" asp-route-status="@status">@(isCurrent ? "Zapisz status" : "Zmień status na"): @StatusHelper.GetStatusDescription(status)</button>

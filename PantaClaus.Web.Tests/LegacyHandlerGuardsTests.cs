@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using PandaClaus.Web;
 using PandaClaus.Web.Core;
 using PandaClaus.Web.Pages;
@@ -104,5 +105,19 @@ public class LegacyHandlerGuardsTests
     {
         var context = Context();
         Assert.IsInstanceOfType<BadRequestResult>(await Letter(context).OnPostAsync(string.Empty));
+    }
+
+    [TestMethod]
+    public async Task LegacyCheckedStatusCannotBeWrittenEvenWithForgedPost()
+    {
+        var context = Context();
+        context.Session.SetString("IsAdmin", "true");
+        context.Request.QueryString = new QueryString("?status=SPRAWDZONE");
+        context.Request.Form = new FormCollection(new Dictionary<string, StringValues>
+        {
+            ["hash"] = "synthetic-hash"
+        });
+        var page = Setup(new StatusUpdateModel(Unreachable<GoogleSheetsClient>(), null!), context);
+        Assert.IsInstanceOfType<BadRequestResult>(await page.OnPostSetStatusAsync());
     }
 }
