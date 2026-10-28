@@ -29,3 +29,5 @@ _ReSharper*/
 packages
 *ncrunch*
 *.vs
+
+PandaClaus.Web/App_Data/featureflags.json
