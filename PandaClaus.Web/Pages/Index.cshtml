@@ -102,7 +102,36 @@
     </div>
 </div>
 
+<div class="modal fade" id="regulation-change-modal" tabindex="-1" aria-labelledby="regulation-change-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="regulation-change-title">Zmiana regulaminu Panda Claus 2026</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Informujemy o zmianie regulaminu akcji. <strong>Nie obowiązuje już limit czasu od śmierci mamy, taty, brata, siostry lub opiekuna prawnego.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Rozumiem</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script>
+        (() => {
+            const key = 'pandaClaus2026NoLossTimeLimitNoticeSeen';
+            try {
+                if (localStorage.getItem(key)) return;
+            } catch { /* Show the notice even when storage is unavailable. */ }
+            const modal = document.getElementById('regulation-change-modal');
+            if (!modal || !window.bootstrap) return;
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+            try { localStorage.setItem(key, 'seen'); } catch { /* Dismissal still works. */ }
+        })();
+    </script>
     <script>
         (() => {
             const countdownElement = document.getElementById('campaign-countdown');
