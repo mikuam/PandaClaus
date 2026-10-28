@@ -145,6 +145,12 @@
         z-index: 9999;
     }
 
+/* Keep the navbar below Bootstrap's modal backdrop while a dialog is open. */
+.modal-open .nav-bar {
+    z-index: 1030;
+    transition: none;
+}
+
 .navbar {
     box-shadow: 0 0 30px rgba(0, 0, 0, .08);
 }
