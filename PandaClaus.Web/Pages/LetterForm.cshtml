@@ -171,9 +171,9 @@
                         <span asp-validation-for="DeceasedRelation" class="text-danger"></span>
                     </div>
                     <div class="mb-4">
-                        <label asp-for="LossTime">Kiedy zmarła ta osoba? <span class="text-danger">*</span></label>
+                        <label asp-for="LossTime">Kiedy zmarła ta osoba?</label>
                         <input asp-for="LossTime" type="text" class="form-control" inputmode="numeric"
-                               placeholder="np. 05.2025 lub 2025" pattern="([0][1-9]|1[0-2])\.[0-9]{4}|[0-9]{4}" required>
+                               placeholder="np. 05.2025 lub 2025">
                         <span asp-validation-for="LossTime" class="text-danger"></span>
                     </div>
                     <div class="mb-4">
@@ -285,41 +285,18 @@
                         feedback.textContent = message;
                     }
 
-                    var lossTime = form.querySelector('input[name="LossTime"]');
-                    function checkLossTime() {
-                        if (!lossTime) return;
-                        lossTime.setCustomValidity('');
-                        var value = lossTime.value;
-                        if (!/^(?:[0-9]{4}|(?:0[1-9]|1[0-2])\.[0-9]{4})$/.test(value)) return;
-                        var parts = value.split('.');
-                        var year = Number(parts[parts.length - 1]);
-                        var month = parts.length === 2 ? Number(parts[0]) : null;
-                        var todayParts = new Intl.DateTimeFormat('en-GB', {
-                            timeZone: 'Europe/Warsaw', year: 'numeric', month: '2-digit', day: '2-digit'
-                        }).formatToParts(new Date());
-                        var get = function (name) { return Number(todayParts.find(function (part) { return part.type === name; }).value); };
-                        var todayYear = get('year'), todayMonth = get('month');
-                        if (year < todayYear - 2 || year > todayYear ||
-                            (year === todayYear && month !== null && month > todayMonth)) {
-                            lossTime.setCustomValidity('Podaj bieżący rok lub jeden z dwóch poprzednich lat. Miesiąc nie może być w przyszłości.');
-                        }
-                    }
-
                     var fields = form.querySelectorAll('input, textarea, select');
                     fields.forEach(function (field) {
                         field.addEventListener('input', function () {
                             clearError(field);
-                            if (field === lossTime) checkLossTime();
                         });
                         field.addEventListener('change', function () {
                             clearError(field);
-                            if (field === lossTime) checkLossTime();
                         });
                     });
 
                     form.addEventListener('submit', function (e) {
                         var firstInvalid = null;
-                        checkLossTime();
 
                         fields.forEach(function (field) {
                             clearError(field);

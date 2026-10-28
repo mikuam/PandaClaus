@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using PandaClaus.Web.Services;
-using PandaClaus.Web.Validation;
 
 namespace PandaClaus.Web.Pages;
 public class LetterFormModel : BasePageModel
@@ -70,10 +69,7 @@ public class LetterFormModel : BasePageModel
     public string DeceasedRelation { get; set; } = string.Empty;
 
     [BindProperty]
-    [Required(ErrorMessage = "Podaj rok śmierci tej osoby")]
-    [RegularExpression(@"^((0[1-9]|1[0-2])\.)?[0-9]{4}$", ErrorMessage = "Podaj rok (np. 2025) albo miesiąc i rok (np. 05.2025)")]
-    [LossWithinTwoYears(ErrorMessage = "Podaj bieżący rok lub jeden z dwóch poprzednich lat. Miesiąc nie może być w przyszłości")]
-    public string LossTime { get; set; } = string.Empty;
+    public string? LossTime { get; set; }
 
     [BindProperty]
     [Required]
@@ -191,7 +187,7 @@ public class LetterFormModel : BasePageModel
             ChildName = ChildName.Trim(),
             ChildAge = ChildAge,
             DeceasedRelation = DeceasedRelation,
-            LossTime = LossTime,
+            LossTime = LossTime ?? string.Empty,
             Description = Description,
             Presents = Presents,
             ImageIds = [],
