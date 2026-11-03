@@ -70,6 +70,11 @@ public class BlobClient
     private static async Task<MemoryStream> StripMetadata(IFormFile file)
     {
         await using var input = file.OpenReadStream();
+        return await StripMetadata(input);
+    }
+
+    private static async Task<MemoryStream> StripMetadata(Stream input)
+    {
         using var image = await Image.LoadAsync(input);
         var format = image.Metadata.DecodedImageFormat ?? throw new InvalidOperationException("Unknown image format.");
 
@@ -112,6 +117,32 @@ public class BlobClient
                 file.FileName, imageId, thumbnailId, file.ContentType, file.Length);
             throw;
         }
+    }
+
+    internal async Task<bool> RemoveMetadata(string blobName)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
+        var blobClient = containerClient.GetBlobClient(blobName);
+
+        if (!await blobClient.ExistsAsync())
+        {
+            return false;
+        }
+
+        var properties = await blobClient.GetPropertiesAsync();
+        var contentType = properties.Value.ContentType;
+
+        using var download = new MemoryStream();
+        await blobClient.DownloadToAsync(download);
+        download.Position = 0;
+
+        await using var clean = await StripMetadata(download);
+
+        await blobClient.UploadAsync(clean, new BlobUploadOptions
+        {
+            HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+        });
+        return true;
     }
 
     internal async Task UpdateContentType(string image, string contentType)

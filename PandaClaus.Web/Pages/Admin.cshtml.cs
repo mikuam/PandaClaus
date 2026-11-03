@@ -101,6 +101,40 @@ public class AdminModel : BasePageModel
         return RedirectToPage("./Index");
     }
 
+    public async Task<IActionResult> OnPostRemoveImageMetadataAsync()
+    {
+        if (!IsAdmin)
+        {
+            return RedirectToPage("./Index");
+        }
+
+        var letters = await _client.FetchLetters();
+        var images = letters.SelectMany(l => l.ImageIds).Where(i => !string.IsNullOrWhiteSpace(i)).Distinct().ToList();
+
+        var processed = 0;
+        var failed = 0;
+        foreach (var image in images)
+        {
+            foreach (var blobName in new[] { image, image + "_thumbnail.jpg" })
+            {
+                try
+                {
+                    if (await _blobClient.RemoveMetadata(blobName))
+                    {
+                        processed++;
+                    }
+                }
+                catch (Exception)
+                {
+                    failed++;
+                }
+            }
+        }
+
+        TempData["SuccessMessage"] = $"Usunięto metadane z {processed} plików. Błędy: {failed}.";
+        return RedirectToPage("./Admin");
+    }
+
     public async Task<IActionResult> OnPostUpdateContentTypeAsync()
     {
         if (IsAdmin)

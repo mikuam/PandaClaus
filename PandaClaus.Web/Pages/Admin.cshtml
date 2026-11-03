@@ -83,6 +83,15 @@
                 </button>
             </form>
 
+            <form method="post" class="content-section mb-4">
+                <h3><i class="fa fa-image me-2"></i>Usuwanie metadanych zdjęć</h3>
+                <p class="text-muted">Przetwarza zdjęcia wszystkich listów (i miniatury) i nadpisuje je w magazynie bez metadanych (np. lokalizacji). Może potrwać dłużej.</p>
+                <button type="submit" asp-page-handler="RemoveImageMetadata" class="btn btn-primary"
+                        onclick="return confirm('Usunąć metadane ze wszystkich zdjęć?');">
+                    Usuń metadane zdjęć
+                </button>
+            </form>
+
             <form method="post">
                 <!-- Option 1 -->
                 <div class="content-section wow fadeIn" data-wow-delay="0.3s">
