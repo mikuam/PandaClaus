@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microsoft.Extensions.Logging;
 using PandaClaus.Web.Core;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -36,7 +35,10 @@ public class BlobClient
             _logger.LogInformation("Uploading photo: FileName={FileName}, ImageId={ImageId}, ContentType={ContentType}, Length={Length}", 
                 file.FileName, imageId, file.ContentType, file.Length);
 
-            await containerClient.UploadBlobAsync(imageId, file.OpenReadStream());
+            await using (var cleanStream = await StripMetadata(file))
+            {
+                await containerClient.UploadBlobAsync(imageId, cleanStream);
+            }
 
             var blobHttpHeader = new BlobHttpHeaders { ContentType = ImageHelper.GetContentType(file.FileName) };
             await containerClient.GetBlobClient(imageId).SetHttpHeadersAsync(blobHttpHeader);
@@ -58,12 +60,36 @@ public class BlobClient
         return imageIds;
     }
 
+    private static void ClearMetadata(Image image)
+    {
+        image.Metadata.ExifProfile = null;
+        image.Metadata.IptcProfile = null;
+        image.Metadata.XmpProfile = null;
+    }
+
+    private static async Task<MemoryStream> StripMetadata(IFormFile file)
+    {
+        await using var input = file.OpenReadStream();
+        using var image = await Image.LoadAsync(input);
+        var format = image.Metadata.DecodedImageFormat ?? throw new InvalidOperationException("Unknown image format.");
+
+        image.Mutate(x => x.AutoOrient());
+        ClearMetadata(image);
+
+        var output = new MemoryStream();
+        await image.SaveAsync(output, format);
+        output.Position = 0;
+        return output;
+    }
+
     private async Task GenerateAndUploadThumbnail(IFormFile file, BlobContainerClient containerClient,
         string thumbnailId, string imageId)
     {
         try
         {
             using var image = await Image.LoadAsync(file.OpenReadStream());
+            image.Mutate(x => x.AutoOrient());
+            ClearMetadata(image);
             image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Mode = ResizeMode.Max,
