@@ -136,6 +136,14 @@ public class BlobClient
         await blobClient.DownloadToAsync(download);
         download.Position = 0;
 
+        var info = await Image.IdentifyAsync(download);
+        if (info.Metadata.ExifProfile == null && info.Metadata.IptcProfile == null && info.Metadata.XmpProfile == null)
+        {
+            return false;
+        }
+
+        download.Position = 0;
+
         await using var clean = await StripMetadata(download);
 
         await blobClient.UploadAsync(clean, new BlobUploadOptions
