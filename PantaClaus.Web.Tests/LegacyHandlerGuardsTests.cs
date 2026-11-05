@@ -49,7 +49,7 @@ public class LegacyHandlerGuardsTests
         new AdminModel(Unreachable<GoogleSheetsClient>(), null!, null!, null!, null!, null!), context);
 
     private static LetterModel Letter(DefaultHttpContext context) => Setup(
-        new LetterModel(Unreachable<GoogleSheetsClient>(), null!, null!, new ConfigurationBuilder().Build(), null!), context);
+        new LetterModel(Unreachable<GoogleSheetsClient>(), null!, null!, new ConfigurationBuilder().Build(), null!, null!, null!), context);
 
     [DataTestMethod]
     [DataRow("index")]

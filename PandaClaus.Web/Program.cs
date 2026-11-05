@@ -10,6 +10,8 @@ builder.Services.AddSingleton<FeatureFlags>();
 builder.Services.AddScoped<GoogleSheetsClient>();
 builder.Services.AddScoped<BlobClient>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddSingleton<VoucherStore>();
+builder.Services.AddSingleton<IVoucherSheet, GoogleVoucherSheet>();
 builder.Services.AddHttpClient<GetResponseClient>();
 
 // Add HttpClient for InPost API
