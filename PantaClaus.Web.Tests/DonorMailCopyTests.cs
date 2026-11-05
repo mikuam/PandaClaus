@@ -16,7 +16,8 @@ public class DonorMailCopyTests
     {
         var source = Source();
         Assert.AreEqual(2, source.Split("27.11.2026", StringSplitOptions.None).Length - 1);
-        Assert.AreEqual(2, source.Split("Siedziba Spectre Cars", StringSplitOptions.None).Length - 1);
+        Assert.AreEqual(2, source.Split("Biuro Spectre Cars", StringSplitOptions.None).Length - 1);
+        Assert.IsFalse(source.Contains("Siedziba Spectre Cars", StringComparison.Ordinal));
         Assert.AreEqual(2, source.Split("3 i 4 grudnia 2026 roku", StringSplitOptions.None).Length - 1);
         Assert.AreEqual(2, source.Split("około 200 listów", StringSplitOptions.None).Length - 1);
         Assert.IsFalse(source.Contains("ul. Opłotki 23", StringComparison.Ordinal));
