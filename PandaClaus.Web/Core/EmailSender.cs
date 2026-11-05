@@ -53,7 +53,7 @@ Gabaryt B – maksymalne wymiary 19 × 38 × 64 cm, maksymalna waga: 25 kg
 Gabaryt C – maksymalne wymiary 41 × 38 × 64 cm, maksymalna waga: 25 kg
 
 Paczkę wyślij do nas pod adres:
-Siedziba Spectre Cars
+Biuro Spectre Cars
 ul. Leśna 12A
 62-023 Borówiec
 Nadając przesyłkę, podaj e-mail: pandaclaus@pandateam.pl oraz numer telefonu: +48 537 925 335.
@@ -90,7 +90,7 @@ Fundacja Panda Team
     <li>Gabaryt C – maksymalne wymiary 41 × 38 × 64 cm, maksymalna waga: 25 kg</li>
 </ul>
 <p><b>Paczkę wyślij do nas pod adres:</b><br/>
-<b>Siedziba Spectre Cars</b><br/>
+<b>Biuro Spectre Cars</b><br/>
 <b>ul. Leśna 12A</b><br/>
 <b>62-023 Borówiec</b></p>
 <p>Nadając przesyłkę, podaj e-mail: <a href=""mailto:pandaclaus@pandateam.pl"">pandaclaus@pandateam.pl</a> oraz numer telefonu: +48 537 925 335.</p>
