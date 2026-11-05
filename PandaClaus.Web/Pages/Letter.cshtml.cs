@@ -7,9 +7,11 @@ public class LetterModel : BasePageModel
 {
     private readonly GoogleSheetsClient _client;
     private readonly EmailSender _emailSender;
+    private readonly VoucherStore _vouchers;
     private readonly BlobClient _blobClient;
     private readonly IConfiguration _configuration;
     private readonly GetResponseClient _getResponseClient;
+    private readonly ILogger<LetterModel> _logger;
 
     [BindProperty]
     public Letter? Letter { get; set; }
@@ -29,8 +31,11 @@ public class LetterModel : BasePageModel
     public string BlobUrl => _configuration["BlobUrl"]!;
 
     public LetterModel(GoogleSheetsClient client, EmailSender emailSender,
-        BlobClient blobClient, IConfiguration configuration, GetResponseClient getResponseClient)
+        BlobClient blobClient, IConfiguration configuration, GetResponseClient getResponseClient, VoucherStore vouchers,
+        ILogger<LetterModel> logger)
     {
+        _logger = logger;
+        _vouchers = vouchers;
         _getResponseClient = getResponseClient;
         _emailSender = emailSender;
         _client = client;
@@ -76,23 +81,41 @@ public class LetterModel : BasePageModel
 
         if (!letter.IsAssigned)
         {
-            await _client.AssignLetterAsync(new LetterAssignment
+            // Reserve before any external assignment or newsletter side effects.
+            await _vouchers.GetOrAllocateAsync(letter.Hash);
+            try
             {
-                Hash = letter.Hash,
-                Name = Letter.AssignedTo,
-                CompanyName = Letter.AssignedToCompanyName,
-                Email = Letter.AssignedToEmail,
-                PhoneNumber = Letter.AssignedToPhone,
-                Info = Letter.AssignedToInfo
-            });
-
-            if (ConsentToNewsletter && !string.IsNullOrWhiteSpace(Letter.AssignedToEmail))
-            {
-                await _getResponseClient.SubscribeAsync(Letter.AssignedToEmail.Trim(), Letter.AssignedTo?.Trim() ?? string.Empty);
+                await _client.AssignLetterAsync(new LetterAssignment
+                {
+                    Hash = letter.Hash,
+                    Name = Letter!.AssignedTo,
+                    CompanyName = Letter.AssignedToCompanyName,
+                    Email = Letter.AssignedToEmail,
+                    PhoneNumber = Letter.AssignedToPhone,
+                    Info = Letter.AssignedToInfo
+                });
             }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Voucher assigned but letter reservation write failed; check both assignments before resend.", ex);
+            }
+
         }
 
         await _emailSender.SendConfirmationEmail(letter.Hash);
+
+        // Optional newsletter cannot prevent the reservation confirmation after a voucher is assigned.
+        if (ConsentToNewsletter && !string.IsNullOrWhiteSpace(Letter?.AssignedToEmail))
+        {
+            try
+            {
+                await _getResponseClient.SubscribeAsync(Letter.AssignedToEmail.Trim(), Letter.AssignedTo?.Trim() ?? string.Empty);
+            }
+            catch (Exception)
+            {
+                _logger.LogWarning("Newsletter subscription failed after reservation confirmation; investigate separately.");
+            }
+        }
 
         HttpContext.Session.SetString("ReservedLetterHash", letter.Hash);
         return RedirectToPage("./Confirmation", new { hash = letter.Hash });
