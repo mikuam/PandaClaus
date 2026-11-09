@@ -222,6 +222,37 @@ Fundacja Panda Team
         await SendCheckedAsync(email);
     }
 
+    public async Task SendPackageAddressed(string hash)
+    {
+        var letter = await _googleSheetsClient.FetchLetterByHashAsync(hash);
+        if (letter == null || !letter.IsAssigned) return;
+
+        var subject = $"Panda Claus - paczka do listu {letter.Number} została zaadresowana";
+
+        var plainTextContent = $"Cześć {letter.AssignedTo}!\n\n" +
+                               $"Chcemy przekazać Ci dobrą wiadomość: paczka przygotowana przez Ciebie do listu numer {letter.Number} dla {letter.ChildName} została już poprawnie zaadresowana i jest gotowa do nadania do dziecka.\n\n" +
+                               "Bardzo dziękujemy za Twoje zaangażowanie, czas i serce włożone w przygotowanie prezentu. Dzięki Tobie możemy wspólnie spełniać dziecięce marzenia i dawać naszym podopiecznym realne wsparcie oraz poczucie, że ktoś o nich pamięta.\n\n" +
+                               "Doceniamy każdy etap pomocy — od wyboru listu, przez kompletowanie paczki, aż po dostarczenie jej do nas. Twoja pomoc naprawdę ma znaczenie i pomaga nam sprawnie przeprowadzić całą akcję.\n\n" +
+                               "W razie pytań jesteśmy do dyspozycji pod adresem: pandaclaus@pandateam.pl.\n\n" +
+                               "Z wdzięcznością i pozdrowieniami,\n" +
+                               "Zespół Panda Team";
+
+        var htmlContent = $@"<h1>Cześć {letter.AssignedTo}!</h1>
+<p>Chcemy przekazać Ci dobrą wiadomość: paczka przygotowana przez Ciebie do listu numer <strong>{letter.Number}</strong> dla <strong>{letter.ChildName}</strong> została już poprawnie zaadresowana i jest gotowa do nadania do dziecka.</p>
+<p>Bardzo dziękujemy za Twoje zaangażowanie, czas i serce włożone w przygotowanie prezentu. Dzięki Tobie możemy wspólnie spełniać dziecięce marzenia i dawać naszym podopiecznym realne wsparcie oraz poczucie, że ktoś o nich pamięta.</p>
+<p>Doceniamy każdy etap pomocy — od wyboru listu, przez kompletowanie paczki, aż po dostarczenie jej do nas. Twoja pomoc naprawdę ma znaczenie i pomaga nam sprawnie przeprowadzić całą akcję.</p>
+<p>W razie pytań jesteśmy do dyspozycji pod adresem: <a href=""mailto:pandaclaus@pandateam.pl"">pandaclaus@pandateam.pl</a>.</p>
+<p>Z wdzięcznością i pozdrowieniami,<br/>Zespół Panda Team</p>";
+
+        var email = new EmailMessage(
+            EmailFrom,
+            letter.AssignedToEmail,
+            new EmailContent(subject) { PlainText = plainTextContent, Html = htmlContent });
+        email.Headers.Add("Message-ID", "<do-not-reply@example.com>");
+
+        await SendCheckedAsync(email);
+    }
+
     private async Task SendCheckedAsync(EmailMessage email)
     {
         var operation = await _emailClient.SendAsync(WaitUntil.Completed, email);

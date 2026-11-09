@@ -46,7 +46,7 @@ public class LegacyHandlerGuardsTests
     }
 
     private static AdminModel Admin(DefaultHttpContext context) => Setup(
-        new AdminModel(Unreachable<GoogleSheetsClient>(), null!, null!, null!, null!, null!), context);
+        new AdminModel(Unreachable<GoogleSheetsClient>(), null!, null!, null!, null!, null!, null!), context);
 
     private static LetterModel Letter(DefaultHttpContext context) => Setup(
         new LetterModel(Unreachable<GoogleSheetsClient>(), null!, null!, new ConfigurationBuilder().Build(), null!, null!, null!), context);

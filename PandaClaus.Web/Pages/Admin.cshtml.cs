@@ -11,6 +11,7 @@ public class AdminModel : BasePageModel
     private readonly BlobClient _blobClient;
     private readonly InPostApiClient _inPostApiClient;
     private readonly InPostShipmentRequestBuilder _shipmentRequestBuilder;
+    private readonly EmailSender _emailSender;
 
     [BindProperty]
     public string LetterNumbers { get; set; }
@@ -36,8 +37,9 @@ public class AdminModel : BasePageModel
         return RedirectToPage("./Admin");
     }
 
-    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient, 
-        InPostApiClient inPostApiClient, InPostShipmentRequestBuilder shipmentRequestBuilder, FeatureFlags featureFlags)
+    public AdminModel(GoogleSheetsClient client, ICsvExporter csvExporter, BlobClient blobClient,
+        InPostApiClient inPostApiClient, InPostShipmentRequestBuilder shipmentRequestBuilder, FeatureFlags featureFlags,
+        EmailSender emailSender)
     {
         _featureFlags = featureFlags;
         _client = client;
@@ -45,6 +47,7 @@ public class AdminModel : BasePageModel
         _blobClient = blobClient;
         _inPostApiClient = inPostApiClient;
         _shipmentRequestBuilder = shipmentRequestBuilder;
+        _emailSender = emailSender;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -180,7 +183,12 @@ public class AdminModel : BasePageModel
         // Update letter status
         foreach (var letter in letters)
         {
+            var shouldSendAddressedEmail = letter.Status != LetterStatus.ZAADRESOWANE;
             await _client.UpdateStatus(letter.Hash, LetterStatus.ZAADRESOWANE, letter.Uwagi);
+            if (shouldSendAddressedEmail)
+            {
+                await _emailSender.SendPackageAddressed(letter.Hash);
+            }
         }
 
         // Mark packages as exported
@@ -238,8 +246,13 @@ public class AdminModel : BasePageModel
             // Update letter status to indicate shipments were created
             foreach (var letter in letters)
             {
-                await _client.UpdateStatus(letter.Hash, LetterStatus.ZAADRESOWANE, 
+                var shouldSendAddressedEmail = letter.Status != LetterStatus.ZAADRESOWANE;
+                await _client.UpdateStatus(letter.Hash, LetterStatus.ZAADRESOWANE,
                     $"Utworzono przesyłki InPost: {shipmentResponses.Count} z {shipmentRequests.Count}");
+                if (shouldSendAddressedEmail)
+                {
+                    await _emailSender.SendPackageAddressed(letter.Hash);
+                }
             }
 
             // Return success message with created shipments count

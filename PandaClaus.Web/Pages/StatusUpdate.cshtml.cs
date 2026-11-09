@@ -70,10 +70,16 @@ public class StatusUpdateModel : BasePageModel
             {
                 return RedirectToPage("./StatusUpdate", new { hash, message = "Podaj gabaryt co najmniej pierwszej paczki" });
             }
+            var previousStatus = Letter.Status;
             await _client.UpdateStatus(hash, status, uwagi);
             if (status == LetterStatus.DOSTARCZONE)
             {
                 await _emailSender.SendPackageReceived(hash);
+            }
+
+            if (status == LetterStatus.ZAADRESOWANE && previousStatus != LetterStatus.ZAADRESOWANE)
+            {
+                await _emailSender.SendPackageAddressed(hash);
             }
 
             if (status == LetterStatus.SPAKOWANE)

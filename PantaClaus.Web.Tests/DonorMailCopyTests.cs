@@ -50,7 +50,7 @@ public class DonorMailCopyTests
     {
         var source = Source();
         Assert.IsFalse(source.Contains("Task.Run(() => _emailClient.Send", StringComparison.Ordinal));
-        Assert.AreEqual(3, source.Split("await SendCheckedAsync(email)", StringSplitOptions.None).Length - 1);
+        Assert.AreEqual(4, source.Split("await SendCheckedAsync(email)", StringSplitOptions.None).Length - 1);
     }
 
     [TestMethod]
