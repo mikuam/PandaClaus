@@ -30,12 +30,6 @@ public class IndexModel : BasePageModel
         if (isAdminFromQuery)
         {
             Request.HttpContext.Session.SetString("IsAdmin", "true");
-            var pendingHash = HttpContext.Session.GetString("PendingReceiptHash");
-            var pendingCode = HttpContext.Session.GetString("PendingReceiptCode");
-            HttpContext.Session.Remove("PendingReceiptHash");
-            HttpContext.Session.Remove("PendingReceiptCode");
-            if (!string.IsNullOrEmpty(pendingHash) && !string.IsNullOrEmpty(pendingCode))
-                return RedirectToPage("./ReceiveConfirmation", new { hash = pendingHash, code = pendingCode });
         }
 
         Request.HttpContext.Session.SetString("IsAdmin", IsAdmin ? "true" : "false");

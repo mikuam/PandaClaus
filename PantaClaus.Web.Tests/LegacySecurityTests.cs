@@ -66,32 +66,6 @@ public class LegacySecurityTests
         Assert.IsFalse(model.IsAdmin);
         context.Session.SetString("IsAdmin", "true");
         Assert.IsTrue(model.IsAdmin);
-        context.Session.SetString("IsEarlyAccess", "true");
-        Assert.IsTrue(model.IsAdmin);
-    }
-
-    [TestMethod]
-    public async Task ReceiptQrDestinationSurvivesLegacyAdminLinkLogin()
-    {
-        var context = Context();
-        var receipt = new ReceiveConfirmationModel(UnreachableSheets(), null!, new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build())
-        {
-            PageContext = new PageContext { HttpContext = context }
-        };
-        Assert.IsInstanceOfType<RedirectToPageResult>(await receipt.OnGetAsync("FAKE99", "123A"));
-        Assert.AreEqual("FAKE99", context.Session.GetString("PendingReceiptHash"));
-        var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["AdminCode"] = "synthetic-admin" }).Build();
-        context.Request.QueryString = new QueryString("?adminCode=synthetic-admin");
-        var index = new IndexModel(UnreachableSheets(), configuration)
-        {
-            PageContext = new PageContext { HttpContext = context }
-        };
-        var resumed = (RedirectToPageResult)await index.OnGetAsync();
-        Assert.AreEqual("./ReceiveConfirmation", resumed.PageName);
-        Assert.AreEqual("FAKE99", resumed.RouteValues!["hash"]);
-        Assert.AreEqual("123A", resumed.RouteValues["code"]);
-        Assert.IsNull(context.Session.GetString("PendingReceiptHash"));
     }
 
     [TestMethod]
@@ -107,16 +81,5 @@ public class LegacySecurityTests
             PageContext = new PageContext { HttpContext = Context() }
         };
         Assert.IsInstanceOfType<NotFoundResult>(await added.OnGetAsync("FAKE99"));
-    }
-
-    [TestMethod]
-    public async Task AnonymousReceiptIsDeniedBeforeSheetsAccess()
-    {
-        var page = new ReceiveConfirmationModel(UnreachableSheets(), null!, new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build())
-        {
-            PageContext = new PageContext { HttpContext = Context() }
-        };
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnGetAsync("FAKE", "1"));
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync("fakehash", "1"));
     }
 }

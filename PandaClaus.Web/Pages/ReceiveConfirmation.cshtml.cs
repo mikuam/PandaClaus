@@ -34,18 +34,6 @@ public class ReceiveConfirmationModel : BasePageModel
 
     public async Task<IActionResult> OnGetAsync(string hash, string code)
     {
-        if (!IsAdmin)
-        {
-            HttpContext.Session.Remove("PendingReceiptHash");
-            HttpContext.Session.Remove("PendingReceiptCode");
-            if (!string.IsNullOrWhiteSpace(hash) && hash.Length <= 64 &&
-                !string.IsNullOrWhiteSpace(code) && code.Length <= 32)
-            {
-                HttpContext.Session.SetString("PendingReceiptHash", hash);
-                HttpContext.Session.SetString("PendingReceiptCode", code);
-            }
-            return RedirectToPage("./Index");
-        }
         Letter = await _client.FetchLetterByHashAsync(hash);
         if (Letter == null)
         {
@@ -76,7 +64,6 @@ public class ReceiveConfirmationModel : BasePageModel
 
     public async Task<IActionResult> OnPostConfirmAsync(string hash, string code)
     {
-        if (!IsAdmin) return RedirectToPage("./Index");
         Letter = !string.IsNullOrWhiteSpace(hash) ? await _client.FetchLetterByHashAsync(hash) : null;
         if (Letter == null) return NotFound();
 

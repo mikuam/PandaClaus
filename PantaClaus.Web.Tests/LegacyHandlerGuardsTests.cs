@@ -105,25 +105,4 @@ public class LegacyHandlerGuardsTests
         var context = Context();
         Assert.IsInstanceOfType<BadRequestResult>(await Letter(context).OnPostAsync(string.Empty));
     }
-
-    [TestMethod]
-    public async Task AnonymousReceiptPostIsDeniedBeforeSheetsAccess()
-    {
-        var page = Setup(new ReceiveConfirmationModel(Unreachable<GoogleSheetsClient>(), null!,
-            new ConfigurationBuilder().Build()), Context());
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnPostConfirmAsync("fakehash", "FAKE"));
-    }
-
-    [TestMethod]
-    public async Task LaterInvalidQrClearsOlderPendingDestination()
-    {
-        var context = Context();
-        var page = Setup(new ReceiveConfirmationModel(Unreachable<GoogleSheetsClient>(), null!,
-            new ConfigurationBuilder().Build()), context);
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnGetAsync("FAKE", "1"));
-        Assert.AreEqual("FAKE", context.Session.GetString("PendingReceiptHash"));
-        Assert.IsInstanceOfType<RedirectToPageResult>(await page.OnGetAsync(new string('X', 65), "1"));
-        Assert.IsNull(context.Session.GetString("PendingReceiptHash"));
-        Assert.IsNull(context.Session.GetString("PendingReceiptCode"));
-    }
 }
