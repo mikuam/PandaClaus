@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PandaClaus.Web.Pages;
 public class ConfirmationModel : BasePageModel
@@ -13,6 +12,7 @@ public class ConfirmationModel : BasePageModel
         if (string.IsNullOrWhiteSpace(hash) ||
             !string.Equals(HttpContext.Session.GetString("ReservedLetterHash"), hash, StringComparison.OrdinalIgnoreCase))
             return NotFound();
+
         Letter = await _client.FetchLetterByHashAsync(hash);
         return Letter == null ? NotFound() : Page();
     }
