@@ -17,13 +17,13 @@ public class CombinedStatusTests
     }
 
     [TestMethod]
-    public void LegacyCheckedStatusRemainsReadableButCannotBeSelected()
+    public void CheckedStatusIsRemovedWithoutRenumberingRemainingStatuses()
     {
-        Assert.IsTrue(Enum.TryParse<LetterStatus>("SPRAWDZONE", out var legacy));
-        Assert.AreEqual(4, (int)legacy);
-        Assert.AreEqual("Paczki sprawdzone (do spakowania)", StatusHelper.GetStatusDescription(legacy));
-        Assert.IsFalse(StatusHelper.IsSelectableStatus(legacy));
+        Assert.IsFalse(Enum.TryParse<LetterStatus>("SPRAWDZONE", out _));
+        Assert.AreEqual(5, (int)LetterStatus.SPAKOWANE);
+        Assert.AreEqual(6, (int)LetterStatus.ZAADRESOWANE);
         Assert.IsTrue(StatusHelper.IsSelectableStatus(LetterStatus.SPAKOWANE));
+        Assert.IsFalse(StatusHelper.IsSelectableStatus((LetterStatus)4));
     }
 
     [TestMethod]

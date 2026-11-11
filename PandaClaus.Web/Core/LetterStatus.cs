@@ -6,7 +6,6 @@ public enum LetterStatus
     DOSTARCZONE = 1,
     W_TRAKCIE_SPRAWDZANIA = 2,
     ODLOZONE = 3,
-    SPRAWDZONE = 4,
     SPAKOWANE = 5,
     ZAADRESOWANE = 6
 }
