@@ -61,7 +61,7 @@ public class StatusUpdateModel : BasePageModel
         var hash = Request.Form["hash"].ToString();
         if (string.IsNullOrWhiteSpace(hash) ||
             !Enum.TryParse<LetterStatus>(Request.Query["status"].ToString(), out var status) ||
-            !StatusHelper.IsSelectableStatus(status))
+            !Enum.IsDefined(status))
             return BadRequest();
 
         Letter = await _client.FetchLetterByHashAsync(hash);

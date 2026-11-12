@@ -22,8 +22,8 @@ public class CombinedStatusTests
         Assert.IsFalse(Enum.TryParse<LetterStatus>("SPRAWDZONE", out _));
         Assert.AreEqual(5, (int)LetterStatus.SPAKOWANE);
         Assert.AreEqual(6, (int)LetterStatus.ZAADRESOWANE);
-        Assert.IsTrue(StatusHelper.IsSelectableStatus(LetterStatus.SPAKOWANE));
-        Assert.IsFalse(StatusHelper.IsSelectableStatus((LetterStatus)4));
+        Assert.IsTrue(Enum.IsDefined(LetterStatus.SPAKOWANE));
+        Assert.IsFalse(Enum.IsDefined((LetterStatus)4));
     }
 
     [TestMethod]
