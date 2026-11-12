@@ -2,9 +2,6 @@
 
 public static class StatusHelper
 {
-    public static bool IsSelectableStatus(LetterStatus status) =>
-        Enum.IsDefined(status);
-
     public static string GetStatusDescription(LetterStatus status)
     {
         return status switch

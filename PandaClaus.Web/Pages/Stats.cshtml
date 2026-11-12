@@ -41,14 +41,6 @@
         </div>
         <div class="container-xxl bg-white pt-2">
             <div class="text-center">
-                <p class="h2 text-center">Listy sprawdzone: @Model.Statistics.Sprawdzone / @Model.Statistics.Letters</p>
-            </div>
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: @Model.Statistics.SprawdzonePercentage%" aria-valuenow="@Model.Statistics.SprawdzonePercentage" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
-        <div class="container-xxl bg-white pt-2">
-            <div class="text-center">
                 <p class="h2 text-center">Listy spakowane: @Model.Statistics.Spakowane / @Model.Statistics.Letters</p>
             </div>
             <div class="progress">
@@ -66,16 +58,6 @@
 
         <div class="container-xxl bg-white pt-5">
             <div class="row text-center">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-header">
-                            <p class="h5">Listów do sprawdzenia</p>
-                        </div>
-                        <div class="card-body">
-                            <p class="stats-card text-primary">@Model.Statistics.DoSprawdzenia</p>
-                        </div>
-                    </div>
-                </div>
                 <div class="col">
                     <div class="card">
                         <div class="card-header">

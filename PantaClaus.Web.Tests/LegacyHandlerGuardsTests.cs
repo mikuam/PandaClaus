@@ -108,11 +108,13 @@ public class LegacyHandlerGuardsTests
     }
 
     [TestMethod]
-    public async Task LegacyCheckedStatusCannotBeWrittenEvenWithForgedPost()
+    [DataRow("SPRAWDZONE")]
+    [DataRow("4")]
+    public async Task RemovedCheckedStatusCannotBeWrittenEvenWithForgedPost(string status)
     {
         var context = Context();
         context.Session.SetString("IsAdmin", "true");
-        context.Request.QueryString = new QueryString("?status=SPRAWDZONE");
+        context.Request.QueryString = new QueryString($"?status={status}");
         context.Request.Form = new FormCollection(new Dictionary<string, StringValues>
         {
             ["hash"] = "synthetic-hash"
