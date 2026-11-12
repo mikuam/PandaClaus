@@ -59,40 +59,37 @@ public class StatusUpdateModel : BasePageModel
     {
         if (!IsAdmin) return RedirectToPage("./Index");
         var hash = Request.Form["hash"].ToString();
-        if (!string.IsNullOrWhiteSpace(hash) &&
-            Enum.TryParse<LetterStatus>(Request.Query["status"].ToString(), out var status) &&
-            Enum.IsDefined(status))
+        if (string.IsNullOrWhiteSpace(hash) ||
+            !Enum.TryParse<LetterStatus>(Request.Query["status"].ToString(), out var status) ||
+            !StatusHelper.IsSelectableStatus(status))
+            return BadRequest();
+
+        Letter = await _client.FetchLetterByHashAsync(hash);
+        if (Letter == null) return NotFound();
+        var uwagi = Request.Form["uwagi"].ToString();
+        if (status == LetterStatus.SPAKOWANE && GetPackageSize("package1Size") == Gabaryt.None)
         {
-            Letter = await _client.FetchLetterByHashAsync(hash);
-            if (Letter == null) return NotFound();
-            var uwagi = Request.Form["uwagi"].ToString();
-            if (status == LetterStatus.SPAKOWANE && GetPackageSize("package1Size") == Gabaryt.None)
-            {
-                return RedirectToPage("./StatusUpdate", new { hash, message = "Podaj gabaryt co najmniej pierwszej paczki" });
-            }
-            var previousStatus = Letter.Status;
-            await _client.UpdateStatus(hash, status, uwagi);
-            if (status == LetterStatus.DOSTARCZONE)
-            {
-                await _emailSender.SendPackageReceived(hash);
-            }
+            return RedirectToPage("./StatusUpdate", new { hash, message = "Podaj gabaryt co najmniej pierwszej paczki" });
+        }
+        var previousStatus = Letter.Status;
+        await _client.UpdateStatus(hash, status, uwagi);
+        if (status == LetterStatus.DOSTARCZONE)
+        {
+            await _emailSender.SendPackageReceived(hash);
+        }
 
-            if (status == LetterStatus.ZAADRESOWANE && previousStatus != LetterStatus.ZAADRESOWANE)
-            {
-                await _emailSender.SendPackageAddressed(hash);
-            }
+        if (status == LetterStatus.ZAADRESOWANE && previousStatus != LetterStatus.ZAADRESOWANE)
+        {
+            await _emailSender.SendPackageAddressed(hash);
+        }
 
-            if (status == LetterStatus.SPAKOWANE)
-            {
-                Letter = await _client.FetchLetterByHashAsync(hash);
-
-                var package1Size = GetPackageSize("package1Size");
-                var package2Size = GetPackageSize("package2Size");
-                var package3Size = GetPackageSize("package3Size");
-
-                var packages = new List<Gabaryt> { package1Size, package2Size, package3Size }.Where(p => p != Gabaryt.None);
-                await _client.CreatePackages(Letter.Number, packages);
-            }
+        if (status == LetterStatus.SPAKOWANE)
+        {
+            var package1Size = GetPackageSize("package1Size");
+            var package2Size = GetPackageSize("package2Size");
+            var package3Size = GetPackageSize("package3Size");
+            var packages = new List<Gabaryt> { package1Size, package2Size, package3Size }.Where(p => p != Gabaryt.None);
+            await _client.CreatePackages(Letter.Number, packages);
         }
 
         return RedirectToPage("./StatusUpdate", new { hash, message = "Status zaktualizowany pomyślnie" });
@@ -101,7 +98,7 @@ public class StatusUpdateModel : BasePageModel
     private Gabaryt GetPackageSize(string parameterName)
     {
         return string.IsNullOrWhiteSpace(Request.Form[parameterName].ToString())
-            ? Package1Size
+            ? Gabaryt.None
             : Enum.Parse<Gabaryt>(Request.Form[parameterName].ToString());
     }
 }

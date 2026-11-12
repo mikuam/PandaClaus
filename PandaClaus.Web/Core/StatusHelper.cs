@@ -2,6 +2,9 @@
 
 public static class StatusHelper
 {
+    public static bool IsSelectableStatus(LetterStatus status) =>
+        Enum.IsDefined(status);
+
     public static string GetStatusDescription(LetterStatus status)
     {
         return status switch
@@ -10,8 +13,7 @@ public static class StatusHelper
             LetterStatus.DOSTARCZONE => "Dostarczono paczki",
             LetterStatus.W_TRAKCIE_SPRAWDZANIA => "Paczki w trakcie sprawdzania",
             LetterStatus.ODLOZONE => "Paczki odłożone do ponownego sprawdzenia",
-            LetterStatus.SPRAWDZONE => "Paczki sprawdzone",
-            LetterStatus.SPAKOWANE => "Paczki spakowane",
+            LetterStatus.SPAKOWANE => "Paczki sprawdzone i spakowane",
             LetterStatus.ZAADRESOWANE => "Paczki zaadresowane",
             _ => string.Empty
         };

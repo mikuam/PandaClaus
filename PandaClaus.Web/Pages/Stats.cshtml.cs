@@ -26,8 +26,8 @@ namespace PandaClaus.Web.Pages
             var dostarczone = letters.Count(l => l.Status >= LetterStatus.DOSTARCZONE);
             var wTrakcieSprawdzania = letters.Count(l => l.Status >= LetterStatus.W_TRAKCIE_SPRAWDZANIA);
             var odlozone = letters.Count(l => l.Status == LetterStatus.ODLOZONE);
-            var sprawdzone = letters.Count(l => l.Status >= LetterStatus.SPRAWDZONE);
-            var doSprawdzenia = letters.Count(l => l.Status < LetterStatus.SPRAWDZONE);
+            var sprawdzone = letters.Count(l => l.Status >= LetterStatus.SPAKOWANE);
+            var doSprawdzenia = letters.Count(l => l.Status < LetterStatus.SPAKOWANE);
             var spakowane = letters.Count(l => l.Status >= LetterStatus.SPAKOWANE);
             var zaadresowane = letters.Count(l => l.Status >= LetterStatus.ZAADRESOWANE);
 
