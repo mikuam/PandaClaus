@@ -16,6 +16,13 @@ public class IndexModel : BasePageModel
     public string ButtonFiltersReserved = "btn-outline-primary";
     public string ButtonFiltersAvailable = "btn-outline-primary";
 
+    public static string GetListCountLabel(string filter) => filter switch
+    {
+        "available" => "Dostępne listy",
+        "reserved" => "Zarezerwowane listy",
+        _ => "Wszystkie listy"
+    };
+
     public IndexModel(GoogleSheetsClient client, IConfiguration configuration)
     {
         _client = client;
